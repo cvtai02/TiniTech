@@ -15,10 +15,8 @@ init-domain:
 init-application:
 	dotnet new classlib -n Application
 	powershell -Command "Remove-Item './Application/Class1.cs' -Force -ErrorAction SilentlyContinue"
-	mkdir .\Application\Interfaces
-	mkdir .\Application\DTOs
-	mkdir .\Application\Validators 
-	mkdir .\Application\Behaviors 
+	mkdir .\Application\Common
+	mkdir .\Application\Common\Behaviors
 	dotnet add Application/Application.csproj package Microsoft.Extensions.Hosting
 	dotnet add Application/Application.csproj package Microsoft.EntityFrameworkCore
 	dotnet add Application/Application.csproj package FluentValidation.DependencyInjectionExtensions
@@ -26,12 +24,9 @@ init-application:
 init-infrastructure:
 	dotnet new classlib -n Infrastructure
 	powershell -Command "Remove-Item './Infrastructure/Class1.cs' -Force -ErrorAction SilentlyContinue"
-	mkdir .\Infrastructure\Services
-	mkdir .\Infrastructure\Configurations
-	mkdir .\Infrastructure\Mediatr
 	mkdir .\Infrastructure\Data
 	dotnet add Infrastructure/Infrastructure.csproj package Npgsql.EntityFrameworkCore.PostgreSQL
-
+	dotnet add Infrastructure/Infrastructure.csproj package Microsoft.EntityFrameworkCore.SqlServer
 
 init-webapi:
 	dotnet new webapi -n WebAPI
@@ -59,7 +54,7 @@ init-solution:
 	dotnet new gitignore
 	dotnet sln add WebAPI\WebAPI.csproj
 	dotnet sln add WebMVC\WebMVC.csproj
-	dotnet sln add UnitTest\UnitTest.csproj
+	dotnet sln add UnitTests\UnitTests.csproj
 	dotnet sln add CrossCutting\CrossCutting.csproj
 	dotnet sln add Domain\Domain.csproj
 	dotnet sln add Application\Application.csproj
@@ -86,3 +81,10 @@ init-monolith:
 	make init-webmvc
 	make init-unit-tests
 	make init-solution
+
+run-webapi:
+	dotnet run --project WebAPI/WebAPI.csproj
+run-webmvc:
+	dotnet run --project WebMVC/WebMVC.csprojư
+run-unit-tests:
+	dotnet test --project UnitTests/UnitTests.csproj --no-build --verbosity normal --filter "Category=Unit"
