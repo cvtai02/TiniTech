@@ -1,0 +1,13 @@
+@Api_HostAddress = http://localhost:5045
+
+POST {{Api_HostAddress}}/api/auth/login
+Accept: */*
+Content-Type: application/json
+
+{
+  "email": "cvtai21@gmail.com",
+  "password": "string",
+  "role": "string"
+}
+
+###
