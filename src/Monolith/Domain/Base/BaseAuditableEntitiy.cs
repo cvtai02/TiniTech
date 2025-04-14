@@ -1,5 +1,9 @@
 namespace Domain.Base;
 
+// <summary>
+// Used to track the creation and modification of an entity.
+// Or need to order by creation date or modification date.
+// </summary>
 public abstract class BaseAuditableEntity : BaseEntity
 {
     public DateTimeOffset Created { get; set; }
