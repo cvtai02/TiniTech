@@ -34,5 +34,5 @@ public class CategoryController : ApiController
             e => HandleFailure<CreateCategoryCommand>(e)
         );
     }
-   
+
 }

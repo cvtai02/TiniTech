@@ -8,6 +8,7 @@ public class VariantPrimaryAttribute : BaseEntity
     public int AttributeId { get; set; }
     public string Value { get; set; } = null!;
     public string ImageUrl { get; set; } = null!;
-    public Attribute? Attribute { get; set; } = null!;
+    public AttributeEntity? Attribute { get; set; } = null!;
+    public ProductVariant? ProductVariant { get; set; } = null!;
 }
 

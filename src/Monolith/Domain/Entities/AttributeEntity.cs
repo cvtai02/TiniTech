@@ -6,7 +6,7 @@ using Domain.Base;
 
 namespace Domain.Entities;
 
-public class Attribute : BaseEntity
+public class AttributeEntity : BaseEntity
 {
     public string Name { get; set; } = null!;
 }

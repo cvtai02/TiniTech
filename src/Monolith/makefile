@@ -20,6 +20,7 @@ init-application:
 	dotnet add Application/Application.csproj package Microsoft.Extensions.Hosting
 	dotnet add Application/Application.csproj package Microsoft.EntityFrameworkCore
 	dotnet add Application/Application.csproj package FluentValidation.DependencyInjectionExtensions
+	dotnet add Application/Application.csproj package Microsoft.AspNetCore.Http.Abstractions
 
 init-infrastructure:
 	dotnet new classlib -n Infrastructure
@@ -88,3 +89,16 @@ run-webmvc:
 	dotnet run --project WebMVC/WebMVC.csprojư
 run-unit-tests:
 	dotnet test --project UnitTests/UnitTests.csproj --no-build --verbosity normal --filter "Category=Unit"
+
+
+name = $(shell basename $(shell pwd))
+
+migration-add:
+	dotnet ef migrations add $(name) --project Infrastructure -o Data/Migrations --startup-project WebAPI
+
+migration-update:
+	dotnet ef database update --project Infrastructure --startup-project WebAPI
+	
+migration-addup:
+	dotnet ef migrations add $(name) --project Infrastructure -o Data/Migrations --startup-project WebAPI
+	dotnet ef database update --project Infrastructure --startup-project WebAPI

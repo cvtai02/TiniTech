@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Constants;
 
-public static class Role
+public static class Roles
 {
     public const string Admin = "Admin";
     public const string Customer = "Customer";

@@ -6,9 +6,11 @@ using Domain.Base;
 
 namespace Domain.Entities;
 
-public class VariantMetric :  BaseEntity
+public class VariantMetric : BaseEntity
 {
     public int ProductVariantId { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
+
+    public ProductVariant? ProductVariant { get; set; } = null!;
 }

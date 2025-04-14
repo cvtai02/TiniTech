@@ -7,7 +7,7 @@ public class ProductMetric : BaseEntity
     public int ProductId { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
-    public float Rating { get; set; }
+    public float RatingAvg { get; set; }
     public int RatingCount { get; set; }
     public int ViewCount { get; set; }
     public int LowestPrice { get; set; }

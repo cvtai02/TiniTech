@@ -13,6 +13,6 @@ public class Product : BaseAuditableEntity
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string Slug { get; set; } = null!;
-    public Category? Category { get; set; }
-    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new HashSet<ProductVariant>();
+    public IList<Category> Category { get; set; } = [];
+    public virtual IList<ProductVariant> ProductVariants { get; set; } = [];
 }
