@@ -4,7 +4,7 @@ import Header from './header';
 import { Outlet } from 'react-router-dom';
 const Layout: React.FC = () => {
   return (
-    <div>
+    <div className="flex flex-row w-screen bg-gray-50">
       <Header />
       <Outlet />
     </div>

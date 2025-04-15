@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { User } from '../types/types';
+import { User } from '../types';
 // export const AppContext: = createContext(); // Tạo context mới
 
 export class Auth {
@@ -22,17 +22,13 @@ export class Auth {
   }
 
   login(user: User, expiresAt: Date): void {
-    if (expiresAt <= new Date()) {
-      throw new Error('Expiration date must be in the future');
-    }
-    if (!user) {
-      throw new Error('User is required for login');
-    }
-    if (!expiresAt) {
-      throw new Error('Expiration date is required for login');
-    }
-    if (!(expiresAt instanceof Date)) {
-      throw new Error('Expiration date must be a Date object');
+    if (
+      !expiresAt ||
+      !(expiresAt instanceof Date) ||
+      expiresAt <= new Date() ||
+      !user
+    ) {
+      console.log('Unauthorized');
     }
 
     this.expiresAt = expiresAt;
