@@ -18,16 +18,17 @@
     -   Tai nghe
     -   Kính
 
--   Mèo
+-   Boss
 
     -   Thức ăn
     -   Bàn cào
     -   Bàn chải
     -   Cát
 
--   Thực phẩm (những thực phẩm có hạn sử dụng dài)
+-   Thức uống
     -   Cà phê rang xay
     -   Trà
+    -   Ly
 
 ### Mỗi product tham chiếu tới duy nhất 1 category, mục đích là khi thêm category, không cần phải duyệt lại products cũ để thêm vào category mới, đồng thời cũng giúp việc tìm kiếm dựa trên category trở nên dễ dàng hơn.
 

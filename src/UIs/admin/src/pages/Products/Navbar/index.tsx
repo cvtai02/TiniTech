@@ -97,7 +97,7 @@ const CategoryNavbar: React.FC = () => {
       <div className="">
         <img src={logo} alt="Logo" className="h-12 w-12" />
       </div>
-      <ul className="flex gap-16 text-white px-6 py-4">
+      <ul className="flex gap-16 text-black px-6 py-4">
         {mockCategories.map((category) => (
           <li className="relative group" key={category.id}>
             <button

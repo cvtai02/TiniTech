@@ -25,6 +25,9 @@ const CategoriesPage = () => {
 
   return (
     <section className="container p-8 mx-auto">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Quản lý danh mục</h1>
+      </header>
       {data.map((category) => (
         <div key={category.id} className="mb-8">
           <div className="flex items-center gap-x-3 justify-between">

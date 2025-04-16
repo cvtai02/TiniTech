@@ -13,3 +13,11 @@ export interface Category {
   parentId?: string;
   subcategories?: Category[];
 }
+
+export interface Product {
+  name: string;
+  price: string;
+  rating: number;
+  reviews: number;
+  image: string;
+}

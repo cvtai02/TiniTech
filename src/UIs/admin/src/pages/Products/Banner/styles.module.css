@@ -1,0 +1,5 @@
+.bg {
+  background: linear-gradient(to bottom right, #f0ceb5, #f0bd24);
+  border-radius: 2rem 2rem 2rem 2rem;
+  border-bottom-right-radius: 18rem 18rem;
+}

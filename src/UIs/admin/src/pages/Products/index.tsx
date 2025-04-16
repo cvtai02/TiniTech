@@ -1,21 +1,24 @@
 import React from 'react';
 import CategoryNavbar from './Navbar';
+import FeaturedProduct from './FeaturedProduct';
+import Banner from './Banner';
+import styles from './styles.module.css';
 const ProductsPage: React.FC = () => {
   return (
-    <div className="grow bg-transparent text-black flex flex-col">
-      <div className="w-full items-center basis-16 bg-black flex gap-4">
+    <div
+      className={`grow  text-black flex flex-col bg-[#F9F7F7] ${styles.fontText}`}
+    >
+      <div className="w-full items-center basis-16 bg-transparent flex gap-4">
         <CategoryNavbar />
       </div>
 
-      <div className="w-full basis-1/2 flex gap-4 bg-amber-100">
-        Advertise slice
+      <div className="w-full h-[36rem] flex bg-transparent p-8 ">
+        <Banner />
       </div>
 
-      <div className="w-full basis-2xs flex gap-4 bg-amber-300">
-        Sản phẩm nổi bật
+      <div className="w-full flex gap-4 ">
+        <FeaturedProduct></FeaturedProduct>
       </div>
-
-      <div className="w-full flex gap-4 bg-amber-600"></div>
     </div>
   );
 };

@@ -1,0 +1,22 @@
+@theme {
+  --color-light: oklch(0.9782, 0.0037, 326.64);
+  --color-muted: oklch(0.9291, 0.0352, 258.37);
+  --color-primary: oklch(0.5881, 0.1714, 263.84);
+  --color-dark: oklch(0.3209, 0.0669, 264.31);
+
+  --font-sans:
+    'Itim', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@font-face {
+  font-family: 'Itim';
+  font-style: normal;
+  font-weight: 400;
+  src: url('https://fonts.googleapis.com/css2?family=Itim&display=swap')
+    format('truetype');
+}
+
+.fontText {
+  font-family: 'Itim', sans-serif;
+}

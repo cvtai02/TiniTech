@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import ProductsPage from './pages/Products';
 import CategoriesPage from './pages/Categories';
 import UsersPage from './pages/Users';
+import ImportGoodsPage from './pages/Import';
 
 const routes = createRoutesFromElements(
   <>
@@ -23,6 +24,7 @@ const routes = createRoutesFromElements(
       <Route path="products" element={<ProductsPage />} />,
       <Route path="categories" element={<CategoriesPage />} />,
       <Route path="users" element={<UsersPage />} />,
+      <Route path="import" element={<ImportGoodsPage />} />,
       <Route element={<PrivateRoute requiredRole="Admin" />}></Route>
     </Route>
 

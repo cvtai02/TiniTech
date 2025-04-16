@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 const Header: React.FC = () => {
   return (
-    <header className="h-screen w-64 bg-transparent text-black flex flex-col border-r border-gray-400 shadow-lg">
+    <header className="h-screen fixed w-64 bg-transparent text-black basis-64 flex flex-col border-r border-gray-400 shadow-lg">
       <div className="text-2xl font-bold p-4 border-b border-gray-300 shadow-sm">
         TiniTech
       </div>
@@ -79,6 +79,18 @@ const Header: React.FC = () => {
               }
             >
               Đánh giá & Tin nhắn
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/import"
+              className={({ isActive }) =>
+                `block py-2 px-4 rounded hover:bg-gray-700 ${
+                  isActive ? 'bg-gray-700' : ''
+                }`
+              }
+            >
+              Nhập kho
             </NavLink>
           </li>
         </ul>
