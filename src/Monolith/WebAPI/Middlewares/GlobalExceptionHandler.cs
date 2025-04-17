@@ -42,6 +42,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
             NotImplementedException => (501, "This api is still under development"),
             OperationCanceledException => (499, "Client closed request"),
             AccessViolationException => (500, "Access violation"),
+            
 
             _ => (500, "An unhandled error occurred")
         };

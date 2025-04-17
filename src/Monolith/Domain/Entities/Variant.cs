@@ -6,13 +6,12 @@ using Domain.Base;
 
 namespace Domain.Entities;
 
-public class ProductVariant : BaseEntity
+public class Variant : BaseAuditableEntity
 {
     public int ProductId { get; set; }
     public int Price { get; set; }
     public string SKU { get; set; } = null!;
     public Product? Product { get; set; } = null!;
-    public virtual ICollection<VariantPrimaryAttribute> VariantPrimaryAttributes { get; set; } = [];
     public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } = [];
 }
 

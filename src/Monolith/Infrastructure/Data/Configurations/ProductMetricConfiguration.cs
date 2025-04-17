@@ -12,6 +12,5 @@ public class ProductMetricConfiguration : IEntityTypeConfiguration<ProductMetric
             .HasColumnType("decimal(3, 2)")
             .HasDefaultValue(0.0f);
 
-
     }
 }

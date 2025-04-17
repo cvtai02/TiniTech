@@ -12,10 +12,6 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
 {
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
-        builder.Property(ci => ci.Quantity)
-            .IsRequired()
-            .HasDefaultValue(1);
-
         builder.HasIndex(ci => ci.UserId)
             .IsUnique()
             .HasDatabaseName("IX_CartItem_UserId");

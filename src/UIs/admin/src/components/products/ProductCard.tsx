@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Product } from '../../types';
+import { ProductBrief } from '../../types';
 import { MdDelete, MdEdit, MdMoreVert } from 'react-icons/md';
 interface ProductCardProps {
-  product: Product;
+  product: ProductBrief;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {

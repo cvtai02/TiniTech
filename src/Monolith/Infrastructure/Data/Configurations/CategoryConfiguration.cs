@@ -21,8 +21,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .OnDelete(DeleteBehavior.Restrict); // Prevents cascading delete to avoid deleting all subcategories when a parent is deleted
 
         builder.HasMany(e => e.Products)
-            .WithMany(e => e.Category)
-            .UsingEntity(j => j.ToTable("CategoryProducts"));
+            .WithOne(e => e.Category)
+            .OnDelete(DeleteBehavior.Restrict); // Prevents cascading delete to avoid deleting all products when a category is deleted
 
         builder.HasIndex(e => e.Slug)
             .IsUnique()

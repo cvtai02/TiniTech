@@ -20,11 +20,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.HasMany(p => p.ProductVariants)
-            .WithOne(v => v.Product)
-            .HasForeignKey(v => v.ProductId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasIndex(p => p.Slug)
             .IsUnique()
             .HasDatabaseName("IX_Product_Slug");
@@ -32,6 +27,5 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Slug)
             .IsRequired()
             .HasMaxLength(200);
-
     }
 }

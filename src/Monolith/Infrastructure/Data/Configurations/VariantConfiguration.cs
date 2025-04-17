@@ -8,23 +8,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Data.Configurations;
 
-public class ProductVariantConfiguration : IEntityTypeConfiguration<ProductVariant>
+public class VariantConfiguration : IEntityTypeConfiguration<Variant>
 {
-    public void Configure(EntityTypeBuilder<ProductVariant> builder)
+    public void Configure(EntityTypeBuilder<Variant> builder)
     {
         builder.Property(v => v.SKU)
             .HasMaxLength(100)
             .IsRequired();
 
         builder.HasMany(v => v.VariantAttributes)
-            .WithOne(va => va.ProductVariant)
-            .HasForeignKey(va => va.ProductVariantId)
+            .WithOne(va => va.Variant)
+            .HasForeignKey(va => va.VariantId)
             .OnDelete(DeleteBehavior.Cascade);
-        builder.HasMany(v => v.VariantPrimaryAttributes)
-            .WithOne(vpa => vpa.ProductVariant)
-            .HasForeignKey(vpa => vpa.ProductVariantId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-
     }
 }

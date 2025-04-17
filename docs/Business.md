@@ -42,3 +42,26 @@
 -   Crud Product
 -   View Orders
 -   View rating and message
+-   Thêm sản phẩm: hiện form thêm sản phẩm gồm:
+
+    -   tên sản phẩm, thương hiệu, slug có giá trị mặc định <ten-san-pham>, mô tả.
+    -   selection box để chọn category
+    -   chọn primary attribute
+    -   chọn attribute khác
+    -   image mặc định
+    -   Hoàn thành
+
+-   Feature: Add Product Variant
+-   Description: Enable users to add a new product variant with an intuitive and flexible UI/UX.
+-   Functional Requirements:
+    -   Product Selection:
+        -   Suggest recently added products (tracked via cookies)
+        -   Allow search by product name or slug
+    -   Attribute Management:
+        -   Display existing attributes and their values
+        -   Allow users to:
+            -   Add new attributes or values
+            -   Edit existing attributes or values
+            -   Delete attributes or values
+    -   User Experience:
+        -   Minimize user input where possible through suggestions and auto-complete

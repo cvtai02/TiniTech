@@ -14,5 +14,6 @@ public class Product : BaseAuditableEntity
     public int CategoryId { get; set; }
     public string Slug { get; set; } = null!;
     public Category? Category { get; set; }
-    public virtual IList<ProductVariant> ProductVariants { get; set; } = [];
+    public IList<ProductImage> Images { get; set; } = new List<ProductImage>();
+    public virtual IList<Variant> Variants { get; set; } = [];
 }

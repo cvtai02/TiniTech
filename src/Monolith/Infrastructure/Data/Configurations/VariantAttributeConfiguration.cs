@@ -12,8 +12,6 @@ public class VariantAttributeConfiguration : IEntityTypeConfiguration<VariantAtt
 {
     public void Configure(EntityTypeBuilder<VariantAttribute> builder)
     {
-        builder.Property(v => v.Value)
-            .HasMaxLength(50)
-            .IsRequired();
+
     }
 }

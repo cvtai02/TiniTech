@@ -8,9 +8,9 @@ namespace Domain.Entities;
 
 public class VariantMetric : BaseEntity
 {
-    public int ProductVariantId { get; set; }
+    public int VariantId { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
 
-    public ProductVariant? ProductVariant { get; set; } = null!;
+    public Variant? Variant { get; set; } = null!;
 }

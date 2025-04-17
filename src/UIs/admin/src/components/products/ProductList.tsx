@@ -1,9 +1,9 @@
 import React from 'react';
 import ProductCard from './ProductCard';
-import { Product } from '../../types';
+import { ProductBrief } from '../../types';
 
 interface ProductListProps {
-  products: Product[];
+  products: ProductBrief[];
 }
 
 const ProductList: React.FC<ProductListProps> = ({ products }) => {

@@ -8,28 +8,32 @@ namespace Domain.ValueObjects;
 
 public class Address : ValueObject
 {
-    public string Street { get; }
     public string City { get; }
-    public string State { get; }
-    public string PostalCode { get; }
-    public string Country { get; }
+    public string District { get; }
+    public string Ward { get; }
     public string PhoneNumber { get; }
+    public string ReceiverName { get; }
+    public string DetailAddress { get; }
 
-    public Address(string street, string city, string state, string postalCode, string country, string phoneNumber)
+    public Address(string city, string district, string ward, string phoneNumber, string receiverName, string detailAddress)
     {
-        Street = street;
         City = city;
-        State = state;
-        PostalCode = postalCode;
-        Country = country;
+        District = district;
+        Ward = ward;
         PhoneNumber = phoneNumber;
+        ReceiverName = receiverName;
+        DetailAddress = detailAddress;
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
-        throw new NotImplementedException();
+        yield return City.ToLower();
+        yield return District.ToLower();
+        yield return Ward.ToLower();
+        yield return PhoneNumber.ToLower();
+        yield return ReceiverName.ToLower();
+        yield return DetailAddress.ToLower();
     }
 
-    // Optionally override Equals and GetHashCode for value equality
 }
 
