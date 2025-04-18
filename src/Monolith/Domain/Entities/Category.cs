@@ -1,16 +1,35 @@
 
 using Domain.Base;
+using Domain.Enums;
+using Domain.Extensions;
 
 namespace Domain.Entities;
 
 public class Category : BaseAuditableEntity
 {
-    public string Name { get; set; } = string.Empty;
+    private string _name = string.Empty;
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Category name cannot be empty or whitespace.", nameof(value));
+            }
+            else
+            {
+                _name = char.ToUpper(value[0]) + value[1..];
+            }
+            Slug = value.ToSlug(Random.Shared.Next(10000000, 99999999));
+        }
+    }
     public string Description { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
     public int? ParentId { get; set; }
-    public bool IsDeleted { get; set; } = false;
+    public CategoryStatus Status { get; set; } = CategoryStatus.Active;
     public Category? Parent { get; set; }
     public ICollection<Category> Subcategories { get; set; } = [];
     public ICollection<Product> Products { get; set; } = [];

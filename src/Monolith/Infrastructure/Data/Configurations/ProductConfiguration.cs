@@ -20,12 +20,15 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.HasIndex(p => p.Slug)
-            .IsUnique()
-            .HasDatabaseName("IX_Product_Slug");
+        // builder.HasIndex(p => p.Slug)
+        //     .IsUnique()
+        //     .HasDatabaseName("IX_Product_Slug");
+        builder.Ignore(p => p.Id);
+        builder.HasKey(p => p.Slug);
 
         builder.Property(p => p.Slug)
             .IsRequired()
             .HasMaxLength(200);
+
     }
 }

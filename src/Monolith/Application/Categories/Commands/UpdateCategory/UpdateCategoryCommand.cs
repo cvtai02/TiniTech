@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
+using Application.Common.Abstraction;
 using Application.Common.Models;
-using Application.Extensions;
+using Domain.Extensions;
 using MediatR;
 
 namespace Application.Categories.Commands;
@@ -20,9 +15,9 @@ public class UpdateCategoryCommand : IRequest<Result<int>>
 
 public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result<int>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly DbContextAbstract _context;
 
-    public UpdateCategoryCommandHandler(IApplicationDbContext context)
+    public UpdateCategoryCommandHandler(DbContextAbstract context)
     {
         _context = context;
     }
@@ -38,10 +33,8 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         // Update slug if name has changed
         if (entity.Name != request.Name)
         {
-            entity.Slug = request.Name.ToSlug(Random.Shared.Next(10000000, 99999999));
+            entity.Name = request.Name; //avoid changging slug if name is not changed
         }
-
-        entity.Name = request.Name;
         entity.Description = request.Description;
         entity.ParentId = request.ParentId;
 
@@ -49,10 +42,5 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity.Id;
-    }
-
-    private string GetSlugFromName(string name)
-    {
-        return name.ToSlug(Random.Shared.Next(10000000, 99999999));
     }
 }

@@ -1,4 +1,5 @@
-using Application.Common.Interfaces;
+using Application.Common.Abstraction;
+using Infrastructure.CloudinaryService;
 using Infrastructure.Data;
 using Infrastructure.Data.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +24,9 @@ public static class DependencyInjection
             options.AddInterceptors(sprovider.GetServices<ISaveChangesInterceptor>());
             options.UseSqlServer(connectionString);
         });
-        builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitializer>();
-
+        builder.Services.AddScoped<IImageService, CloudinaryImageService>();
         builder.Services.AddSingleton(TimeProvider.System);
     }
 }

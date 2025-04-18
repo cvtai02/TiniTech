@@ -4,16 +4,37 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Base;
 using Domain.Entities;
+using Domain.Enums;
+using Domain.Extensions;
 
 namespace Domain.Entities;
 
 public class Product : BaseAuditableEntity
 {
-    public string Name { get; set; } = string.Empty;
+    private string _name = string.Empty;
+
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Product name cannot be empty or whitespace.", nameof(value));
+            }
+            else
+            {
+                _name = char.ToUpper(value[0]) + value[1..];
+            }
+            Slug = value.ToSlug(Random.Shared.Next(100000000, 999999999));
+        }
+    }
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string Slug { get; set; } = null!;
+    public ProductStatus Status { get; set; } = ProductStatus.Active;
     public Category? Category { get; set; }
-    public IList<ProductImage> Images { get; set; } = new List<ProductImage>();
+    public IList<ProductImage> Images { get; set; } = [];
     public virtual IList<Variant> Variants { get; set; } = [];
+
 }

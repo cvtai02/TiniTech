@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
+using Application.Common.Abstraction;
 using Application.Common.Models;
-using Application.Extensions;
 using Domain.Entities;
+using Domain.Extensions;
 using MediatR;
 
 namespace Application.Categories.Commands;
@@ -19,8 +15,8 @@ public class CreateCategoryCommand : IRequest<Result<int>>
 
 public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<int>>
 {
-    private readonly IApplicationDbContext _context;
-    public CreateCategoryCommandHandler(IApplicationDbContext context)
+    private readonly DbContextAbstract _context;
+    public CreateCategoryCommandHandler(DbContextAbstract context)
     {
         _context = context;
     }
@@ -32,7 +28,6 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
             Name = request.Name,
             Description = request.Description,
             ParentId = request.ParentId,
-            Slug = request.Name.ToSlug(Random.Shared.Next(10000000, 99999999)),
         };
 
         _context.Categories.Add(entity);

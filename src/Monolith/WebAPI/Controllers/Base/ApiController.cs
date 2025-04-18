@@ -51,9 +51,9 @@ public abstract class ApiController : ControllerBase
             new()
             {
                 Title = title,
+                Status = status,
                 // Type = error.Code,
                 Detail = error.Message,
-                Status = status,
                 Extensions = { { nameof(errors), errors } }
             };
 

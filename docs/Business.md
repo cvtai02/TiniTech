@@ -54,6 +54,7 @@
 -   Feature: Add Product Variant
 -   Description: Enable users to add a new product variant with an intuitive and flexible UI/UX.
 -   Functional Requirements:
+
     -   Product Selection:
         -   Suggest recently added products (tracked via cookies)
         -   Allow search by product name or slug
@@ -65,3 +66,16 @@
             -   Delete attributes or values
     -   User Experience:
         -   Minimize user input where possible through suggestions and auto-complete
+
+-   Xóa category:
+
+    -   Chỉ có thể xóa mềm khi không có product nào trực thuộc 'active'. hoặc không có subcategory nào. xóa hẳn sau 30 days
+    -   Có thể recycle
+
+-   Xóa sản phẩm:
+
+    -   Cho vào thùng rác, xóa sau 30 ngày.
+    -   Có thể recycle: Khi recycle, recycle luôn category nếu nó đang deleted
+
+-   Thêm category:
+    -   Name không trùng. Trùng thì thông báo check trong thùng rác

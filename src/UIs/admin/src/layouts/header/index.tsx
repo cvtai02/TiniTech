@@ -54,7 +54,7 @@ const Header: React.FC = () => {
                 }`
               }
             >
-              Sản phẩm
+              Trang bán hàng
             </NavLink>
           </li>
           <li>

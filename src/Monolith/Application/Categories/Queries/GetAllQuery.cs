@@ -1,4 +1,4 @@
-using Application.Common.Interfaces;
+using Application.Common.Abstraction;
 using Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -9,21 +9,13 @@ public class GetAllCategoriesQuery : IRequest<Result<List<CategoryDto>>>
 {
 }
 
-public class CategoryDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
-    public int? ParentId { get; set; }
-    public List<CategoryDto> Subcategories { get; set; } = new List<CategoryDto>();
-}
+
 
 public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuery, Result<List<CategoryDto>>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly DbContextAbstract _context;
 
-    public GetAllCategoriesQueryHandler(IApplicationDbContext context)
+    public GetAllCategoriesQueryHandler(DbContextAbstract context)
     {
         _context = context;
     }
