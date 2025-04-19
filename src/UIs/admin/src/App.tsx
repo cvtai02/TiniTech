@@ -18,6 +18,7 @@ import UsersPage from './pages/Users';
 import ImportGoodsPage from './pages/Import';
 import AddProductPage from './pages/AddProduct';
 import AddProductVariantPage from './pages/AddVariant';
+import NotFoundPage from './pages/NotFoundPage';
 
 const routes = createRoutesFromElements(
   <>
@@ -29,6 +30,7 @@ const routes = createRoutesFromElements(
       <Route path="import" element={<ImportGoodsPage />} />,
       <Route path="import/new-product" element={<AddProductPage />} />,
       <Route path="import/new-variant" element={<AddProductVariantPage />} />,
+      <Route path="*" element={<NotFoundPage />}></Route>
       <Route element={<PrivateRoute requiredRole="Admin" />}></Route>
     </Route>
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Application.Common.Abstraction;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +21,11 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUser, CurrentUser>();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>()
             .AddProblemDetails()
-            .AddControllers();
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
 
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

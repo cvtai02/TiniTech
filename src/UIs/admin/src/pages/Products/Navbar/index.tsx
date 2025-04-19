@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaEdit } from 'react-icons/fa';
-import logo from '../../../assets/logo.svg';
+import logo from '../../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 
 export const mockCategories = [

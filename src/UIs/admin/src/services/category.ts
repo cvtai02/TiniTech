@@ -1,5 +1,5 @@
 // api/category.ts
-import { Category } from '../types';
+import { Category } from '../types/category';
 import { Response } from './response';
 import { apiFetch } from './wrappers';
 
@@ -160,11 +160,13 @@ export const updateCategory = async (
   return body.data;
 };
 
-export const deleteCategory = async (
+export const updateCategoryStatus = async (
   id: string,
+  status: 'Active' | 'Deleted',
 ): Promise<Response<boolean>> => {
-  const res = await apiFetch(`${API_URL}/api/categories/${id}`, {
-    method: 'DELETE',
+  const res = await apiFetch(`${API_URL}/api/categories/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ id, status }),
   });
 
   if (!res.ok) throw new Error('Failed to delete category');

@@ -1,11 +1,26 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import {
+  FaHome,
+  FaShoppingCart,
+  FaFolder,
+  FaStore,
+  FaUsers,
+  FaComments,
+  FaBoxOpen,
+} from 'react-icons/fa';
 
 const Header: React.FC = () => {
   return (
     <header className="h-screen fixed w-64 bg-transparent text-black basis-64 flex flex-col border-r border-gray-400 shadow-lg">
-      <div className="text-2xl font-bold p-4 border-b border-gray-300 shadow-sm">
-        TiniTech
+      <div
+        className="text-3xl font-bold p-4 border-b border-gray-300 shadow-sm pl-8 "
+        style={{
+          fontFamily: "'EB Garamond', serif",
+          transform: 'skewX(-8deg)',
+        }}
+      >
+        <span style={{ color: '#f0bd24' }}>Tini</span>Tech
       </div>
       <nav className="flex-grow">
         <ul className="flex flex-col space-y-2 p-4">
@@ -13,11 +28,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaHome className="w-5 h-5 mr-2" />
               Dashboard
             </NavLink>
           </li>
@@ -25,11 +41,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/orders"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaShoppingCart className="w-5 h-5 mr-2" />
               Đơn hàng
             </NavLink>
           </li>
@@ -37,11 +54,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/categories"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaFolder className="w-5 h-5 mr-2" />
               Danh mục
             </NavLink>
           </li>
@@ -49,11 +67,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/products"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaStore className="w-5 h-5 mr-2" />
               Trang bán hàng
             </NavLink>
           </li>
@@ -61,11 +80,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/users"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaUsers className="w-5 h-5 mr-2" />
               Khách hàng
             </NavLink>
           </li>
@@ -73,11 +93,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/rating-messages"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaComments className="w-5 h-5 mr-2" />
               Đánh giá & Tin nhắn
             </NavLink>
           </li>
@@ -85,11 +106,12 @@ const Header: React.FC = () => {
             <NavLink
               to="/import"
               className={({ isActive }) =>
-                `block py-2 px-4 rounded hover:bg-gray-700 ${
-                  isActive ? 'bg-gray-700' : ''
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
                 }`
               }
             >
+              <FaBoxOpen className="w-5 h-5 mr-2" />
               Nhập kho
             </NavLink>
           </li>

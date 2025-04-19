@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,13 +39,15 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
     {
         return exception switch
         {
-            KeyNotFoundException => (404, "Resource not found"),
-            NotImplementedException => (501, "This api is still under development"),
-            OperationCanceledException => (499, "Client closed request"),
-            AccessViolationException => (500, "Access violation"),
-            
-
-            _ => (500, "An unhandled error occurred")
+            ValidationException => (StatusCodes.Status400BadRequest, "Validation Error"),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, "Invalid Operation"),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request"),
+            TimeoutException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
+            NotImplementedException => (StatusCodes.Status501NotImplemented, "Not Implemented"),
+            OperationCanceledException => (StatusCodes.Status400BadRequest, "Operation Cancelled"),
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
     }
 }

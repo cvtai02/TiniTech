@@ -32,7 +32,8 @@ public class GetCategoriesByStatusQueryHandler : IRequestHandler<GetCategoriesBy
                 Name = c.Name,
                 Description = c.Description,
                 Slug = c.Slug,
-                ParentId = c.ParentId
+                ParentId = c.ParentId,
+                Status = c.Status,
             })
             .ToListAsync(cancellationToken);
 

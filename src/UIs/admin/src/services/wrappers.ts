@@ -29,6 +29,7 @@ export async function apiFetch(
     return response;
   } catch (error) {
     console.error('Fetch error:', error);
+    
     throw error;
   }
 }

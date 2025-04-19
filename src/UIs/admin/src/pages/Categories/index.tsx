@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { FaInfoCircle } from 'react-icons/fa';
+import { FaInfoCircle, FaTrashRestore } from 'react-icons/fa';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Category } from '../../types';
+import { AiOutlineRollback } from 'react-icons/ai';
+import { FaUndo, FaRecycle, FaHistory } from 'react-icons/fa';
+
+import { Category } from '../../types/category';
 import {
   fetchCategories,
   addCategory,
   updateCategory,
-  deleteCategory,
+  updateCategoryStatus,
 } from '../../services/category';
 
 // Mock service functions - replace with your actual API calls
@@ -29,6 +32,8 @@ const CategoriesPage: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isActivateModalOpen, setIsActivateModalOpen] =
+    useState<boolean>(false);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [isParentCategory, setIsParentCategory] = useState<boolean>(true);
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
@@ -49,6 +54,9 @@ const CategoriesPage: React.FC = () => {
       setIsAddModalOpen(false);
       resetForm();
     },
+    onError: (error) => {
+      alert(`Error adding category: ${error}`);
+    },
   });
 
   const updateMutation = useMutation({
@@ -60,11 +68,17 @@ const CategoriesPage: React.FC = () => {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteCategory,
+  const updateStatusMutation = useMutation({
+    mutationFn: (params: { id: string; status: 'Active' | 'Deleted' }) =>
+      updateCategoryStatus(params.id, params.status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       setIsDeleteModalOpen(false);
+      setIsActivateModalOpen(false);
+    },
+    onError: () => {
+      setIsDeleteModalOpen(false);
+      setIsActivateModalOpen(false);
     },
   });
 
@@ -107,6 +121,11 @@ const CategoriesPage: React.FC = () => {
     setCurrentCategory(category);
     setIsDeleteModalOpen(true);
   };
+  const handleActivate = (category: Category) => {
+    console.log('Activate category:', category);
+    setCurrentCategory(category);
+    setIsActivateModalOpen(true);
+  };
 
   const handleSubmitAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +141,19 @@ const CategoriesPage: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (currentCategory?.id) {
-      deleteMutation.mutate(currentCategory.id);
+      updateStatusMutation.mutate({
+        id: currentCategory.id,
+        status: 'Deleted',
+      });
+    }
+  };
+
+  const handleConfirmActivate = () => {
+    if (currentCategory?.id) {
+      updateStatusMutation.mutate({
+        id: currentCategory.id,
+        status: 'Active',
+      });
     }
   };
 
@@ -146,7 +177,7 @@ const CategoriesPage: React.FC = () => {
         <div className="bg-white rounded-lg w-full max-w-md mx-auto p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">
-              {isParentCategory ? 'Thêm danh mục' : 'Thêm danh mục con'}
+              {isParentCategory ? 'Thêm danh mục gốc' : 'Thêm danh mục nhánh'}
             </h3>
             <button
               onClick={() => setIsAddModalOpen(false)}
@@ -185,7 +216,7 @@ const CategoriesPage: React.FC = () => {
             {!isParentCategory && selectedParentId && data && (
               <div className="mb-4">
                 <p className="text-sm text-gray-600">
-                  Danh mục cha:{' '}
+                  Danh mục gốc:{' '}
                   {data.find((c) => c.id === selectedParentId)?.name}
                 </p>
               </div>
@@ -200,7 +231,7 @@ const CategoriesPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                 disabled={addMutation.isPending}
               >
                 {addMutation.isPending ? 'Đang xử lý...' : 'Lưu'}
@@ -225,7 +256,7 @@ const CategoriesPage: React.FC = () => {
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={() => handleOpenAddModal()}
           >
-            Thêm danh mục
+            Thêm danh mục gốc
           </button>
         </div>
         <p className="text-gray-500 dark:text-gray-300">No categories found.</p>
@@ -288,7 +319,7 @@ const CategoriesPage: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                 disabled={updateMutation.isPending}
               >
                 {updateMutation.isPending ? 'Đang xử lý...' : 'Lưu'}
@@ -327,9 +358,47 @@ const CategoriesPage: React.FC = () => {
             <button
               onClick={handleConfirmDelete}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              disabled={deleteMutation.isPending}
+              disabled={updateStatusMutation.isPending}
             >
-              {deleteMutation.isPending ? 'Đang xử lý...' : 'Xóa'}
+              {updateStatusMutation.isPending ? 'Đang xử lý...' : 'Xóa'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+
+  const renderActivateModal = () =>
+    isActivateModalOpen &&
+    currentCategory && (
+      <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex items-center justify-center">
+        <div className="bg-white rounded-lg w-full max-w-md mx-auto p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Kích hoạt danh mục</h3>
+            <button
+              onClick={() => setIsActivateModalOpen(false)}
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-700"
+            >
+              &times;
+            </button>
+          </div>
+          <p className="mb-4">
+            Bạn có muốn kích danh mục "{currentCategory.name}"?. Việc này cũng
+            sẽ kích hoạt danh mục gốc.
+          </p>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsActivateModalOpen(false)}
+              className="mr-2 px-4 py-2 text-gray-600 rounded hover:bg-gray-100"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={handleConfirmActivate}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? 'Đang xử lý...' : 'Kích hoạt'}
             </button>
           </div>
         </div>
@@ -344,14 +413,16 @@ const CategoriesPage: React.FC = () => {
           className="px-4 py-2 bg-white text-black hover:bg-gray-200 rounded dark:bg-black dark:text-white dark:hover:bg-black/80"
           onClick={() => handleOpenAddModal()}
         >
-          Thêm danh mục
+          Thêm danh mục gốc
         </button>
       </div>
 
       {data.map((category) => (
         <div key={category.id} className="mb-8">
           <div className="flex items-center gap-x-3 justify-between">
-            <div className="relative group grow flex items-center gap-x-3">
+            <div
+              className={`relative group grow flex items-center gap-x-3 ${category.status === 'Deleted' ? 'text-red-400' : ''}`}
+            >
               <h2 className="text-lg font-medium">{category.name}</h2>
               <FaInfoCircle className="text-gray-500 dark:text-gray-300 hover:text-gray-700 cursor-pointer" />
               <div className="bg-gray-800 w-fit text-white text-sm px-2 py-1 rounded  opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -363,30 +434,47 @@ const CategoriesPage: React.FC = () => {
             <div className="flex items-center gap-x-6">
               {(category.subcategories === undefined ||
                 category.subcategories === null ||
-                category.subcategories.length === 0) && (
-                <button
-                  className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-red-500 focus:outline-none"
-                  onClick={() => handleDelete(category)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
+                category.subcategories?.every(
+                  (item) => item.status === 'Deleted',
+                ) ||
+                category.subcategories.length === 0) &&
+                category.status !== 'Deleted' && (
+                  <button
+                    className="text-gray-500  transition-colors duration-200 hover:text-red-500 focus:outline-none"
+                    onClick={() => handleDelete(category)}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                    />
-                  </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
+                    </svg>
+                  </button>
+                )}
+              {category.status === 'Deleted' && (
+                <button
+                  className="text-gray-500 transition-colors duration-200 hover:text-blue-500 focus:outline-none"
+                  onClick={() =>
+                    handleActivate({
+                      ...category,
+                      parentId: category.id,
+                    })
+                  }
+                >
+                  <FaTrashRestore className="w-[1.175rem] h-[1.175rem]" />
                 </button>
               )}
 
               <button
-                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
+                className="text-gray-500  transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
                 onClick={() => handleEdit(category)}
               >
                 <svg
@@ -405,25 +493,27 @@ const CategoriesPage: React.FC = () => {
                 </svg>
               </button>
 
-              <button
-                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-green-500 focus:outline-none"
-                onClick={() => handleOpenAddModal(category.id)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
+              {category.status === 'Active' && (
+                <button
+                  className="text-gray-500  transition-colors duration-200 hover:text-green-500 focus:outline-none"
+                  onClick={() => handleOpenAddModal(category.id)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m7.5-7.5h-15"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
 
@@ -436,7 +526,7 @@ const CategoriesPage: React.FC = () => {
                       <tr>
                         <th
                           scope="col"
-                          className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-3/12 "
+                          className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-2/12 "
                         >
                           <div className="flex items-center gap-x-3">
                             <span>Danh mục</span>
@@ -445,7 +535,7 @@ const CategoriesPage: React.FC = () => {
 
                         <th
                           scope="col"
-                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-3/12 "
+                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-2/12 "
                         >
                           <button className="flex items-center gap-x-2">
                             <span>Doanh thu/Đã bán</span>
@@ -470,6 +560,13 @@ const CategoriesPage: React.FC = () => {
                           Mô tả
                         </th>
 
+                        <th
+                          scope="col"
+                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-2/12"
+                        >
+                          Trạng thái
+                        </th>
+
                         <th scope="col" className="relative py-3.5 px-4">
                           <span className="sr-only">Actions</span>
                         </th>
@@ -481,7 +578,7 @@ const CategoriesPage: React.FC = () => {
                         category.subcategories.length === 0) && (
                         <tr>
                           <td
-                            colSpan={5}
+                            colSpan={6}
                             className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 text-center"
                           >
                             Không có danh mục con nào
@@ -509,32 +606,58 @@ const CategoriesPage: React.FC = () => {
                             {subcategory.description}
                           </td>
 
-                          <td className="px-4 py-4 text-sm whitespace-nowrap">
-                            <div className="flex items-center gap-x-6">
-                              <button
-                                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-red-500 focus:outline-none"
-                                onClick={() =>
-                                  handleDelete({
-                                    ...subcategory,
-                                    parentId: category.id,
-                                  })
-                                }
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  className="w-5 h-5"
+                          <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
+                            <span
+                              className={`px-2 py-1 text-xs rounded-full ${
+                                subcategory.status === 'Active'
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                              }`}
+                            >
+                              {subcategory.status || 'N/A'}
+                            </span>
+                          </td>
+
+                          <td className="px-4 py-4 text-sm whitespace-nowrap ">
+                            <div className="flex items-center justify-end gap-x-6">
+                              {subcategory.status == 'Deleted' ? (
+                                <button
+                                  className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-blue-500 focus:outline-none"
+                                  onClick={() =>
+                                    handleActivate({
+                                      ...subcategory,
+                                      parentId: category.id,
+                                    })
+                                  }
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                                  />
-                                </svg>
-                              </button>
+                                  <FaTrashRestore className="w-[1.175rem] h-[1.175rem]" />
+                                </button>
+                              ) : (
+                                <button
+                                  className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-red-500 focus:outline-none"
+                                  onClick={() =>
+                                    handleDelete({
+                                      ...subcategory,
+                                      parentId: category.id,
+                                    })
+                                  }
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="1.5"
+                                    stroke="currentColor"
+                                    className="w-5 h-5"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                    />
+                                  </svg>
+                                </button>
+                              )}
 
                               <button
                                 className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
@@ -577,6 +700,7 @@ const CategoriesPage: React.FC = () => {
       {renderAddModal()}
       {renderEditModal()}
       {renderDeleteModal()}
+      {renderActivateModal()}
     </section>
   );
 };

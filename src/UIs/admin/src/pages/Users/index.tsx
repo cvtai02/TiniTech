@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
-import { Category } from '../../types';
+import { Category } from '../../types/category';
 import { fetchCategories } from '../../services/category';
 
 const UsersPage = () => {

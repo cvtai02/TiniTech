@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

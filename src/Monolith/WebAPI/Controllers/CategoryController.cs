@@ -59,6 +59,7 @@ public class CategoryController : ApiController
     [HttpPatch("status")]
     public async Task<IActionResult> Del([FromBody] PatchCategoryStatus body)
     {
+        Console.WriteLine(body.Status);
         if (body.Status == CategoryStatus.Deleted)
         {
             var result = await Sender.Send(new SoftDeleteCategoryCommand { Id = body.Id });

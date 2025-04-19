@@ -12,6 +12,7 @@ public class ProductDetail
     public string Slug { get; set; } = null!;
     public string Name { get; set; } = null!;
     public int Price { get; set; }
+    public int CategoryId { get; set; }
     public string Description { get; set; } = null!;
     public List<string> ImageUrls { get; set; } = [];
     public float Rating { get; set; }
@@ -25,7 +26,7 @@ public class ProductDetail
 public class VariantDto
 {
     public int Price { get; set; }
-    public string SKU { get; set; } = null!;
+    public string Sku { get; set; } = null!;
     public int Stock { get; set; }
     public List<VariantAttributeDto> VariantAttributes { get; set; } = [];
 }
@@ -38,7 +39,7 @@ public class VariantAttributeDto
 
 public class AttributeValueDto
 {
-    public int Order { get; set; }
+    public int OrderPriority { get; set; }
     public string Value { get; set; } = null!;
     public string? ImageUrl { get; set; }
 }
@@ -46,6 +47,7 @@ public class AttributeValueDto
 public class AttributeDto
 {
     public string Name { get; set; } = null!;
+    public float OrderPriority { get; set; }
     public bool IsPrimary { get; set; }
     public List<AttributeValueDto> Values { get; set; } = [];
 }

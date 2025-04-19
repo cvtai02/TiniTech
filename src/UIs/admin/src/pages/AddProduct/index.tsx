@@ -1,10 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-
-// Types
-interface Category {
-  id: string;
-  name: string;
-}
+import { fetchCategories } from '../../services/category';
+import { Category } from '../../types/category';
+import { CreateProductDto } from './createProductDto';
 
 const AddProductPage: React.FC = () => {
   // Form state
@@ -29,28 +26,10 @@ const AddProductPage: React.FC = () => {
   }, [formData.name]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Replace with actual API calls
-        setTimeout(() => {
-          const dummyCategories: Category[] = [
-            { id: '1', name: 'Electronics' },
-            { id: '2', name: 'Clothing' },
-            { id: '3', name: 'Home & Garden' },
-            { id: '4', name: 'Books' },
-            { id: '5', name: 'Toys' },
-          ];
-
-          setCategories(dummyCategories);
-          setIsLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
+    fetchCategories().then((data) => {
+      setCategories(data);
+      setIsLoading(false);
+    });
   }, []);
 
   const handleInputChange = (
