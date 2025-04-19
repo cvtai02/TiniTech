@@ -36,7 +36,6 @@
 
 ### As an admin.
 
--   Xem thông tin bán hàng
 -   View User
 -   Crud Categories
 -   Crud Product
@@ -46,14 +45,14 @@
 
     -   tên sản phẩm, thương hiệu, slug có giá trị mặc định <ten-san-pham>, mô tả.
     -   selection box để chọn category
-    -   chọn primary attribute
-    -   chọn attribute khác
-    -   image mặc định
-    -   Hoàn thành
+    -   Chọn danh sách attribute
+    -   Chọn attribute chính
+    -   Chọn danh sách image
+    -   Chọn image mặc định
+    -   Submit
+    -   Note: OrderPriority Start from 0. The smaller it is, the higher the priority.
 
 -   Feature: Add Product Variant
--   Description: Enable users to add a new product variant with an intuitive and flexible UI/UX.
--   Functional Requirements:
 
     -   Product Selection:
         -   Suggest recently added products (tracked via cookies)
@@ -64,8 +63,6 @@
             -   Add new attributes or values
             -   Edit existing attributes or values
             -   Delete attributes or values
-    -   User Experience:
-        -   Minimize user input where possible through suggestions and auto-complete
 
 -   Xóa category:
 
@@ -74,7 +71,7 @@
 
 -   Xóa sản phẩm:
 
-    -   Cho vào thùng rác, xóa sau 30 ngày.
+    -   Cho vào thùng rác
     -   Có thể recycle: Khi recycle, recycle luôn category nếu nó đang deleted
 
 -   Thêm category:

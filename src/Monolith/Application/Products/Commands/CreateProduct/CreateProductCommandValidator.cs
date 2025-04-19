@@ -20,12 +20,16 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
             RuleFor(x => x.CategoryId)
                 .GreaterThan(0).WithMessage("CategoryId must be greater than 0.");
 
-            RuleFor(x => x.Image)
-                .NotNull().WithMessage("Image is required.")
-                .Must(file => file.Length > 0).WithMessage("File is empty.")
-                .Must(file => allowImageContentTypes.Contains(file.ContentType))
-                .WithMessage("Image content type is not supported.")
-                .Must(file => file.Length <= 2 * 1024 * 1024).WithMessage("Image size must not exceed 2MB.");
+            RuleFor(x => x.Images)
+                .NotNull().WithMessage("Images list is required.")
+                .NotEmpty().WithMessage("At least one image is required.")
+                .ForEach(image =>
+                {
+                    image.Must(file => file.Length > 0).WithMessage("File is empty.")
+                        .Must(file => allowImageContentTypes.Contains(file.ContentType))
+                        .WithMessage("Image content type is not supported.")
+                        .Must(file => file.Length <= 2 * 1024 * 1024).WithMessage("Image size must not exceed 2MB.");
+                });
         }
     }
 

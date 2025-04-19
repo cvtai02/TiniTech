@@ -150,7 +150,7 @@ const CategoriesPage: React.FC = () => {
             </h3>
             <button
               onClick={() => setIsAddModalOpen(false)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-700"
             >
               &times;
             </button>
@@ -211,7 +211,10 @@ const CategoriesPage: React.FC = () => {
       </div>
     );
 
-  if (isLoading) return <p className="text-gray-500">Loading categories...</p>;
+  if (isLoading)
+    return (
+      <p className="text-gray-500 dark:text-gray-300">Loading categories...</p>
+    );
   if (isError) return <p className="text-red-500">Error loading categories.</p>;
   if (!data || data.length === 0)
     return (
@@ -225,7 +228,7 @@ const CategoriesPage: React.FC = () => {
             Thêm danh mục
           </button>
         </div>
-        <p className="text-gray-500">No categories found.</p>
+        <p className="text-gray-500 dark:text-gray-300">No categories found.</p>
         {/* Add Modal */}
         {renderAddModal()}
       </div>
@@ -243,7 +246,7 @@ const CategoriesPage: React.FC = () => {
             </h3>
             <button
               onClick={() => setIsEditModalOpen(false)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-700"
             >
               &times;
             </button>
@@ -305,7 +308,7 @@ const CategoriesPage: React.FC = () => {
             <h3 className="text-lg font-medium">Xác nhận xóa</h3>
             <button
               onClick={() => setIsDeleteModalOpen(false)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 dark:text-gray-300 hover:text-gray-700"
             >
               &times;
             </button>
@@ -338,7 +341,7 @@ const CategoriesPage: React.FC = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Quản lý danh mục</h1>
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="px-4 py-2 bg-white text-black hover:bg-gray-200 rounded dark:bg-black dark:text-white dark:hover:bg-black/80"
           onClick={() => handleOpenAddModal()}
         >
           Thêm danh mục
@@ -350,7 +353,7 @@ const CategoriesPage: React.FC = () => {
           <div className="flex items-center gap-x-3 justify-between">
             <div className="relative group grow flex items-center gap-x-3">
               <h2 className="text-lg font-medium">{category.name}</h2>
-              <FaInfoCircle className="text-gray-500 hover:text-gray-700 cursor-pointer" />
+              <FaInfoCircle className="text-gray-500 dark:text-gray-300 hover:text-gray-700 cursor-pointer" />
               <div className="bg-gray-800 w-fit text-white text-sm px-2 py-1 rounded  opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                 <strong>Slug:</strong> {category.slug}
                 <br />
@@ -362,7 +365,7 @@ const CategoriesPage: React.FC = () => {
                 category.subcategories === null ||
                 category.subcategories.length === 0) && (
                 <button
-                  className="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none"
+                  className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-red-500 focus:outline-none"
                   onClick={() => handleDelete(category)}
                 >
                   <svg
@@ -383,7 +386,7 @@ const CategoriesPage: React.FC = () => {
               )}
 
               <button
-                className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
+                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
                 onClick={() => handleEdit(category)}
               >
                 <svg
@@ -403,7 +406,7 @@ const CategoriesPage: React.FC = () => {
               </button>
 
               <button
-                className="text-gray-500 transition-colors duration-200 hover:text-green-500 focus:outline-none"
+                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-green-500 focus:outline-none"
                 onClick={() => handleOpenAddModal(category.id)}
               >
                 <svg
@@ -427,13 +430,13 @@ const CategoriesPage: React.FC = () => {
           <div className="flex flex-col mt-2">
             <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div className="overflow-hidden border border-gray-200 md:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-200  dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
                       <tr>
                         <th
                           scope="col"
-                          className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 w-3/12 "
+                          className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-3/12 "
                         >
                           <div className="flex items-center gap-x-3">
                             <span>Danh mục</span>
@@ -442,7 +445,7 @@ const CategoriesPage: React.FC = () => {
 
                         <th
                           scope="col"
-                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 w-3/12 "
+                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-3/12 "
                         >
                           <button className="flex items-center gap-x-2">
                             <span>Doanh thu/Đã bán</span>
@@ -462,7 +465,7 @@ const CategoriesPage: React.FC = () => {
 
                         <th
                           scope="col"
-                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 w-5/12"
+                          className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-300 w-5/12"
                         >
                           Mô tả
                         </th>
@@ -472,14 +475,14 @@ const CategoriesPage: React.FC = () => {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
                       {(category.subcategories === undefined ||
                         category.subcategories === null ||
                         category.subcategories.length === 0) && (
                         <tr>
                           <td
                             colSpan={5}
-                            className="px-4 py-4 text-sm text-gray-500 text-center"
+                            className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 text-center"
                           >
                             Không có danh mục con nào
                           </td>
@@ -491,7 +494,7 @@ const CategoriesPage: React.FC = () => {
                             <div className="inline-flex items-center gap-x-3">
                               <div className="flex items-center gap-x-2">
                                 <div>
-                                  <h2 className="font-medium text-gray-800">
+                                  <h2 className="font-medium text-gray-800 dark:text-white">
                                     {subcategory.name}
                                   </h2>
                                 </div>
@@ -499,17 +502,17 @@ const CategoriesPage: React.FC = () => {
                             </div>
                           </td>
 
-                          <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
+                          <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                             -
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
+                          <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                             {subcategory.description}
                           </td>
 
                           <td className="px-4 py-4 text-sm whitespace-nowrap">
                             <div className="flex items-center gap-x-6">
                               <button
-                                className="text-gray-500 transition-colors duration-200 hover:text-red-500 focus:outline-none"
+                                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-red-500 focus:outline-none"
                                 onClick={() =>
                                   handleDelete({
                                     ...subcategory,
@@ -534,7 +537,7 @@ const CategoriesPage: React.FC = () => {
                               </button>
 
                               <button
-                                className="text-gray-500 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
+                                className="text-gray-500 dark:text-gray-300 transition-colors duration-200 hover:text-yellow-500 focus:outline-none"
                                 onClick={() =>
                                   handleEdit(
                                     { ...subcategory, parentId: category.id },

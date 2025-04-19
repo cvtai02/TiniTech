@@ -9,6 +9,10 @@ public class GetProductDetailBySlug : IRequest<Result<ProductDetailDto>>
     public string Slug { get; set; } = null!;
 }
 
+public class ProductDetailDto
+{
+}
+
 public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailBySlug, Result<ProductDetailDto>>
 {
     private readonly DbContextAbstract _context;

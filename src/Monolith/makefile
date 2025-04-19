@@ -102,3 +102,9 @@ migration-update:
 migration-addup:
 	dotnet ef migrations add $(name) --project Infrastructure -o Data/Migrations --startup-project WebAPI
 	dotnet ef database update --project Infrastructure --startup-project WebAPI
+
+migration-reset:
+	dotnet ef database update 0 --project Infrastructure --startup-project WebAPI
+
+migration-remove:
+	dotnet ef migrations remove --project Infrastructure --startup-project WebAPI

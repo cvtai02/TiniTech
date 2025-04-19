@@ -1,8 +1,12 @@
+using Application.Products.Commands.ActivateProductCommand;
 using Application.Products.Commands.CreateProductCommand;
-using Application.Products.Commands.DeleteProductCommand;
+using Application.Products.Commands.SoftDeleteProductCommand;
 using Application.Products.Queries.GetDetailBySlug;
+using Application.Products.Queries.GetNewProduct;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controllers.Base;
 
@@ -65,28 +69,55 @@ public class ProductController : ApiController
     //         e => HandleFailure<UpdateProductCommand>(e)
     //     );
     // }
+    public record PatchStatusData(int Id, ProductStatus Status);
 
-    [HttpDelete("{slug}")]
-    public async Task<IActionResult> Delete(string slug)
+    [HttpPatch("status")]
+    public async Task<IActionResult> UpdateStatus([FromBody] PatchStatusData body)
     {
-        var result = await Sender.Send(new DeleteProductCommand { Slug = slug });
+        if (body.Status == ProductStatus.Deleted)
+        {
+            var result = await Sender.Send(new SoftDeleteProductCommand { Id = body.Id });
 
-        return result.Match(
-            r => Ok(new Response
+            return result.Match(
+                r => Ok(new Response
+                {
+                    Title = "Product Deleted",
+                    Status = "Success",
+                    Detail = "Product status changed to deleted",
+                    Data = r,
+                    Errors = null
+                }),
+                e => HandleFailure<SoftDeleteProductCommand>(e)
+            );
+        }
+        else if (body.Status == ProductStatus.Active)
+        {
+            var result = await Sender.Send(new ActivateProductCommand { Id = body.Id });
+
+            return result.Match(
+                r => Ok(new Response
+                {
+                    Title = "Product Restored",
+                    Status = "Success",
+                    Detail = "Product status changed to active",
+                    Data = r,
+                    Errors = null
+                }),
+                e => HandleFailure<ActivateProductCommand>(e)
+            );
+        }
+        else return BadRequest(
+            new Response
             {
-                Title = "Product Deleted",
-                Status = "Success",
-                Detail = "Product Deleted Successfully",
-                Data = r,
-                Errors = null
-            }),
-            e => HandleFailure<DeleteProductCommand>(e)
-        );
+                Title = "Bad Request",
+                Status = "Error",
+                Detail = "Invalid Product Status",
+                Data = null,
+                Errors = new[] { "Invalid Product Status" }
+            });
     }
 
-
-
-    [HttpGet("{id}")]
+    [HttpGet("{slug}")]
     public async Task<IActionResult> GetBySlug(string slug)
     {
         var result = await Sender.Send(new GetProductDetailBySlug { Slug = slug });
@@ -101,6 +132,24 @@ public class ProductController : ApiController
                 Errors = null
             }),
             e => HandleFailure<GetProductDetailBySlug>(e)
+        );
+    }
+
+    [HttpGet("new")]
+    public async Task<IActionResult> GetNewProducts([FromQuery] GetNewProductsQuery query)
+    {
+        var result = await Sender.Send(query);
+
+        return result.Match(
+            r => Ok(new Response
+            {
+                Title = "Ok",
+                Status = "Success",
+                Detail = "New Products Retrieved Successfully",
+                Data = r,
+                Errors = null
+            }),
+            e => HandleFailure<GetNewProductsQuery>(e)
         );
     }
 }

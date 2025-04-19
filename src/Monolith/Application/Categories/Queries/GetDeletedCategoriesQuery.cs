@@ -5,22 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Categories.Queries;
 
-public class GetAllCategoriesQuery : IRequest<Result<List<CategoryDto>>>
+public class GetDeletedCategorisQuery : IRequest<Result<List<CategoryDto>>>
 {
 }
 
 
 
-public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuery, Result<List<CategoryDto>>>
+public class GetDeletedCategorisQueryHandler : IRequestHandler<GetDeletedCategorisQuery, Result<List<CategoryDto>>>
 {
     private readonly DbContextAbstract _context;
 
-    public GetAllCategoriesQueryHandler(DbContextAbstract context)
+    public GetDeletedCategorisQueryHandler(DbContextAbstract context)
     {
         _context = context;
     }
 
-    public async Task<Result<List<CategoryDto>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<CategoryDto>>> Handle(GetDeletedCategorisQuery request, CancellationToken cancellationToken)
     {
         // First get all categories
         var categories = await _context.Categories

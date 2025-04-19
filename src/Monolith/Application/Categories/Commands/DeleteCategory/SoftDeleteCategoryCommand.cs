@@ -7,43 +7,38 @@ using Domain.Enums;
 
 namespace Application.Categories.Commands;
 
-public class DeleteCategoryCommand : IRequest<Result<bool>>
+public class SoftDeleteCategoryCommand : IRequest<Result<bool>>
 {
     public int Id { get; set; }
 }
 
-public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, Result<bool>>
+public class SoftDeleteCategoryCommandHandler : IRequestHandler<SoftDeleteCategoryCommand, Result<bool>>
 {
     private readonly DbContextAbstract _context;
 
-    public DeleteCategoryCommandHandler(DbContextAbstract context)
+    public SoftDeleteCategoryCommandHandler(DbContextAbstract context)
     {
         _context = context;
     }
 
-    public async Task<Result<bool>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(SoftDeleteCategoryCommand request, CancellationToken cancellationToken)
     {
-        var category = await _context.Categories.FindAsync(request.Id);
+        var category = await _context.Categories.Include(c => c.Subcategories).Include(c => c.Products)
+            .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (category == null)
         {
-            return new KeyNotFoundException($"Category with ID {request.Id} not found.");
+            return new KeyNotFoundException($"Category {request.Id} not found.");
         }
 
         // Check if category has subcategories
-        var hasSubcategories = await _context.Categories
-            .AnyAsync(c => c.ParentId == request.Id && c.Status != CategoryStatus.Deleted, cancellationToken);
-
-        if (hasSubcategories)
+        if (category.Subcategories.Any(x => x.Status != CategoryStatus.Deleted))
         {
             return new RestrictDeleteException("Cannot delete category that has subcategories which are not deleted");
         }
 
         // Check if category is used by any products
-        var isUsedByProducts = await _context.Products
-            .AnyAsync(p => p.CategoryId == request.Id && p.Status != ProductStatus.Deleted, cancellationToken);
-
-        if (isUsedByProducts)
+        if (category.Products.Any(x => x.Status != ProductStatus.Deleted))
         {
             return new RestrictDeleteException("Cannot delete category that is used by products which are not deleted");
         }

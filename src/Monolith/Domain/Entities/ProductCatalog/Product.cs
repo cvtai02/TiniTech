@@ -32,9 +32,12 @@ public class Product : BaseAuditableEntity
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string Slug { get; set; } = null!;
+    public string ImageUrl { get; set; } = string.Empty;
     public ProductStatus Status { get; set; } = ProductStatus.Active;
     public Category? Category { get; set; }
-    public IList<ProductImage> Images { get; set; } = [];
-    public virtual IList<Variant> Variants { get; set; } = [];
+    public List<ProductImage> Images { get; set; } = [];
+    public List<ProductAttribute> Attributes { get; set; } = [];
+    public virtual List<Variant> Variants { get; set; } = [];
+    public ProductMetric? Metric { get; set; } = null!;
 
 }

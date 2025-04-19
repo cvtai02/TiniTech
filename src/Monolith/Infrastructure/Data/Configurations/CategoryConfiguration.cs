@@ -11,9 +11,9 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> builder)
     {
-        builder.Property(e => e.Name)
-            .HasMaxLength(200)
-            .IsRequired();
+        builder.HasIndex(e => e.Name)
+            .IsUnique()
+            .HasDatabaseName("IX_Category_Name");
 
         builder.HasOne(e => e.Parent)
             .WithMany(e => e.Subcategories)
@@ -25,7 +25,6 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .OnDelete(DeleteBehavior.Restrict); // Prevents cascading delete to avoid deleting all products when a category is deleted
 
         builder.HasIndex(e => e.Slug)
-            .IsUnique()
             .HasDatabaseName("IX_Category_Slug");
 
     }

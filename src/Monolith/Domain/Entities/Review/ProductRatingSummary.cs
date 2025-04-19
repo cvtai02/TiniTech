@@ -6,7 +6,7 @@ using Domain.Base;
 
 namespace Domain.Entities;
 
-public class ProductRatingDetail : BaseEntity
+public class ProductRatingSummary : BaseEntity
 {
     public int OneStar { get; set; }
     public int TwoStar { get; set; }

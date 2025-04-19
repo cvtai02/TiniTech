@@ -22,7 +22,7 @@ public class Category : BaseAuditableEntity
             {
                 _name = char.ToUpper(value[0]) + value[1..];
             }
-            Slug = value.ToSlug(Random.Shared.Next(10000000, 99999999));
+            Slug = value.ToSlug();
         }
     }
     public string Description { get; set; } = string.Empty;

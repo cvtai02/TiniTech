@@ -6,7 +6,7 @@ const Layout: React.FC = () => {
   return (
     <div className="flex flex-row w-screen bg-gray-50">
       <Header />
-      <div className="ml-64 w-full">
+      <div className="ml-64 w-full min-h-screen">
         <Outlet />
       </div>
     </div>

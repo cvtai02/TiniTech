@@ -1,5 +1,7 @@
 using Application.Categories.Commands;
+using Application.Categories.Commands.ActivateCategory;
 using Application.Categories.Queries;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,28 +55,56 @@ public class CategoryController : ApiController
         );
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Del(int id)
+    public record PatchCategoryStatus(int Id, CategoryStatus Status);
+    [HttpPatch("status")]
+    public async Task<IActionResult> Del([FromBody] PatchCategoryStatus body)
     {
-        var result = await Sender.Send(new DeleteCategoryCommand { Id = id });
+        if (body.Status == CategoryStatus.Deleted)
+        {
+            var result = await Sender.Send(new SoftDeleteCategoryCommand { Id = body.Id });
 
-        return result.Match(
-            r => Ok(new Response
-            {
-                Title = "Category Deleted",
-                Status = "Success",
-                Detail = "Category Deleted",
-                Data = r,
-                Errors = null
-            }),
-            e => HandleFailure<DeleteCategoryCommand>(e)
-        );
+            return result.Match(
+                r => Ok(new Response
+                {
+                    Title = "Category Deleted",
+                    Status = "Success",
+                    Detail = "Category Status Changed to Deleted",
+                    Data = r,
+                    Errors = null
+                }),
+                e => HandleFailure<SoftDeleteCategoryCommand>(e)
+            );
+        }
+        else if (body.Status == CategoryStatus.Active)
+        {
+            var result = await Sender.Send(new ActivateCategoryCommand { Id = body.Id });
+
+            return result.Match(
+                r => Ok(new Response
+                {
+                    Title = "Category Restored",
+                    Status = "Success",
+                    Detail = "Category Status Changed to Active",
+                    Data = r,
+                    Errors = null
+                }),
+                e => HandleFailure<ActivateCategoryCommand>(e)
+            );
+        }
+        else return BadRequest(new Response
+        {
+            Title = "Bad Request",
+            Status = "Error",
+            Detail = "Invalid Category Status",
+            Data = null,
+            Errors = new[] { "Invalid Category Status" }
+        });
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] GetCategoriesByStatusQuery query)
     {
-        var result = await Sender.Send(new GetAllCategoriesQuery());
+        var result = await Sender.Send(query);
 
         return result.Match(
             r => Ok(new Response
@@ -85,7 +115,7 @@ public class CategoryController : ApiController
                 Data = r,
                 Errors = null
             }),
-            e => HandleFailure<GetAllCategoriesQuery>(e)
+            e => HandleFailure<GetCategoriesByStatusQuery>(e)
         );
     }
 
