@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { FaPlus, FaTrash, FaStar, FaImage } from 'react-icons/fa';
 import { fetchCategories } from '../../services/category';
 import { fetchAttributes } from '../../services/attribute';
@@ -10,8 +10,6 @@ import { toSku } from '../../utils/to-sku';
 import { createProduct } from '../../services/product';
 
 const AddProductPage: React.FC = () => {
-  const queryClient = useQueryClient();
-
   // Form state
   const [product, setProduct] = useState<CreateProductDto>({
     name: '',
@@ -179,45 +177,40 @@ const AddProductPage: React.FC = () => {
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      try {
-        // Prepare final product data
-        const finalProduct = {
-          ...product,
-          // Move default image to the front
-          images: [
-            product.images[defaultImageIndex],
-            ...product.images.filter((_, i) => i !== defaultImageIndex),
-          ],
-          //Move primary attribute to the front
-          attributeIds: [
-            primaryAttributeId,
-            ...product.attributeIds.filter((id) => id !== primaryAttributeId),
-          ],
-        };
+      // Prepare final product data
+      const finalProduct = {
+        ...product,
+        // Move default image to the front
+        images: [
+          product.images[defaultImageIndex],
+          ...product.images.filter((_, i) => i !== defaultImageIndex),
+        ],
+        //Move primary attribute to the front
+        attributeIds: [
+          primaryAttributeId,
+          ...product.attributeIds.filter((id) => id !== primaryAttributeId),
+        ],
+      };
 
-        await createProduct(finalProduct);
+      await createProduct(finalProduct);
 
-        console.log('Product submitted:', finalProduct);
+      console.log('Product submitted:', finalProduct);
 
-        // Reset form
-        setProduct({
-          name: '',
-          description: '',
-          categoryId: '',
-          sku: '',
-          price: 0,
-          images: [],
-          attributeIds: [],
-        });
-        setSelectedParentCategory('');
-        setImagePreviewUrls([]);
-        setDefaultImageIndex(0);
-        setPrimaryAttributeId('');
-        setErrors({});
-      } catch (error) {
-        console.error('Error creating product:', error);
-        setErrors({ form: 'Failed to create product. Please try again.' });
-      }
+      // Reset form
+      setProduct({
+        name: '',
+        description: '',
+        categoryId: '',
+        sku: '',
+        price: 0,
+        images: [],
+        attributeIds: [],
+      });
+      setSelectedParentCategory('');
+      setImagePreviewUrls([]);
+      setDefaultImageIndex(0);
+      setPrimaryAttributeId('');
+      setErrors({});
     }
 
     setIsSubmitting(false);
