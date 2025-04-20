@@ -16,7 +16,7 @@ public static class StringExtensions
     /// <param name="text">The Vietnamese text to convert</param>
     /// <param name="randomNumber">Maximum length of the slug (optional)</param>
     /// <returns>A URL-friendly slug</returns>
-    public static string ToSlug(this string text, int? randomNumber = null)
+    public static string ToSlug(this string text, string identityString = "")
     {
         if (string.IsNullOrWhiteSpace(text))
             return string.Empty;
@@ -40,8 +40,7 @@ public static class StringExtensions
         normalizedString = normalizedString.Trim('-');
 
         // Apply max length if specified
-        if (randomNumber.HasValue)
-            normalizedString = randomNumber.ToString() + '-' + normalizedString;
+        normalizedString = identityString + '-' + normalizedString;
 
         return normalizedString;
     }

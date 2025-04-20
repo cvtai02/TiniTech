@@ -1,255 +1,554 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FaPlus, FaTrash, FaStar, FaImage } from 'react-icons/fa';
 import { fetchCategories } from '../../services/category';
-import { Category } from '../../types/category';
-import { CreateProductDto } from './createProductDto';
+import { fetchAttributes } from '../../services/attribute';
+import { CreateProductDto } from '../../types/product';
+import { validatePostProduct } from './validatePostProduct';
+import { formatVND } from '../../utils/formatCurrency';
+import { toSku } from '../../utils/to-sku';
+import { createProduct } from '../../services/product';
 
 const AddProductPage: React.FC = () => {
+  const queryClient = useQueryClient();
+
   // Form state
-  const [formData, setFormData] = useState({
+  const [product, setProduct] = useState<CreateProductDto>({
     name: '',
-    brand: '',
     description: '',
     categoryId: '',
-    defaultImage: null as File | null,
+    sku: '',
+    price: 0,
+    images: [],
+    attributeIds: [],
   });
 
-  // Options for select fields
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  // UI state
+  const [selectedParentCategory, setSelectedParentCategory] =
+    useState<string>('');
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [defaultImageIndex, setDefaultImageIndex] = useState<number>(0);
+  const [primaryAttributeId, setPrimaryAttributeId] = useState<string>('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Fetch categories and attributes
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
+
+  const { data: attributes = [] } = useQuery({
+    queryKey: ['attributes'],
+    queryFn: fetchAttributes,
+  });
+
+  // Derived state for subcategories
+  const parentCategories = categories;
+  const subcategories =
+    categories.find((category) => category.id == selectedParentCategory)
+      ?.subcategories || [];
 
   useEffect(() => {
-    // Generate slug from product name
-    if (formData.name) {
-      setFormData((prev) => ({ ...prev }));
-    }
-  }, [formData.name]);
+    const parentName =
+      categories.find((e) => e.id == selectedParentCategory)?.name || '';
+    const subName =
+      subcategories.find((e) => e.id == product.categoryId)?.name || '';
 
-  useEffect(() => {
-    fetchCategories().then((data) => {
-      setCategories(data);
-      setIsLoading(false);
-    });
-  }, []);
+    const newSku = toSku(parentName, subName, product.name);
+    setProduct((prev) => ({ ...prev, sku: newSku }));
+  }, [product.categoryId, product.name]);
 
+  // Handle form input changes
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'price') {
+      // remove 0 at the start of the string
+      const parsedValue = parseInt(value.replace(/^0+/, ''));
+      if (isNaN(parsedValue)) {
+        return;
+      }
+      setProduct((prev) => ({ ...prev, [name]: parsedValue }));
+      return;
+    }
+    setProduct((prev) => ({ ...prev, [name]: value }));
+    console.log(product);
   };
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFormData((prev) => ({ ...prev, defaultImage: file }));
+  // Handle category selection
+  const handleParentCategoryChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const value = e.target.value;
+    setSelectedParentCategory(value);
+    setProduct((prev) => ({ ...prev, categoryId: '' })); // Reset child category
+  };
 
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setProduct((prev) => ({ ...prev, categoryId: value }));
+  };
+
+  // Handle attribute selection
+  const handleAttributeToggle = (attributeId: string) => {
+    setProduct((prev) => {
+      const attributeIds = prev.attributeIds.includes(attributeId)
+        ? prev.attributeIds.filter((id) => id !== attributeId)
+        : [...prev.attributeIds, attributeId];
+
+      // If we're removing the primary attribute, reset it
+      if (
+        primaryAttributeId === attributeId &&
+        !attributeIds.includes(attributeId)
+      ) {
+        setPrimaryAttributeId('');
+      }
+
+      return { ...prev, attributeIds };
+    });
+  };
+
+  const handleSetPrimaryAttribute = (attributeId: string) => {
+    // Only set as primary if it's already selected
+    if (product.attributeIds.includes(attributeId)) {
+      setPrimaryAttributeId(attributeId);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Product data submitted:', formData);
-    // Implementation for form submission
-    // You would typically send this data to your API
+  // Handle image uploads
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+
+      // Create preview URLs for the images
+      const newImagePreviewUrls = newFiles.map((file) =>
+        URL.createObjectURL(file),
+      );
+
+      setProduct((prev) => ({
+        ...prev,
+        images: [...prev.images, ...newFiles],
+      }));
+
+      setImagePreviewUrls((prev) => [...prev, ...newImagePreviewUrls]);
+
+      // If this is the first image, set it as default
+      if (product.images.length === 0) {
+        setDefaultImageIndex(0);
+      }
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  const handleRemoveImage = (index: number) => {
+    // Create new arrays without the removed image
+    const newImages = [...product.images];
+    newImages.splice(index, 1);
+
+    const newPreviewUrls = [...imagePreviewUrls];
+    // Revoke the object URL to prevent memory leaks
+    URL.revokeObjectURL(newPreviewUrls[index]);
+    newPreviewUrls.splice(index, 1);
+
+    setProduct((prev) => ({
+      ...prev,
+      images: newImages,
+    }));
+
+    setImagePreviewUrls(newPreviewUrls);
+
+    // Update default image index if needed
+    if (index === defaultImageIndex) {
+      setDefaultImageIndex(0); // Reset to first image or 0 if no images left
+    } else if (index < defaultImageIndex) {
+      setDefaultImageIndex(defaultImageIndex - 1); // Adjust index if we removed an image before the default
+    }
+  };
+
+  const handleSetDefaultImage = (index: number) => {
+    setDefaultImageIndex(index);
+  };
+
+  // Submit handler
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const validationErrors = validatePostProduct(product);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        // Prepare final product data
+        const finalProduct = {
+          ...product,
+          // Move default image to the front
+          images: [
+            product.images[defaultImageIndex],
+            ...product.images.filter((_, i) => i !== defaultImageIndex),
+          ],
+          //Move primary attribute to the front
+          attributeIds: [
+            primaryAttributeId,
+            ...product.attributeIds.filter((id) => id !== primaryAttributeId),
+          ],
+        };
+
+        await createProduct(finalProduct);
+
+        console.log('Product submitted:', finalProduct);
+
+        // Reset form
+        setProduct({
+          name: '',
+          description: '',
+          categoryId: '',
+          sku: '',
+          price: 0,
+          images: [],
+          attributeIds: [],
+        });
+        setSelectedParentCategory('');
+        setImagePreviewUrls([]);
+        setDefaultImageIndex(0);
+        setPrimaryAttributeId('');
+        setErrors({});
+      } catch (error) {
+        console.error('Error creating product:', error);
+        setErrors({ form: 'Failed to create product. Please try again.' });
+      }
+    }
+
+    setIsSubmitting(false);
+  };
+
+  // Clean up image previews when component unmounts
+  useEffect(() => {
+    return () => {
+      imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   return (
-    <div className="container mx-auto pt-8 p-16">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Thêm sản phẩm mới</h1>
-        <button
-          onClick={() => window.history.back()}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-        >
-          Quay lại
-        </button>
-      </div>
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Thêm sản phẩm mới</h1>
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <form onSubmit={handleSubmit}>
-          {/* Basic Information */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-gray-200">
-              Thông tin cơ bản
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label
-                  className="block text-gray-700 font-medium mb-2"
-                  htmlFor="name"
-                >
-                  Tên sản phẩm <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-gray-700 font-medium mb-2"
-                  htmlFor="category"
-                >
-                  Danh mục gốc <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="category"
-                  name="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <form onSubmit={handleSubmit} className="space-y-6 ">
+        {/* Category Selection */}
+        <div className="text-white p-6 rounded-lg shadow bg-gray-900 ">
+          <h2 className="text-xl font-semibold mb-4 ">Chọn danh mục</h2>
 
-              <div>
-                <label
-                  className="block text-gray-700 font-medium mb-2"
-                  htmlFor="category"
-                >
-                  Danh mục trực thuộc <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="category"
-                  name="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="mt-6">
-              <label
-                className="block text-gray-700 font-medium mb-2"
-                htmlFor="description"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Danh mục gốc *
+              </label>
+              <select
+                value={selectedParentCategory}
+                onChange={handleParentCategoryChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                Description
+                <option value="">Chọn</option>
+                {parentCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Danh mục trực thuộc *
+              </label>
+              <select
+                name="categoryId"
+                value={product.categoryId}
+                onChange={handleCategoryChange}
+                disabled={!selectedParentCategory}
+                className={` border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 
+                  ${errors.categoryId ? 'border-red-500' : 'border-gray-300'} 
+                `}
+              >
+                {selectedParentCategory && <option value="">Chọn</option>}
+                {subcategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              {errors.categoryId && (
+                <p className="mt-1 text-sm text-red-500">{errors.categoryId}</p>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* Basic Information */}
+        <div className="text-white p-6 rounded-lg shadow bg-gray-900">
+          <h2 className="text-xl font-semibold mb-4">Thông tin cơ bản</h2>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Tên sản phẩm*
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={product.name}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md ${errors.name ? 'border-red-500' : 'border-gray-700'}`}
+                placeholder="Nhập tên sản phẩm"
+              />
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                SKU*
+              </label>
+              <input
+                type="text"
+                name="sku"
+                value={toSku(
+                  categories.find((e) => e.id == selectedParentCategory)
+                    ?.name || '',
+                  subcategories.find((e) => e.id == product.categoryId)?.name ||
+                    '',
+                  product.name,
+                )}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md ${errors.sku ? 'border-red-500' : 'border-gray-700'}`}
+                placeholder="nhập SKU"
+              />
+              {errors.sku && (
+                <p className="mt-1 text-sm text-red-500">{errors.sku}</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Giá bán*
+                {product.price ? (
+                  <span className="text-sm text-white mt-1">
+                    : {formatVND(product.price)}
+                  </span>
+                ) : (
+                  <span className="text-sm text-white mt-1">
+                    : {formatVND(0)}
+                  </span>
+                )}
+              </label>
+              <input
+                type="text"
+                name="price"
+                value={product.price}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-md ${errors.price ? 'border-red-500' : 'border-gray-700'}`}
+                placeholder="Nhập giá sản phẩm"
+              />
+
+              {errors.price && (
+                <p className="mt-1 text-sm text-red-500">{errors.price}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                Mô tả
               </label>
               <textarea
-                id="description"
                 name="description"
-                value={formData.description}
+                value={product.description}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              ></textarea>
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-6 pb-2 border-b border-gray-200">
-              Default Image <span className="text-red-500">*</span>
-            </h2>
-            <div className="flex items-start space-x-6">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">
-                  Product Image
-                </label>
-                <div className="flex items-center">
-                  <label className="flex flex-col items-center justify-center w-48 h-48 border-2 border-gray-300 border-dashed rounded cursor-pointer hover:bg-gray-50">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      {!imagePreview ? (
-                        <>
-                          <svg
-                            className="w-10 h-10 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            ></path>
-                          </svg>
-                          <p className="mt-2 text-sm text-gray-500">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>{' '}
-                            or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            PNG, JPG, or WEBP (max. 2MB)
-                          </p>
-                        </>
-                      ) : (
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="object-cover w-full h-full"
-                        />
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </label>
-                </div>
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-700 font-medium mb-2">
-                  Image Guidelines
+                className={`w-full px-3 py-2 border rounded-md ${errors.description ? 'border-red-500' : 'border-gray-700'}`}
+                placeholder="Nhập mô tả sản phẩm"
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.description}
                 </p>
-                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                  <li>Use high-quality images (at least 800x800 pixels)</li>
-                  <li>Use a white or transparent background</li>
-                  <li>Show the product clearly without any text overlays</li>
-                  <li>Maximum file size: 2MB</li>
-                </ul>
-              </div>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end mt-8">
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Create Product
-            </button>
+        {/* Attributes */}
+        <div className="bg-gray-900 p-6 rounded-lg shadow text-white">
+          <h2 className="text-xl font-semibold mb-4">Thêm thuộc tính</h2>
+
+          {attributes.length === 0 ? (
+            <p className="text-gray-500">
+              Hiện không có thuộc tính. Có thể thêm thuộc tính khi tạo biến thể.
+            </p>
+          ) : (
+            <div>
+              <div className="mb-2 text-sm text-gray-500">
+                Chọn thuộc tính cho sản phẩm và chọn thuộc tính chính để hiển
+                thị hình ảnh của các biến thể
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {attributes.map((attribute) => (
+                  <div
+                    key={attribute.id}
+                    className={`flex items-center justify-between p-3 rounded border ${
+                      product.attributeIds.includes(attribute.id)
+                        ? 'border-blue-500 bg-gray-800'
+                        : 'border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`attr-${attribute.id}`}
+                        checked={product.attributeIds.includes(attribute.id)}
+                        onChange={() => handleAttributeToggle(attribute.id)}
+                        className="mr-2 h-4 w-4 text-blue-600"
+                      />
+                      <label
+                        htmlFor={`attr-${attribute.id}`}
+                        className="text-sm"
+                      >
+                        {attribute.name}
+                      </label>
+                    </div>
+
+                    {product.attributeIds.includes(attribute.id) && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetPrimaryAttribute(attribute.id)}
+                        className={`flex items-center justify-center h-5 w-5 rounded-full ${
+                          primaryAttributeId === attribute.id
+                            ? 'bg-yellow-600 text-yellow-200'
+                            : 'bg-gray-700 text-gray-400 hover:bg-gray-700'
+                        }`}
+                        title={
+                          primaryAttributeId === attribute.id
+                            ? 'Primary Attribute'
+                            : 'Set as Primary'
+                        }
+                      >
+                        <FaStar className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {errors.attributeIds && (
+                <p className="mt-2 text-sm text-red-500">
+                  {errors.attributeIds}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Images */}
+        <div className="bg-gray-900 text-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Hình ảnh</h2>
+
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <label
+                htmlFor="image-upload"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center cursor-pointer hover:bg-blue-700"
+              >
+                <FaPlus className="mr-2" />
+                Thêm hình ảnh
+              </label>
+              <input
+                id="image-upload"
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <span className="ml-3 text-sm text-gray-500">
+                Tải lên hình ảnh (JPEG, PNG, etc.)
+              </span>
+            </div>
+
+            {errors.images && (
+              <p className="text-sm text-red-500">{errors.images}</p>
+            )}
+
+            {imagePreviewUrls.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                {imagePreviewUrls.map((url, index) => (
+                  <div
+                    key={index}
+                    className={`relative group rounded-lg overflow-hidden border-2 ${
+                      index === defaultImageIndex
+                        ? 'border-yellow-400'
+                        : 'border-gray-200'
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`Product preview ${index + 1}`}
+                      className="w-full h-32 object-cover"
+                    />
+
+                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSetDefaultImage(index)}
+                          className={`p-1.5 rounded-full ${
+                            index === defaultImageIndex
+                              ? 'bg-yellow-400 text-yellow-800'
+                              : 'bg-white text-gray-700 hover:bg-yellow-100'
+                          }`}
+                          title={
+                            index === defaultImageIndex
+                              ? 'Default Image'
+                              : 'Set as Default'
+                          }
+                        >
+                          <FaImage className="h-4 w-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className="p-1.5 bg-white text-red-600 rounded-full hover:bg-red-100"
+                          title="Remove Image"
+                        >
+                          <FaTrash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {index === defaultImageIndex && (
+                      <div className="absolute top-0 left-0 bg-yellow-400 text-xs px-1.5 py-0.5 rounded-br">
+                        Default
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`px-6 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Product'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

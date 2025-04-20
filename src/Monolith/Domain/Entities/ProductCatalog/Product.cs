@@ -26,9 +26,10 @@ public class Product : BaseAuditableEntity
             {
                 _name = char.ToUpper(value[0]) + value[1..];
             }
-            Slug = value.ToSlug(Random.Shared.Next(100000000, 999999999));
+            Slug = value.ToSlug(DateTime.Now.ToYymmddhhmmss());
         }
     }
+    public string Sku { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public int CategoryId { get; set; }
     public string Slug { get; set; } = null!;

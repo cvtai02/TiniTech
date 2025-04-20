@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text.Json;
+using Application.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Middlewares;
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment environment) : IExceptionHandler
@@ -39,7 +42,6 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
     {
         return exception switch
         {
-            ValidationException => (StatusCodes.Status400BadRequest, "Validation Error"),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             InvalidOperationException => (StatusCodes.Status400BadRequest, "Invalid Operation"),
@@ -47,6 +49,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
             TimeoutException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
             NotImplementedException => (StatusCodes.Status501NotImplemented, "Not Implemented"),
             OperationCanceledException => (StatusCodes.Status400BadRequest, "Operation Cancelled"),
+            DbUpdateException when exception.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601) =>
+         (StatusCodes.Status409Conflict, "Unique Constraint Violation"),
+            InfrastructureException => (StatusCodes.Status500InternalServerError, "Infrastructure Error"),
             _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
     }

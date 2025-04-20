@@ -28,7 +28,7 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
                     image.Must(file => file.Length > 0).WithMessage("File is empty.")
                         .Must(file => allowImageContentTypes.Contains(file.ContentType))
                         .WithMessage("Image content type is not supported.")
-                        .Must(file => file.Length <= 2 * 1024 * 1024).WithMessage("Image size must not exceed 2MB.");
+                        .Must(file => file.Length <= 5 * 1024 * 1024).WithMessage("Image size must not exceed 5MB.");
                 });
         }
     }

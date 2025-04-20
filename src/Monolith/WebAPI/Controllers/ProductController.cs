@@ -23,12 +23,12 @@ public class ProductController : ApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateProductCommand cmd)
+    public async Task<IActionResult> Create([FromForm] CreateProductCommand cmd)
     {
         var result = await Sender.Send(cmd);
 
         return result.Match(
-            r => CreatedAtAction(nameof(GetBySlug), new { id = r }, new Response
+            r => CreatedAtAction(nameof(GetBySlug), new { slug = r }, new Response
             {
                 Title = "Product Created",
                 Status = "Success",
@@ -136,9 +136,13 @@ public class ProductController : ApiController
     }
 
     [HttpGet("new")]
-    public async Task<IActionResult> GetNewProducts([FromQuery] GetNewProductsQuery query)
+    public async Task<IActionResult> GetNewProducts([FromQuery] int page = 1, [FromQuery] int page_size = 10)
     {
-        var result = await Sender.Send(query);
+        var result = await Sender.Send(new GetNewProductsQuery
+        {
+            PageNumber = page,
+            PageSize = page_size
+        });
 
         return result.Match(
             r => Ok(new Response

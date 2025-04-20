@@ -5,7 +5,7 @@ export type User = {
   role: string;
 };
 
-export interface CustomerBilling {
+export type CustomerBilling = {
   id: string;
   name: string;
   phone: string;
@@ -13,4 +13,4 @@ export interface CustomerBilling {
   city: string;
   district: string;
   ward: string;
-}
+};

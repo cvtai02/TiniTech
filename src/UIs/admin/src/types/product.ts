@@ -1,24 +1,26 @@
-export interface ProductBrief {
+export type ProductBrief = {
   id: string;
   slug: string;
   name: string;
-  price: string;
+  price: number;
   imageUrl: string;
   rating: number;
   ratingCount: number;
   stock: number;
   sold: number;
-}
+};
 
-export interface CreateProductDto {
+export type CreateProductDto = {
   name: string;
   description: string;
+  sku: string;
+  price: number;
   categoryId: string;
   images: File[];
   attributeIds: string[];
-}
+};
 
-export interface ProductDetail {
+export type ProductDetail = {
   id: string;
   slug: string;
   name: string;
@@ -50,4 +52,4 @@ export interface ProductDetail {
       value: string;
     }[];
   }[];
-}
+};

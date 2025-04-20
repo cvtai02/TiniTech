@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { FaInfoCircle, FaTrashRestore } from 'react-icons/fa';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AiOutlineRollback } from 'react-icons/ai';
-import { FaUndo, FaRecycle, FaHistory } from 'react-icons/fa';
 
 import { Category } from '../../types/category';
 import {
@@ -11,6 +9,7 @@ import {
   updateCategory,
   updateCategoryStatus,
 } from '../../services/category';
+import { toast } from 'react-toastify';
 
 // Mock service functions - replace with your actual API calls
 
@@ -53,9 +52,6 @@ const CategoriesPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       setIsAddModalOpen(false);
       resetForm();
-    },
-    onError: (error) => {
-      alert(`Error adding category: ${error}`);
     },
   });
 

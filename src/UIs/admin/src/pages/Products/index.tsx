@@ -1,6 +1,6 @@
 import React from 'react';
 import CategoryNavbar from './Navbar';
-import FeaturedProduct from './FeaturedProduct';
+import NewProducts from './NewProducts';
 import Banner from './Banner';
 import styles from './styles.module.css';
 const ProductsPage: React.FC = () => {
@@ -17,7 +17,7 @@ const ProductsPage: React.FC = () => {
       </div>
 
       <div className="w-full flex gap-4 ">
-        <FeaturedProduct></FeaturedProduct>
+        <NewProducts></NewProducts>
       </div>
     </div>
   );

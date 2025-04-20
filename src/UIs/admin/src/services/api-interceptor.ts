@@ -18,18 +18,22 @@ export async function apiFetch(
     // --- Response Interceptor ---
     if (response.status >= 400) {
       if (response.status === 401) {
-        // Token expired, redirect to login or refresh token logic here
         console.warn('Unauthorized! Redirecting to login...');
         window.location.href = '/login';
       }
-      var body = await response.json();
-      console.error('Error response:', body);
-    }
 
+      // Thêm xử lý an toàn khi parse JSON
+      let errorBody;
+      errorBody = await response.json();
+      throw new Error(`${errorBody.title}`);
+    }
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Fetch error:', error);
-    
-    throw error;
+    if (error.name === 'TypeError') {
+      throw new Error(`Lỗi kết nối`);
+    } else {
+      throw error;
+    }
   }
 }

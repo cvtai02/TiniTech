@@ -42,7 +42,6 @@
 -   View Orders
 -   View rating and message
 -   Thêm sản phẩm: hiện form thêm sản phẩm gồm:
-
     -   tên sản phẩm, thương hiệu, slug có giá trị mặc định <ten-san-pham>, mô tả.
     -   selection box để chọn category
     -   Chọn danh sách attribute
@@ -51,9 +50,7 @@
     -   Chọn image mặc định
     -   Submit
     -   Note: OrderPriority Start from 0. The smaller it is, the higher the priority.
-
--   Feature: Add Product Variant
-
+-   Add Product Variant
     -   Product Selection:
         -   Suggest recently added products (tracked via cookies)
         -   Allow search by product name or slug
@@ -63,16 +60,15 @@
             -   Add new attributes or values
             -   Edit existing attributes or values
             -   Delete attributes or values
-
--   Xóa category:
-
-    -   Chỉ có thể xóa mềm khi không có product nào trực thuộc 'active'. hoặc không có subcategory nào. xóa hẳn sau 30 days
-    -   Có thể recycle
-
--   Xóa sản phẩm:
+-   Xóa sản phẩm: (xóa mềm)
 
     -   Cho vào thùng rác
     -   Có thể recycle: Khi recycle, recycle luôn category nếu nó đang deleted
 
+-   Xóa category: (xóa mềm)
+    -   Chỉ có thể xóa mềm khi không có product nào trực thuộc 'active'. hoặc không có subcategory nào.
+    -   Có thể recycle
 -   Thêm category:
-    -   Name không trùng. Trùng thì thông báo check trong thùng rác
+    -   Name không trùng.
+-   Sửa category:
+    -   Name, Description

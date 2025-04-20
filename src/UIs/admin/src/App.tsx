@@ -4,7 +4,7 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom';
-
+import { toast } from 'react-toastify';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute';
@@ -40,7 +40,30 @@ const routes = createRoutesFromElements(
 
 const router = createBrowserRouter(routes);
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      retryDelay: 3000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      throwOnError(error) {
+        if (error instanceof Error) {
+          toast.error('Query error:' + error.message);
+        }
+        return false;
+      },
+    },
+
+    mutations: {
+      onError: (error) => {
+        if (error) {
+          toast.error(error.message);
+        }
+      },
+    },
+  },
+});
 function App() {
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,13 +1,13 @@
 // api/category.ts
+import { toast } from 'react-toastify';
 import { Category } from '../types/category';
-import { Response } from './response';
-import { apiFetch } from './wrappers';
+import { Response } from '../types/response';
+import { apiFetch } from './api-interceptor';
 
 const API_URL = import.meta.env.VITE_CORE_API_URL || '';
 
 export const fetchCategories = async (): Promise<Category[]> => {
-  const res = await fetch(`${API_URL}/api/categories`);
-  if (!res.ok) throw new Error('Failed to fetch categories');
+  const res = await apiFetch(`${API_URL}/api/categories`);
   var body = await res.json();
   return body.data;
   // return [
@@ -139,7 +139,9 @@ export const addCategory = async (
     body: JSON.stringify(category),
   });
 
-  if (!res.ok) throw new Error('Failed to add category');
+  if (res.status === 201) {
+    toast.success('Thêm danh mục thành công!');
+  }
   const body = await res.json();
   return body.data;
 };
@@ -155,7 +157,9 @@ export const updateCategory = async (
     body: JSON.stringify(category),
   });
 
-  if (!res.ok) throw new Error('Failed to update category');
+  if (res.status === 200) {
+    toast.success('Cập nhật danh mục thành công!');
+  }
   const body = await res.json();
   return body.data;
 };
@@ -169,7 +173,9 @@ export const updateCategoryStatus = async (
     body: JSON.stringify({ id, status }),
   });
 
-  if (!res.ok) throw new Error('Failed to delete category');
+  if (res.status === 200) {
+    toast.success('Cập nhật trạng thái danh mục thành công!');
+  }
   const body = await res.json();
   return body.data;
 };

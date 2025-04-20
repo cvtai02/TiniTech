@@ -17,8 +17,8 @@ public class CloudinaryImageService : IImageService
     public IList<string> AllowImageContentTypes { get; } = new List<string>
     {
         "image/jpeg",
+        "image/jpg",
         "image/png",
-        "image/gif",
         "image/webp"
     };
 

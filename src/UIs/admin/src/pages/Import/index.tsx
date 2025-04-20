@@ -103,24 +103,24 @@ const ImportGoodsPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Import Goods Management</h1>
+      <h1 className="text-3xl font-bold mb-8">Quản lý đơn nhập hàng</h1>
 
       {/* Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <ActionButton
-          text="New Import Receipt"
+          text="Tạo phiếu nhập"
           icon="📝"
           onClick={handleCreateImportReceipt}
           color="bg-blue-600 hover:bg-blue-700"
         />
         <ActionButton
-          text="New Product"
+          text="Sản phẩm mới"
           icon="📦"
           onClick={() => navigate('/import/new-product')}
           color="bg-purple-600 hover:bg-purple-700"
         />
         <ActionButton
-          text="New Product Variant"
+          text="Thêm biến thể mới"
           icon="🔄"
           onClick={() => navigate('/import/new-variant')}
           color="bg-teal-600 hover:bg-teal-700"

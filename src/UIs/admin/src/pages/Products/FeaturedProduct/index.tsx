@@ -42,7 +42,6 @@ const FeaturedProduct = () => {
   return (
     <div className=" shadow-md rounded-lg p-4 mb-4 grow bg-transparent">
       <h2 className="text-xl font-semibold mb-4">Sản phẩm nổi bật</h2>
-      <ProductList products={products} />
     </div>
   );
 };
