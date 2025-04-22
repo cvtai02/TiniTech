@@ -1,17 +1,17 @@
 import React from 'react';
-import ProductList from '../../../components/products/ProductList';
+import ProductList from '../../../components/products/WrappableProductList';
 import { useQuery } from '@tanstack/react-query';
-import { getNewProducts } from '../../../services/product';
-import { ProductBrief } from '../../../types/product';
+import { getProducts } from '../../../services/product';
+import { GetProductsQuery, ProductBriefDto } from '../../../types';
 
 const NewProducts: React.FC = () => {
   const {
     data: newProducts,
     isLoading,
     error,
-  } = useQuery<ProductBrief[]>({
+  } = useQuery<ProductBriefDto[]>({
     queryKey: ['newProducts', 1, 10], // Page 1, 10 items per page
-    queryFn: () => getNewProducts(1, 10), // Pass the required parameters
+    queryFn: () => getProducts(new GetProductsQuery()), // Pass the required parameters
   });
 
   if (isLoading) {
@@ -43,10 +43,10 @@ const NewProducts: React.FC = () => {
   }
 
   return (
-      <div className="shadow-md rounded-lg p-4 mb-4 grow bg-transparent">
-        <h2 className="text-xl font-semibold mb-4">New Arrivals</h2>
-        <ProductList products={newProducts} />
-      </div>
+    <div className="shadow-md rounded-lg p-4 mb-4 grow bg-transparent">
+      <h2 className="text-xl font-semibold mb-4">New Arrivals</h2>
+      <ProductList products={newProducts} />
+    </div>
   );
 };
 

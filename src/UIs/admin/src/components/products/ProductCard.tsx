@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { ProductBrief } from '../../types/product';
+import { ProductBriefDto } from '../../types';
 import { MdDelete, MdEdit, MdMoreVert } from 'react-icons/md';
 import { formatVND } from '../../utils/formatCurrency';
-import { toast } from 'react-toastify';
 import { updateProductStatus } from '../../services/product';
 import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
-  product: ProductBrief;
+  product: ProductBriefDto;
   onProductDeleted?: () => void; // Add this new prop
 }
 
@@ -20,6 +20,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const toggleOptions = () => {
     setShowOptions(!showOptions);
   };
+
+  const navigate = useNavigate();
 
   const deleteMutation = useMutation({
     mutationFn: () => updateProductStatus(product.id, 'Deleted'),
@@ -44,23 +46,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 w-full max-w-xs flex flex-col">
-      <a
-        className="relative flex h-60 overflow-hidden mb-4 rounded-xl"
-        href="#"
-      >
+    <div
+      className="bg-white rounded-lg shadow-md p-4 w-full max-w-sm flex flex-col hover:cursor-pointer"
+      onClick={() => navigate(`/products/${product.slug}`)}
+    >
+      <div className="relative flex aspect-square overflow-hidden mb-4 rounded-lg ">
         <img
-          className="object-cover"
+          className="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105 "
           src={product.imageUrl}
           alt="product image"
         />
-      </a>
-      <div className="flex-grow flex justify-between">
+      </div>
+      <div className="flex-grow flex justify-between items-end">
         <div className="">
-          <h3 className="text-md font-semibold ">{product.name}</h3>
-          <p className="text-gray-800 font-bold mb-1">
-            {formatVND(product.price)}
-          </p>
+          <h3 className="font-medium ">{product.name}</h3>
           <div className="flex items-center gap-1 text-sm text-yellow-500 ">
             {'★'.repeat(product.rating)}
             {'☆'.repeat(5 - product.rating)}{' '}
@@ -68,6 +67,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               ({product.ratingCount})
             </span>
           </div>
+          <p className="mt-2 flex justify-between items-center font-bold">
+            {formatVND(product.price)}
+          </p>
         </div>
         <div className="relative">
           <MdMoreVert

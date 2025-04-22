@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Application.Products.Queries.Dtos;
 
-public class ProductDetail
+public class ProductDetailDto
 {
     public int Id { get; set; }
     public string Slug { get; set; } = null!;
@@ -19,8 +15,53 @@ public class ProductDetail
     public int RatingCount { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
+    public int FeaturedPoint { get; set; }
     public List<AttributeDto> Attributes { get; set; } = [];
     public List<VariantDto> Variants { get; set; } = [];
+
+    public static ProductDetailDto FromProduct(Product product)
+    {
+        return new ProductDetailDto
+        {
+            Id = product.Id,
+            Slug = product.Slug,
+            Name = product.Name,
+            Price = product.Metric.LowestPrice,
+            CategoryId = product.CategoryId,
+            FeaturedPoint = product.Metric.FeaturedPoint,
+            Description = product.Description,
+            ImageUrls = [.. product.Images.Select(i => i.ImageUrl)],
+            Rating = product.Metric.RatingAvg,
+            RatingCount = product.Metric.RatingCount,
+            Stock = product.Metric.Stock,
+            Sold = product.Metric.Sold,
+            Attributes = [.. product.Attributes.Select(a => new AttributeDto
+            {
+                AttributeId = a.AttributeId,
+                Name = a.Attribute.Name,
+                OrderPriority = a.OrderPriority,
+                IsPrimary = a.IsPrimary,
+                Values = [.. a.ProductAttributeValues.Select(v => new AttributeValueDto
+                {
+                    OrderPriority = v.OrderPriority,
+                    Value = v.Value,
+                    ImageUrl = v.ImageUrl
+                })]
+            })],
+
+            Variants = [.. product.Variants.Select(v => new VariantDto
+            {
+                Price = v.Price,
+                Sku = v.Sku,
+                Stock = v.Metric.Stock,
+                VariantAttributes = [.. v.VariantAttributes.Select(va => new VariantAttributeDto
+                {
+                    AttributeId = va.AttributeId,
+                    Value = va.Value
+                })]
+            })]
+        };
+    }
 }
 
 public class VariantDto
@@ -33,19 +74,20 @@ public class VariantDto
 
 public class VariantAttributeDto
 {
-    public string Name { get; set; } = null!;
+    public int AttributeId { get; set; }
     public string Value { get; set; } = null!;
 }
 
 public class AttributeValueDto
 {
-    public int OrderPriority { get; set; }
+    public float OrderPriority { get; set; }
     public string Value { get; set; } = null!;
     public string? ImageUrl { get; set; }
 }
 
 public class AttributeDto
 {
+    public int AttributeId { get; set; }
     public string Name { get; set; } = null!;
     public float OrderPriority { get; set; }
     public bool IsPrimary { get; set; }

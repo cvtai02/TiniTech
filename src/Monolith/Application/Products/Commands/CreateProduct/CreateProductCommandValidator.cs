@@ -21,7 +21,6 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
                 .GreaterThan(0).WithMessage("CategoryId must be greater than 0.");
 
             RuleFor(x => x.Images)
-                .NotNull().WithMessage("Images list is required.")
                 .NotEmpty().WithMessage("At least one image is required.")
                 .ForEach(image =>
                 {

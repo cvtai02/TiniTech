@@ -1,4 +1,4 @@
-import { CreateProductDto } from '../../types/product';
+import { CreateProductDto } from '../../types';
 
 /**
  * Validates a product form submission
@@ -22,6 +22,11 @@ export const validatePostProduct = (
   // Validate category
   if (!product.categoryId) {
     errors.categoryId = 'Vui lòng chọn danh mục sản phẩm';
+  }
+
+  // Validate description
+  if (!product.description.trim()) {
+    errors.description = 'Mô tả sản phẩm là bắt buộc';
   }
 
   // Validate SKU

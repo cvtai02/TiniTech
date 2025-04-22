@@ -7,3 +7,5 @@ export const fetchAttributes = async (): Promise<Attribute[]> => {
   const body = await res.json();
   return body.data;
 };
+
+

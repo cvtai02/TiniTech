@@ -2,7 +2,7 @@ using Application.Products.Commands.ActivateProductCommand;
 using Application.Products.Commands.CreateProductCommand;
 using Application.Products.Commands.SoftDeleteProductCommand;
 using Application.Products.Queries.GetDetailBySlug;
-using Application.Products.Queries.GetNewProduct;
+using Application.Products.Queries.GetProducts;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +25,7 @@ public class ProductController : ApiController
     [HttpPost]
     public async Task<IActionResult> Create([FromForm] CreateProductCommand cmd)
     {
+        Console.WriteLine("CreateProductCommand: " + cmd.ToString());
         var result = await Sender.Send(cmd);
 
         return result.Match(
@@ -135,25 +136,22 @@ public class ProductController : ApiController
         );
     }
 
-    [HttpGet("new")]
-    public async Task<IActionResult> GetNewProducts([FromQuery] int page = 1, [FromQuery] int page_size = 10)
+
+    [HttpGet]
+    public async Task<IActionResult> Search([FromQuery] GetProductsQuery query)
     {
-        var result = await Sender.Send(new GetNewProductsQuery
-        {
-            PageNumber = page,
-            PageSize = page_size
-        });
+        var result = await Sender.Send(query);
 
         return result.Match(
             r => Ok(new Response
             {
                 Title = "Ok",
                 Status = "Success",
-                Detail = "New Products Retrieved Successfully",
+                Detail = "Search Products Retrieved Successfully",
                 Data = r,
                 Errors = null
             }),
-            e => HandleFailure<GetNewProductsQuery>(e)
+            e => HandleFailure<GetProductsQuery>(e)
         );
     }
 }

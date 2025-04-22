@@ -12,19 +12,23 @@ import { AuthContextProvider } from './contexts/AuthContext';
 import Layout from './layouts';
 import Home from './pages/Dashboard';
 import Login from './pages/Login';
-import ProductsPage from './pages/Products';
+import LandingPage from './pages/LandingPage';
 import CategoriesPage from './pages/Categories';
 import UsersPage from './pages/Users';
 import ImportGoodsPage from './pages/Import';
 import AddProductPage from './pages/AddProduct';
 import AddProductVariantPage from './pages/AddVariant';
 import NotFoundPage from './pages/NotFoundPage';
+import ProductDetailPage from './pages/ProductDetail';
+import ProductPage from './pages/Products';
 
 const routes = createRoutesFromElements(
   <>
     <Route path="/" element={<Layout />}>
       <Route path="" element={<Home />} />,
-      <Route path="products" element={<ProductsPage />} />,
+      <Route path="landing" element={<LandingPage />} />,
+      <Route path="products" element={<ProductPage />} />,
+      <Route path="products/:slug" element={<ProductDetailPage />} />,
       <Route path="categories" element={<CategoriesPage />} />,
       <Route path="users" element={<UsersPage />} />,
       <Route path="import" element={<ImportGoodsPage />} />,
@@ -33,7 +37,6 @@ const routes = createRoutesFromElements(
       <Route path="*" element={<NotFoundPage />}></Route>
       <Route element={<PrivateRoute requiredRole="Admin" />}></Route>
     </Route>
-
     <Route path="/login" element={<Login></Login>}></Route>
   </>,
 );

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Application.Common.Abstraction;
 using Application.Common.Exceptions;
 using Application.Common.Models;
@@ -15,6 +11,7 @@ namespace Application.Products.Commands.CreateProductCommand;
 /// Command to create a new product.
 /// Images[0] will be the main image.
 /// AttributeIds[0] will be the main attribute.
+/// If attributeIds[0] == -1, then there is no main attribute.
 /// </summary>
 public class CreateProductCommand : IRequest<Result<string>>
 {
@@ -51,13 +48,22 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             {
                 AttributeId = id,
                 OrderPriority = index,
-                IsPrimary = index == 0
             })],
             Metric = new ProductMetric
             {
                 LowestPrice = request.Price,
             },
         };
+
+        if (product.Attributes[0].AttributeId == -1)
+        {
+            product.Attributes.RemoveAt(0); // Remove the main attribute if it is -1
+        }
+        else
+        {
+            product.Attributes[0].IsPrimary = true; // Set the first attribute as the main attribute
+        }
+
 
         var uploadTasks = request.Images.Select(async (image, index) =>
         {

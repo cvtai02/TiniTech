@@ -21,7 +21,10 @@ public abstract class ApiController : ControllerBase
 
     protected IActionResult HandleFailure<T>(Result<T> result)
     {
-
+        if (result.IsSuccess)
+        {
+            throw new InvalidOperationException("Result is not a failure.");
+        }
         if (result.Exception is FluentValidationException validationException)
         {
             return BadRequest(
@@ -31,9 +34,23 @@ public abstract class ApiController : ControllerBase
                     validationException.Errors));
         }
 
-        if (result.IsSuccess)
+
+        if (result.Exception is KeyNotFoundException keyNotFoundException)
         {
-            throw new InvalidOperationException();
+            return NotFound(
+                CreateProblemDetails(
+                    "Not Found",
+                    StatusCodes.Status404NotFound,
+                    keyNotFoundException));
+        }
+
+        if (result.Exception is RestrictDeleteException restrictDeleteException)
+        {
+            return NotFound(
+                CreateProblemDetails(
+                    restrictDeleteException.Message,
+                    StatusCodes.Status400BadRequest,
+                    restrictDeleteException));
         }
 
         return BadRequest(

@@ -7,20 +7,29 @@ import {
   FaStore,
   FaUsers,
   FaComments,
+  FaCubes,
   FaBoxOpen,
 } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   return (
-    <header className="h-screen fixed w-64 bg-transparent text-black basis-64 flex flex-col border-r border-gray-400 shadow-lg">
-      <div
-        className="text-3xl font-bold p-4 border-b border-gray-300 shadow-sm pl-8 "
-        style={{
-          fontFamily: "'EB Garamond', serif",
-          transform: 'skewX(-8deg)',
-        }}
-      >
-        <span style={{ color: '#f0bd24' }}>Tini</span>Tech
+    <header className="h-screen bg-transparent sticky top-0 text-black basis-64 flex flex-col border-r border-gray-400 shadow-lg">
+      <div className="text-3xl font-bold p-4 border-b border-gray-300 shadow-sm pl-8 flex ">
+        <div
+          style={{
+            fontFamily: "'EB Garamond', serif",
+            transform: 'skewX(-8deg)',
+          }}
+        >
+          <span
+            style={{
+              color: '#f0bd24',
+            }}
+          >
+            Tini
+          </span>
+          Tech
+        </div>
       </div>
       <nav className="flex-grow">
         <ul className="flex flex-col space-y-2 p-4">
@@ -66,6 +75,19 @@ const Header: React.FC = () => {
           <li>
             <NavLink
               to="/products"
+              className={({ isActive }) =>
+                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                  isActive ? 'bg-black text-white' : ''
+                }`
+              }
+            >
+              <FaCubes className="w-5 h-5 mr-2" />
+              Sản phẩm
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/landing"
               className={({ isActive }) =>
                 `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''

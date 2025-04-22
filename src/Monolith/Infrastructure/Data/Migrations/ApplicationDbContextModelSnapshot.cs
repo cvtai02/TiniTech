@@ -289,8 +289,8 @@ namespace Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsFeatured")
-                        .HasColumnType("bit");
+                    b.Property<int>("FeaturedPoint")
+                        .HasColumnType("int");
 
                     b.Property<int>("LowestPrice")
                         .HasColumnType("int");
@@ -349,7 +349,7 @@ namespace Infrastructure.Data.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SKU")
+                    b.Property<string>("Sku")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -372,10 +372,8 @@ namespace Infrastructure.Data.Migrations
                     b.Property<int>("AttributeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductAttributeValueId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Value")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("VariantId")
@@ -409,7 +407,8 @@ namespace Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VariantId");
+                    b.HasIndex("VariantId")
+                        .IsUnique();
 
                     b.ToTable("VariantMetrics");
                 });
@@ -529,8 +528,8 @@ namespace Infrastructure.Data.Migrations
             modelBuilder.Entity("Domain.Entities.VariantMetric", b =>
                 {
                     b.HasOne("Domain.Entities.Variant", "Variant")
-                        .WithMany()
-                        .HasForeignKey("VariantId")
+                        .WithOne("Metric")
+                        .HasForeignKey("Domain.Entities.VariantMetric", "VariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -550,7 +549,8 @@ namespace Infrastructure.Data.Migrations
 
                     b.Navigation("Images");
 
-                    b.Navigation("Metric");
+                    b.Navigation("Metric")
+                        .IsRequired();
 
                     b.Navigation("Variants");
                 });
@@ -562,6 +562,9 @@ namespace Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Domain.Entities.Variant", b =>
                 {
+                    b.Navigation("Metric")
+                        .IsRequired();
+
                     b.Navigation("VariantAttributes");
                 });
 #pragma warning restore 612, 618

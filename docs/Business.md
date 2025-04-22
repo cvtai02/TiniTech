@@ -71,4 +71,11 @@
 -   Thêm category:
     -   Name không trùng.
 -   Sửa category:
+
     -   Name, Description
+
+-   Add Variant:
+    -   pick product: by searching. Recommend recently added products
+    -   For each attribute of product. Pick an value then user can fill Price
+    -   Fill: SKU (auto recommended by available toSku())
+    -   User can add Product Attribute and Attribute value while the process

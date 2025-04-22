@@ -1,5 +1,8 @@
 @import 'tailwindcss';
-
+@theme {
+  --color-primary: oklch(0.82 0.1605 87.85);
+  --color-secondary: oklch(0.72 0.15 60); /* approx #f28c18 */
+}
 @layer utilities {
   .animate-star-movement-bottom {
     animation: star-movement-bottom linear infinite alternate;
@@ -27,5 +30,23 @@
       transform: translate(100%, 0%);
       opacity: 0;
     }
+  }
+}
+
+.scroll-bar {
+  &::-webkit-scrollbar {
+    width: calc(var(--spacing) * 2) /* 0.5rem = 8px */;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: calc(infinity * 1px);
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: calc(infinity * 1px);
+  }
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-neutral-700) /* oklch(37.1% 0 0) = #404040 */;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-neutral-500) /* oklch(55.6% 0 0) = #737373 */;
   }
 }

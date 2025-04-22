@@ -167,7 +167,7 @@ export const updateCategory = async (
 export const updateCategoryStatus = async (
   id: string,
   status: 'Active' | 'Deleted',
-): Promise<Response<boolean>> => {
+): Promise<boolean> => {
   const res = await apiFetch(`${API_URL}/api/categories/status`, {
     method: 'PATCH',
     body: JSON.stringify({ id, status }),
@@ -175,7 +175,7 @@ export const updateCategoryStatus = async (
 
   if (res.status === 200) {
     toast.success('Cập nhật trạng thái danh mục thành công!');
+    return true;
   }
-  const body = await res.json();
-  return body.data;
+  return false;
 };

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { FaPlus, FaTrash, FaStar, FaImage } from 'react-icons/fa';
 import { fetchCategories } from '../../services/category';
 import { fetchAttributes } from '../../services/attribute';
-import { CreateProductDto } from '../../types/product';
+import { CreateProductDto } from '../../types';
 import { validatePostProduct } from './validatePostProduct';
 import { formatVND } from '../../utils/formatCurrency';
 import { toSku } from '../../utils/to-sku';
@@ -39,6 +39,12 @@ const AddProductPage: React.FC = () => {
   const { data: attributes = [] } = useQuery({
     queryKey: ['attributes'],
     queryFn: fetchAttributes,
+  });
+
+  const createProductMutation = useMutation({
+    mutationFn: async (finalProduct: CreateProductDto) => {
+      return await createProduct(finalProduct);
+    },
   });
 
   // Derived state for subcategories
@@ -113,6 +119,9 @@ const AddProductPage: React.FC = () => {
     if (product.attributeIds.includes(attributeId)) {
       setPrimaryAttributeId(attributeId);
     }
+    if (primaryAttributeId === attributeId) {
+      setPrimaryAttributeId('');
+    }
   };
 
   // Handle image uploads
@@ -171,12 +180,12 @@ const AddProductPage: React.FC = () => {
   // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     const validationErrors = validatePostProduct(product);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
+      setIsSubmitting(true);
       // Prepare final product data
       const finalProduct = {
         ...product,
@@ -192,28 +201,31 @@ const AddProductPage: React.FC = () => {
         ],
       };
 
-      await createProduct(finalProduct);
+      createProductMutation.mutate(finalProduct, {
+        onSettled: () => {
+          setIsSubmitting(false);
+        },
+        onSuccess: () => {
+          console.log('Product submitted:', finalProduct);
 
-      console.log('Product submitted:', finalProduct);
-
-      // Reset form
-      setProduct({
-        name: '',
-        description: '',
-        categoryId: '',
-        sku: '',
-        price: 0,
-        images: [],
-        attributeIds: [],
+          // Reset form
+          setProduct({
+            name: '',
+            description: '',
+            categoryId: '',
+            sku: '',
+            price: 0,
+            images: [],
+            attributeIds: [],
+          });
+          setSelectedParentCategory('');
+          setImagePreviewUrls([]);
+          setDefaultImageIndex(0);
+          setPrimaryAttributeId('');
+          setErrors({});
+        },
       });
-      setSelectedParentCategory('');
-      setImagePreviewUrls([]);
-      setDefaultImageIndex(0);
-      setPrimaryAttributeId('');
-      setErrors({});
     }
-
-    setIsSubmitting(false);
   };
 
   // Clean up image previews when component unmounts
@@ -240,7 +252,7 @@ const AddProductPage: React.FC = () => {
               <select
                 value={selectedParentCategory}
                 onChange={handleParentCategoryChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className=" border b te text-sm rounded-lg   block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Chọn</option>
                 {parentCategories.map((category) => (
@@ -387,23 +399,23 @@ const AddProductPage: React.FC = () => {
                 {attributes.map((attribute) => (
                   <div
                     key={attribute.id}
-                    className={`flex items-center justify-between p-3 rounded border ${
+                    className={`flex items-center justify-between rounded border ${
                       product.attributeIds.includes(attribute.id)
                         ? 'border-blue-500 bg-gray-800'
                         : 'border-gray-300'
                     }`}
                   >
-                    <div className="flex items-center">
+                    <div className="flex items-center grow ps-4  rounded-sm border-gray-400">
                       <input
                         type="checkbox"
                         id={`attr-${attribute.id}`}
                         checked={product.attributeIds.includes(attribute.id)}
                         onChange={() => handleAttributeToggle(attribute.id)}
-                        className="mr-2 h-4 w-4 text-blue-600"
+                        className="w-4 h-4 text-blue-600 rounded-sm  focus:ring-blue-600 ring-offset-gray-800 focus:ring-2 bg-gray-700 border-gray-600"
                       />
                       <label
                         htmlFor={`attr-${attribute.id}`}
-                        className="text-sm"
+                        className="w-full py-4 ms-2 text-sm font-medium  text-gray-300"
                       >
                         {attribute.name}
                       </label>
@@ -413,7 +425,7 @@ const AddProductPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleSetPrimaryAttribute(attribute.id)}
-                        className={`flex items-center justify-center h-5 w-5 rounded-full ${
+                        className={`flex items-center mr-4 justify-center h-6 w-6 rounded-full ${
                           primaryAttributeId === attribute.id
                             ? 'bg-yellow-600 text-yellow-200'
                             : 'bg-gray-700 text-gray-400 hover:bg-gray-700'
@@ -448,7 +460,7 @@ const AddProductPage: React.FC = () => {
             <div className="flex items-center">
               <label
                 htmlFor="image-upload"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md flex items-center cursor-pointer hover:bg-blue-700"
+                className="px-4 py-2 w-full items-center flex bg-gray-100 text-black rounded-md justify-center cursor-pointer hover:bg-gray-300"
               >
                 <FaPlus className="mr-2" />
                 Thêm hình ảnh
@@ -461,9 +473,6 @@ const AddProductPage: React.FC = () => {
                 onChange={handleImageUpload}
                 className="hidden"
               />
-              <span className="ml-3 text-sm text-gray-500">
-                Tải lên hình ảnh (JPEG, PNG, etc.)
-              </span>
             </div>
 
             {errors.images && (
@@ -534,11 +543,11 @@ const AddProductPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`px-6 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+            className={`relative h-12 overflow-hidden rounded bg-neutral-950 px-5 py-2.5 text-white transition-all duration-300 hover:bg-neutral-800 hover:ring-2 hover:ring-neutral-800 hover:ring-offset-2 ${
               isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
-            {isSubmitting ? 'Creating...' : 'Create Product'}
+            {isSubmitting ? 'Chờ một tí ...' : 'Thêm sản phẩm'}
           </button>
         </div>
       </form>

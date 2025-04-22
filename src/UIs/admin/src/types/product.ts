@@ -1,55 +1,101 @@
-export type ProductBrief = {
+export const ProductStatus = [
+  {
+    label: 'Active',
+    value: 'active',
+  },
+  {
+    label: 'Draft',
+    value: 'draft',
+  },
+  {
+    label: 'Deleted',
+    value: 'deleted',
+  },
+];
+export const OrderCriteria = [
+  {
+    label: 'Created Date',
+    value: 'createdDate',
+  },
+  {
+    label: 'Rating',
+    value: 'rating',
+  },
+  {
+    label: 'Price',
+    value: 'price',
+  },
+  {
+    label: 'Sold',
+    value: 'sold',
+  },
+  {
+    label: 'Stock',
+    value: 'stock',
+  },
+  {
+    label: 'Featured Point',
+    value: 'featuredPoint',
+  },
+];
+export const OrderDirection = [
+  {
+    label: 'Ascending',
+    value: 'ascending',
+  },
+  {
+    label: 'Descending',
+    value: 'descending',
+  },
+];
+
+export interface ProductBriefDto {
   id: string;
   slug: string;
   name: string;
+  sku: string;
   price: number;
+  featuredPoint: number;
+  status: string;
   imageUrl: string;
   rating: number;
   ratingCount: number;
   stock: number;
   sold: number;
-};
+}
 
-export type CreateProductDto = {
-  name: string;
-  description: string;
-  sku: string;
-  price: number;
-  categoryId: string;
-  images: File[];
-  attributeIds: string[];
-};
+export class GetProductsQuery {
+  pageNumber?: number;
+  pageSize?: number;
+  search?: string | null;
+  categorySlug?: string | null;
+  status?: string[] | null;
+  orderBy?: string;
+  orderDirection?: string;
 
-export type ProductDetail = {
-  id: string;
-  slug: string;
-  name: string;
-  categoryId: string;
-  description: string;
-  price: string;
-  imageUrls: string[];
-  rating: number;
-  ratingCount: number;
-  stock: number;
-  sold: number;
-  attributes: {
-    name: string;
-    orderPriority: number;
-    isPrimary: boolean;
-    values: {
-      value: string;
-      orderPriority: number;
-      imageUrl?: string | null;
-    }[];
-  }[];
+  constructor(init?: Partial<GetProductsQuery>) {
+    Object.assign(this, init);
+  }
 
-  variants: {
-    price: string;
-    sku: string;
-    stock: number;
-    variantAttributes: {
-      name: string;
-      value: string;
-    }[];
-  }[];
-};
+  getQueryString(): string {
+    const params = new URLSearchParams();
+
+    if (this.pageNumber != null)
+      params.append('pageNumber', String(this.pageNumber));
+    if (this.pageSize != null) params.append('pageSize', String(this.pageSize));
+    if (this.search) params.append('search', this.search);
+    if (this.categorySlug) params.append('categorySlug', this.categorySlug);
+    if (this.status && this.status.length > 0) {
+      this.status.forEach((s) => params.append('status', s));
+    }
+    if (this.orderBy) params.append('orderBy', this.orderBy);
+    if (this.orderDirection)
+      params.append('orderDirection', this.orderDirection);
+
+    if (params.toString().length !== 0) {
+      return `?${params.toString()}`;
+    }
+
+    return params.toString();
+  }
+}

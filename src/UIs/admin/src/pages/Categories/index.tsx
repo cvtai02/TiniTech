@@ -68,10 +68,8 @@ const CategoriesPage: React.FC = () => {
       updateCategoryStatus(params.id, params.status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
-      setIsDeleteModalOpen(false);
-      setIsActivateModalOpen(false);
     },
-    onError: () => {
+    onSettled: () => {
       setIsDeleteModalOpen(false);
       setIsActivateModalOpen(false);
     },

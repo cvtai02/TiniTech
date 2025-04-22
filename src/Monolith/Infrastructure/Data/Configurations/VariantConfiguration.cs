@@ -12,7 +12,7 @@ public class VariantConfiguration : IEntityTypeConfiguration<Variant>
 {
     public void Configure(EntityTypeBuilder<Variant> builder)
     {
-        builder.Property(v => v.SKU)
+        builder.Property(v => v.Sku)
             .HasMaxLength(100)
             .IsRequired();
 

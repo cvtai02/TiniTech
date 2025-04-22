@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { useQuery } from '@tanstack/react-query';
 import { Category } from '../../types/category';
 import { fetchCategories } from '../../services/category';
@@ -12,16 +10,6 @@ const UsersPage = () => {
 
   if (isLoading) return <p className="text-gray-500">Loading categories...</p>;
   if (isError) return <p className="text-red-500">Error loading categories.</p>;
-
-  const handleEdit = (category: Category) => {
-    console.log('Edit:', category);
-    // TODO: open edit modal or navigate to edit page
-  };
-
-  const handleDelete = (category: Category) => {
-    console.log('Delete:', category);
-    // TODO: confirm + delete logic
-  };
 
   return (
     <section className="container px-4 mx-auto">

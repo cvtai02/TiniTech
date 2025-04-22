@@ -27,3 +27,15 @@ export function toSku(
   const sku = `${getInitials(rootCategoryName)}-${getInitials(leafCategoryName)}-${getInitials(productName)}-${datePart}`;
   return sku;
 }
+
+export function toVariantSku(
+  productSku: string,
+  attributeValues: string[],
+): string {
+  const skuParts = productSku.split('-');
+  const datePart = skuParts.pop(); // Remove the last part (date)
+  const variantPart = attributeValues
+    .map((value) => value.trim().toUpperCase().replace(/\s+/g, ''))
+    .join('');
+  return `${skuParts.join('-')}-${variantPart}-${datePart}`;
+}

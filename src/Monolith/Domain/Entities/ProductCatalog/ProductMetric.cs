@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class ProductMetric : BaseEntity
 {
     public int ProductId { get; set; }
-    public bool IsFeatured { get; set; }
+    public int FeaturedPoint { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
     public float RatingAvg { get; set; }

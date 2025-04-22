@@ -10,8 +10,9 @@ public class Variant : BaseAuditableEntity
 {
     public int ProductId { get; set; }
     public int Price { get; set; }
-    public string SKU { get; set; } = null!;
-    public Product? Product { get; set; } = null!;
+    public string Sku { get; set; } = null!;
+    public Product Product { get; set; } = null!;
     public virtual ICollection<VariantAttribute> VariantAttributes { get; set; } = [];
+    public VariantMetric Metric { get; set; } = null!;
 }
 

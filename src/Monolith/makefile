@@ -84,9 +84,11 @@ init-monolith:
 	make init-solution
 
 run-webapi:
-	dotnet run --project WebAPI/WebAPI.csproj
+	dotnet run --project WebAPI/WebAPI.csproj 
+run-webapi-nobuild:
+	dotnet run --project WebAPI/WebAPI.csproj --no-build
 run-webmvc:
-	dotnet run --project WebMVC/WebMVC.csprojư
+	dotnet run --project WebMVC/WebMVC.csproj
 run-unit-tests:
 	dotnet test --project UnitTests/UnitTests.csproj --no-build --verbosity normal --filter "Category=Unit"
 
