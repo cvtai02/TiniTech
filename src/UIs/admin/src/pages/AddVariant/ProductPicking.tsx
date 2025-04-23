@@ -18,7 +18,7 @@ export default function ProductSearch({ onProductSelect }: ProductSearchProps) {
       getProducts(
         new GetProductsQuery({
           search: searchTerm,
-          pageNumber: 1,
+          page: 1,
           pageSize: 12,
         }),
       ),
@@ -28,8 +28,7 @@ export default function ProductSearch({ onProductSelect }: ProductSearchProps) {
   // Query for recently added products
   const { data: recentProducts, isLoading: recentLoading } = useQuery({
     queryKey: ['newProducts'],
-    queryFn: () =>
-      getProducts(new GetProductsQuery({ pageNumber: 1, pageSize: 12 })),
+    queryFn: () => getProducts(new GetProductsQuery({ page: 1, pageSize: 12 })),
     enabled: showRecentProducts,
   });
 
@@ -95,9 +94,9 @@ export default function ProductSearch({ onProductSelect }: ProductSearchProps) {
                     [&::-webkit-scrollbar-track]:bg-neutral-700
                     [&::-webkit-scrollbar-thumb]:bg-neutral-500"
       >
-        {displayedProducts?.length ? (
+        {displayedProducts?.items.length ? (
           <ul className="w-full divide-y divide-gray-700 columns-2">
-            {displayedProducts.map((product: ProductBriefDto) => (
+            {displayedProducts.items.map((product: ProductBriefDto) => (
               <li
                 key={product.id}
                 onClick={() => onProductSelect(product)}

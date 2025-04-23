@@ -4,7 +4,7 @@ import { FaSearch, FaPlus, FaTrash } from 'react-icons/fa';
 import { fetchAttributes } from '../../services/attribute';
 import { formatVND } from '../../utils/formatCurrency';
 import { toVariantSku } from '../../utils/to-sku';
-import { getProducts, getProductAttribute } from '../../services/product';
+import { getProductsFn, getProductAttribute } from '../../services/product';
 import {
   createVariant,
   createProductAttribute,
