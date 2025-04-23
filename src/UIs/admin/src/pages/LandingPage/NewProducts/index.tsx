@@ -1,16 +1,20 @@
 import React from 'react';
-import ProductList from '../../../components/products/WrappableProductList';
 import { useQuery } from '@tanstack/react-query';
-import { getProducts } from '../../../services/product';
-import { GetProductsQuery, ProductBriefDto } from '../../../types';
+import { getProductsFn as getProducts } from '../../../services/product';
+import {
+  GetProductsQuery,
+  PaginatedList,
+  ProductBriefDto,
+} from '../../../types';
+import WrappableProductList from '../../../components/products/WrappableProductList';
 
 const NewProducts: React.FC = () => {
   const {
     data: newProducts,
     isLoading,
     error,
-  } = useQuery<ProductBriefDto[]>({
-    queryKey: ['newProducts', 1, 10], // Page 1, 10 items per page
+  } = useQuery<PaginatedList<ProductBriefDto>>({
+    queryKey: ['newProducts'], // Page 1, 10 items per page
     queryFn: () => getProducts(new GetProductsQuery()), // Pass the required parameters
   });
 
@@ -32,7 +36,7 @@ const NewProducts: React.FC = () => {
     );
   }
 
-  if (!newProducts || newProducts.length === 0) {
+  if (!newProducts || newProducts.items.length === 0) {
     return (
       <div className="text-center p-8">
         <p className="text-gray-500">
@@ -45,7 +49,7 @@ const NewProducts: React.FC = () => {
   return (
     <div className="shadow-md rounded-lg p-4 mb-4 grow bg-transparent">
       <h2 className="text-xl font-semibold mb-4">New Arrivals</h2>
-      <ProductList products={newProducts} />
+      <WrappableProductList products={newProducts.items} />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getProducts } from '../../services/product';
+import { getProductsFn as getProducts } from '../../services/product';
 import { GetProductsQuery, ProductBriefDto } from '../../types/product';
 
 interface ProductSearchProps {

@@ -5,6 +5,7 @@ import {
   CreateVariantDto,
   ProductDetailDto,
   GetProductsQuery,
+  PaginatedList,
 } from '../types';
 import { toast } from 'react-toastify';
 
@@ -73,14 +74,14 @@ export const createVariant = async (data: CreateVariantDto) => {
   return body.data;
 };
 
-export const getProducts = async (
+export const getProductsFn = async (
   data: GetProductsQuery,
-): Promise<ProductBriefDto[]> => {
+): Promise<PaginatedList<ProductBriefDto>> => {
   var queryString = data.getQueryString();
 
   const res = await apiFetch(`${API_URL}/api/products${queryString}`);
   const body = await res.json();
-  return body.data.items;
+  return body.data;
 };
 
 export const createProductAttribute = async (data: {

@@ -65,11 +65,11 @@ export interface ProductBriefDto {
 }
 
 export class GetProductsQuery {
-  pageNumber?: number;
-  pageSize?: number;
+  page: number = 1;
+  pageSize: number = 8;
   search?: string | null;
   categorySlug?: string | null;
-  status?: string[] | null;
+  status: string[] = ['active', 'draft'];
   orderBy?: string;
   orderDirection?: string;
 
@@ -80,8 +80,7 @@ export class GetProductsQuery {
   getQueryString(): string {
     const params = new URLSearchParams();
 
-    if (this.pageNumber != null)
-      params.append('pageNumber', String(this.pageNumber));
+    if (this.page != null) params.append('pageNumber', String(this.page));
     if (this.pageSize != null) params.append('pageSize', String(this.pageSize));
     if (this.search) params.append('search', this.search);
     if (this.categorySlug) params.append('categorySlug', this.categorySlug);

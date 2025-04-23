@@ -1,1 +1,4 @@
 .vscode/*
+
+# is this needed?
+src/uis/admin/.git/* 

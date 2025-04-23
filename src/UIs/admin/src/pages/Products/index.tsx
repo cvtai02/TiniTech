@@ -3,34 +3,28 @@ import { FiSearch, FiFilter, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import {
   Category,
   OrderCriteria,
-  ProductStatus,
+  PaginatedList,
   ProductBriefDto,
-  GetProductsQuery,
+  ProductStatus,
 } from '../../types';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategories } from '../../services/category';
-import { getProducts } from '../../services/product';
-import ProductCard from '../../components/products/ProductCard';
-import WrappableProductList from '../../components/products/WrappableProductList';
-
-interface FilterState {
-  category: string;
-  subCategory: string;
-  status: string;
-  sortBy: string;
-  sortDirection: 'asc' | 'desc';
-}
+import { GetProductsQuery } from '../../types';
+import ProductList from '../../components/products/WrappableProductList';
+import { getProductsFn } from '../../services/product';
 
 const ProductPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>('');
   const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
-  const [filters, setFilters] = useState<FilterState>({
-    category: 'all',
-    subCategory: 'all',
-    status: 'all',
-    sortBy: 'createdDate',
-    sortDirection: 'desc',
-  });
+  const [filters, setFilters] = useState<GetProductsQuery>(
+    new GetProductsQuery({
+      page: 1,
+      pageSize: 8,
+      orderBy: 'createdDate',
+      orderDirection: 'descending',
+      status: ['active', 'draft'],
+    }),
+  );
+  const [category, setCategory] = useState<Category>();
 
   // Fetch categories using React Query
   const { data: categories } = useQuery<Category[]>({
@@ -38,54 +32,38 @@ const ProductPage: React.FC = () => {
     queryFn: fetchCategories,
   });
 
-  // Fetch products using React Query with filters
-  const {
-    data: products,
-    isLoading: isProductLoading,
-    isError: isProductError,
-  } = useQuery<ProductBriefDto[]>({
-    queryKey: ['products', searchTerm, filters],
-    queryFn: () => {
-      const query = new GetProductsQuery({
-        search: searchTerm || null,
-        categorySlug:
-          filters.subCategory !== 'all'
-            ? filters.subCategory
-            : filters.category !== 'all'
-              ? filters.category
-              : null,
-        status: filters.status !== 'all' ? [filters.status] : null,
-        orderBy: filters.sortBy,
-        orderDirection:
-          filters.sortDirection === 'asc' ? 'ascending' : 'descending',
-        pageNumber: 1,
-        pageSize: 8,
-      });
-      return getProducts(query);
-    },
+  const { data, isLoading } = useQuery<PaginatedList<ProductBriefDto>>({
+    queryKey: ['products', filters],
+    queryFn: () => getProductsFn(filters),
   });
 
   // Handler functions
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setFilters(
+      new GetProductsQuery({
+        ...filters,
+        search: e.target.value,
+      }),
+    );
   };
 
-  const handleFilterChange = (key: keyof FilterState, value: string) => {
-    if (key === 'category') {
-      setFilters({
+  const handleFilterChange = (key: keyof GetProductsQuery, value: string) => {
+    setFilters(
+      new GetProductsQuery({
         ...filters,
-        subCategory: 'all',
-
         [key]: value,
-      });
-
-      return;
-    }
-
-    setFilters({
-      ...filters,
-      [key]: value,
-    });
+      }),
+    );
+  };
+  const handleRootCategoryChange = (value: string) => {
+    setCategory(categories?.find((category) => category.slug === value));
+    setFilters(
+      new GetProductsQuery({
+        ...filters,
+        categorySlug: value,
+      }),
+    );
+    return;
   };
 
   const toggleMobileFilters = () => {
@@ -93,19 +71,26 @@ const ProductPage: React.FC = () => {
   };
 
   const handleSortChange = (sortOption: string) => {
-    if (filters.sortBy === sortOption) {
+    if (filters.orderBy === sortOption) {
       // Toggle direction if already sorting by this option
-      setFilters({
-        ...filters,
-        sortDirection: filters.sortDirection === 'asc' ? 'desc' : 'asc',
-      });
+      setFilters(
+        new GetProductsQuery({
+          ...filters,
+          orderDirection:
+            filters.orderDirection === 'descending'
+              ? 'ascending'
+              : 'descending',
+        }),
+      );
     } else {
       // Set new sort option with default descending direction
-      setFilters({
-        ...filters,
-        sortBy: sortOption,
-        sortDirection: 'desc',
-      });
+      setFilters(
+        new GetProductsQuery({
+          ...filters,
+          orderBy: sortOption,
+          orderDirection: 'descending',
+        }),
+      );
     }
   };
 
@@ -119,10 +104,10 @@ const ProductPage: React.FC = () => {
         </label>
         <select
           className="w-full p-2 border border-gray-300 rounded-md"
-          value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
+          value={category?.slug || ''}
+          onChange={(e) => handleRootCategoryChange(e.target.value)}
         >
-          <option value="all">All Categories</option>
+          <option value="">All Categories</option>
           {categories?.map((category) => (
             <option key={category.id} value={category.slug}>
               {category.name}
@@ -131,26 +116,21 @@ const ProductPage: React.FC = () => {
         </select>
       </div>
 
-      {/* Sub-Category Filter */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Sub-Category
+          Sub-category
         </label>
         <select
           className="w-full p-2 border border-gray-300 rounded-md"
-          value={filters.subCategory}
-          onChange={(e) => handleFilterChange('subCategory', e.target.value)}
-          disabled={filters.category === 'all'}
+          value={filters.categorySlug || ''}
+          onChange={(e) => handleFilterChange('categorySlug', e.target.value)}
         >
-          <option value="all">All Sub-Categories</option>
-          {filters.category !== 'all' &&
-            categories
-              ?.find((cat) => cat.slug === filters.category)
-              ?.subcategories?.map((sub) => (
-                <option key={sub.id} value={sub.slug}>
-                  {sub.name}
-                </option>
-              ))}
+          <option value="">All Categories</option>
+          {category?.subcategories?.map((category) => (
+            <option key={category.id} value={category.slug}>
+              {category.name}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -163,11 +143,29 @@ const ProductPage: React.FC = () => {
           {ProductStatus.map((status) => (
             <label key={status.value} className="inline-flex items-center">
               <input
-                type="radio"
+                type="checkbox"
                 className="form-radio h-4 w-4 text-blue-600"
-                checked={filters.status === status.value}
+                checked={filters.status?.includes(status.value)}
                 value={status.value}
-                onChange={() => handleFilterChange('status', status.value)}
+                onChange={() => {
+                  if (filters.status?.includes(status.value)) {
+                    setFilters(
+                      new GetProductsQuery({
+                        ...filters,
+                        status: filters.status.filter(
+                          (s) => s !== status.value,
+                        ),
+                      }),
+                    );
+                  } else {
+                    setFilters(
+                      new GetProductsQuery({
+                        ...filters,
+                        status: [...(filters.status || []), status.value],
+                      }),
+                    );
+                  }
+                }}
               />
               <span className="ml-2 capitalize text-sm">{status.label}</span>
             </label>
@@ -185,15 +183,15 @@ const ProductPage: React.FC = () => {
             <button
               key={sort.value}
               className={`px-3 py-1 rounded text-sm flex items-center justify-between ${
-                filters.sortBy === sort.value
+                filters.orderBy === sort.value
                   ? 'bg-blue-100 text-blue-700 border border-blue-300'
                   : 'bg-gray-100 text-gray-700 border border-gray-200'
               }`}
-              onClick={() => handleSortChange(sort.value as any)}
+              onClick={() => handleSortChange(sort.value)}
             >
               {sort.label}
-              {filters.sortBy === sort.value &&
-                (filters.sortDirection === 'asc' ? (
+              {filters.orderBy === sort.value &&
+                (filters.orderDirection === 'ascending' ? (
                   <FiChevronUp className="ml-1" />
                 ) : (
                   <FiChevronDown className="ml-1" />
@@ -214,7 +212,7 @@ const ProductPage: React.FC = () => {
             type="text"
             placeholder="Search products..."
             className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchTerm}
+            value={filters.search || ''}
             onChange={handleSearchChange}
           />
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -256,23 +254,81 @@ const ProductPage: React.FC = () => {
 
         {/* Product Grid - Takes remaining space */}
         <div className="flex-1 p-4">
-          {isProductLoading ? (
+          <ProductList products={data?.items || []} />
+          {isLoading && (
             <div className="flex justify-center items-center h-64">
-              <div className="text-gray-500">Loading products...</div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
-          ) : isProductError ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="text-red-500">
-                Error loading products. Please try again.
-              </div>
-            </div>
-          ) : products && products.length > 0 ? (
-            <WrappableProductList products={products} />
-          ) : (
+          )}
+          {data?.items.length === 0 && !isLoading && (
             <div className="flex justify-center items-center h-64">
               <div className="text-gray-500">No products found.</div>
             </div>
           )}
+
+          <div className="flex items-center justify-between mt-6">
+            <a className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                className="w-5 h-5 rtl:-scale-x-100"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
+                />
+              </svg>
+
+              <span>previous</span>
+            </a>
+
+            <div className="items-center hidden lg:flex gap-x-3">
+              {data?.totalPages &&
+                Array.from({ length: data.totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    className={`px-3 py-1 rounded text-sm flex items-center justify-between ${
+                      filters.page === index + 1
+                        ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200'
+                    }`}
+                    onClick={() =>
+                      setFilters(
+                        new GetProductsQuery({
+                          ...filters,
+                          page: index + 1,
+                        }),
+                      )
+                    }
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+            </div>
+
+            <a className="flex items-center px-5 py-2 text-sm text-gray-700 capitalize transition-colors duration-200 bg-white border rounded-md gap-x-2 hover:bg-gray-100 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800">
+              <span>Next</span>
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                className="w-5 h-5 rtl:-scale-x-100"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </div>
