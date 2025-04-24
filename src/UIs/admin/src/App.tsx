@@ -17,7 +17,6 @@ import CategoriesPage from './pages/Categories';
 import UsersPage from './pages/Users';
 import ImportGoodsPage from './pages/Import';
 import AddProductPage from './pages/AddProduct';
-import AddProductVariantPage from './pages/AddVariant';
 import NotFoundPage from './pages/NotFoundPage';
 import ProductDetailPage from './pages/ProductDetail';
 import ProductPage from './pages/Products';
@@ -33,7 +32,6 @@ const routes = createRoutesFromElements(
       <Route path="users" element={<UsersPage />} />,
       <Route path="import" element={<ImportGoodsPage />} />,
       <Route path="import/new-product" element={<AddProductPage />} />,
-      <Route path="import/new-variant" element={<AddProductVariantPage />} />,
       <Route path="*" element={<NotFoundPage />}></Route>
       <Route element={<PrivateRoute requiredRole="Admin" />}></Route>
     </Route>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getProductsFn as getProducts } from '../../../services/product';
 import {
-  GetProductsQuery,
+  GetProductsQueryParams as GetProductsQuery,
   PaginatedList,
   ProductBriefDto,
 } from '../../../types';

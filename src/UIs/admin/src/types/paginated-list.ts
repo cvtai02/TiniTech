@@ -6,3 +6,4 @@ export interface PaginatedList<T> {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
 }
+

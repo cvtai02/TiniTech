@@ -18,8 +18,7 @@ export async function apiFetch(
     // --- Response Interceptor ---
     if (response.status >= 400) {
       if (response.status === 401) {
-        console.warn('Unauthorized! Redirecting to login...');
-        window.location.href = '/login';
+        // console.warn('Unauthorized! Redirecting to login...');
       }
 
       // Thêm xử lý an toàn khi parse JSON

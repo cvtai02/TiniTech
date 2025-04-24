@@ -17,11 +17,10 @@ public class CreateProductCommand : IRequest<Result<string>>
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Sku { get; set; } = string.Empty;
+    public string Sku { get; set; } = null!;
     public int Price { get; set; }
     public int CategoryId { get; set; }
-    public List<IFormFile> Images { get; set; } = null!;
-    public List<int> AttributeIds { get; set; } = null!;
+    public List<IFormFile> Images { get; set; } = [];
 }
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<string>>
@@ -44,11 +43,6 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Sku = request.Sku,
             Description = request.Description,
             CategoryId = request.CategoryId,
-            Attributes = [.. request.AttributeIds.Select((id, index) => new ProductAttribute
-            {
-                AttributeId = id,
-                OrderPriority = index,
-            })],
             Metric = new ProductMetric
             {
                 LowestPrice = request.Price,
@@ -65,7 +59,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         }
 
 
-        var uploadTasks = request.Images.Select(async (image, index) =>
+        var uploadTasks = request.Images?.Select(async (image, index) =>
         {
             var imageUrl = await _imageService.UploadImageAsync(image, "catalog/product", $"{product.Slug}_{index}");
             return new ProductImage
@@ -75,14 +69,22 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             };
         });
 
-        var uploadedImages = await Task.WhenAll(uploadTasks);
-
-        if (uploadedImages.Length == 0)
+        if (uploadTasks == null || !uploadTasks.Any())
         {
-            return new InfrastructureException("No images were uploaded successfully.");
+
         }
-        product.Images.AddRange(uploadedImages);
-        product.ImageUrl = uploadedImages.First().ImageUrl; // Set the first image as the main image
+        else
+        {
+            var uploadedImages = await Task.WhenAll(uploadTasks);
+
+            if (uploadedImages.Length == 0)
+            {
+                return new InfrastructureException("No images were uploaded successfully.");
+            }
+            product.Images.AddRange(uploadedImages);
+            product.ImageUrl = uploadedImages.First().ImageUrl; // Set the first image as the main image
+        }
+
 
         _context.Products.Add(product);
 

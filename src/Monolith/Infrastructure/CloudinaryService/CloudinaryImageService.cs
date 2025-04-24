@@ -43,19 +43,29 @@ public class CloudinaryImageService : IImageService
         if (!AllowImageContentTypes.Contains(file.ContentType))
             throw new ArgumentException($"File type {file.ContentType} is not supported.");
 
-        // If no filename specified, generate one
+        // Generate a unique filename with timestamp to prevent collisions
+        string uniqueFileName;
         if (string.IsNullOrEmpty(fileName))
         {
-            fileName = Guid.NewGuid().ToString();
+            uniqueFileName = $"{DateTime.UtcNow.Ticks}_{Guid.NewGuid()}";
+        }
+        else
+        {
+            // Append a timestamp to user-provided filename to ensure uniqueness
+            string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(fileName);
+            string extension = System.IO.Path.GetExtension(fileName);
+            uniqueFileName = $"{fileNameWithoutExtension}_{DateTime.UtcNow.Ticks}{extension}";
         }
 
         // Prepare upload parameters
         var uploadParams = new ImageUploadParams
         {
-            File = new FileDescription(fileName, file.OpenReadStream()),
+            File = new FileDescription(uniqueFileName, file.OpenReadStream()),
             Folder = folderName,
-            PublicId = fileName,
-            Overwrite = true
+            PublicId = uniqueFileName,
+            UseFilename = true,
+            UniqueFilename = true, // This ensures Cloudinary adds uniqueness to the filename
+            Overwrite = false // Prevent overwriting existing images
         };
 
         try
@@ -132,5 +142,34 @@ public class CloudinaryImageService : IImageService
         {
             throw new Exception($"An error occurred when deleting the image: {ex.Message}", ex);
         }
+    }
+
+    public async Task<List<string>> UploadImageListAsync(List<IFormFile> files, string folderName)
+    {
+        if (files == null || !files.Any())
+            throw new ArgumentNullException(nameof(files), "No files were provided for upload.");
+
+        if (string.IsNullOrEmpty(folderName))
+            throw new ArgumentException("Folder name must be provided.", nameof(folderName));
+
+        // Validate all files first
+        foreach (var file in files)
+        {
+            if (!AllowImageContentTypes.Contains(file.ContentType))
+                throw new ArgumentException($"File type {file.ContentType} is not supported.");
+        }
+
+        // Create tasks for all uploads to process them in parallel
+        var uploadTasks = files.Select(file =>
+        {
+            // Each file gets a unique generated name
+            return UploadImageAsync(file, folderName);
+        }).ToList();
+
+        // Wait for all tasks to complete and collect results
+        var uploadedUrls = await Task.WhenAll(uploadTasks);
+
+        // Return the list of URLs
+        return uploadedUrls.ToList();
     }
 }

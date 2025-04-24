@@ -2,9 +2,8 @@ import { apiFetch, postForm } from './api-interceptor';
 import {
   CreateProductDto,
   ProductBriefDto,
-  CreateVariantDto,
   ProductDetailDto,
-  GetProductsQuery,
+  GetProductsQueryParams as GetProductsQuery,
   PaginatedList,
 } from '../types';
 import { toast } from 'react-toastify';
@@ -61,19 +60,6 @@ export const updateProductStatus = async (
   return body.data;
 };
 
-export const createVariant = async (data: CreateVariantDto) => {
-  const res = await apiFetch(`${API_URL}/api/products/variants`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  if (res.status === 201) {
-    toast.success('Thêm biến thể sản phẩm thành công!');
-  }
-  const body = await res.json();
-
-  return body.data;
-};
-
 export const getProductsFn = async (
   data: GetProductsQuery,
 ): Promise<PaginatedList<ProductBriefDto>> => {
@@ -84,82 +70,3 @@ export const getProductsFn = async (
   return body.data;
 };
 
-export const createProductAttribute = async (data: {
-  productId: string;
-  attributeId: string;
-}) => {
-  const res = await apiFetch(`${API_URL}/api/products/attributes`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  if (res.status === 201) {
-    toast.success('Thêm thuộc tính sản phẩm thành công!');
-  }
-  const body = await res.json();
-
-  return body.data;
-};
-
-export const deleteProductAttribute = async (
-  productId: string,
-  attributeId: string,
-) => {
-  const res = await apiFetch(`${API_URL}/api/products/attributes`, {
-    method: 'DELETE',
-    body: JSON.stringify({ productId, attributeId }),
-  });
-  if (res.status === 200) {
-    toast.success('Xóa thuộc tính sản phẩm thành công!');
-  }
-  const body = await res.json();
-
-  return body.data;
-};
-
-export const addProductAttributeValue = async (data: {
-  productId: string;
-  attributeId: string;
-  value: string;
-}) => {
-  const res = await apiFetch(`${API_URL}/api/products/attributes/values`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  if (res.status === 201) {
-    toast.success('Thêm thuộc tính sản phẩm thành công!');
-  }
-  const body = await res.json();
-
-  return body.data;
-};
-
-export const deleteProductAttributeValue = async (
-  productId: string,
-  attributeId: string,
-  value: string,
-) => {
-  const res = await apiFetch(`${API_URL}/api/products/attributes/values`, {
-    method: 'DELETE',
-    body: JSON.stringify({ productId, attributeId, value }),
-  });
-  if (res.status === 200) {
-    toast.success('Xóa thuộc tính sản phẩm thành công!');
-  }
-  const body = await res.json();
-
-  return body.data;
-};
-
-export const getProductAttribute = async (productId: string) => {
-  const res = await apiFetch(`${API_URL}/api/products/${productId}/attributes`);
-  const body = await res.json();
-  return body.data;
-};
-
-export const getProductDetailBySlug = async (
-  slug: string,
-): Promise<ProductDetailDto> => {
-  const res = await apiFetch(`${API_URL}/api/products/${slug}`);
-  const body = await res.json();
-  return body.data;
-};

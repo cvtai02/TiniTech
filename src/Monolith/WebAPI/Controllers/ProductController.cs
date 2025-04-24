@@ -1,6 +1,8 @@
 using Application.Products.Commands.ActivateProductCommand;
 using Application.Products.Commands.CreateProductCommand;
 using Application.Products.Commands.SoftDeleteProductCommand;
+using Application.Products.Commands.UpdateProductImages;
+using Application.Products.Commands.UpdateProductInfo;
 using Application.Products.Queries.GetDetailBySlug;
 using Application.Products.Queries.GetProducts;
 using Domain.Enums;
@@ -41,37 +43,43 @@ public class ProductController : ApiController
         );
     }
 
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> Update(int id, [FromBody] UpdateProductCommand cmd)
-    // {
-    //     if (id != cmd.Id)
-    //     {
-    //         return BadRequest(new Response
-    //         {
-    //             Title = "Bad Request",
-    //             Status = "Error",
-    //             Detail = "ID in URL must match ID in request body",
-    //             Data = null,
-    //             Errors = new[] { "ID mismatch" }
-    //         });
-    //     }
+    [HttpPatch]
+    public async Task<IActionResult> Update([FromBody] UpdateProductInfoCommand cmd)
+    {
+        var result = await Sender.Send(cmd);
 
-    //     var result = await Sender.Send(cmd);
+        return result.Match(
+            r => Ok(new Response
+            {
+                Title = "Product Updated",
+                Status = "Success",
+                Detail = "Product Updated Successfully",
+                Data = r,
+                Errors = null
+            }),
+            e => HandleFailure<UpdateProductInfoCommand>(e)
+        );
+    }
 
-    //     return result.Match(
-    //         r => Ok(new Response
-    //         {
-    //             Title = "Product Updated",
-    //             Status = "Success",
-    //             Detail = "Product Updated Successfully",
-    //             Data = r,
-    //             Errors = null
-    //         }),
-    //         e => HandleFailure<UpdateProductCommand>(e)
-    //     );
-    // }
+    [HttpPatch("images")]
+    public async Task<IActionResult> UpdateImages([FromForm] UpdateProductImagesCommand cmd)
+    {
+        var result = await Sender.Send(cmd);
+
+        return result.Match(
+            r => Ok(new Response
+            {
+                Title = "Product Images Updated",
+                Status = "Success",
+                Detail = "Product Images Updated Successfully",
+                Data = r,
+                Errors = null
+            }),
+            e => HandleFailure<UpdateProductImagesCommand>(e)
+        );
+    }
+
     public record PatchStatusData(int Id, ProductStatus Status);
-
     [HttpPatch("status")]
     public async Task<IActionResult> UpdateStatus([FromBody] PatchStatusData body)
     {

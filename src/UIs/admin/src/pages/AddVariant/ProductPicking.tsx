@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getProductsFn as getProducts } from '../../services/product';
-import { GetProductsQuery, ProductBriefDto } from '../../types/product';
+import {
+  GetProductsQueryParams as GetProductsQuery,
+  ProductBriefDto,
+} from '../../types/product';
 
 interface ProductSearchProps {
   onProductSelect: (product: ProductBriefDto) => void;

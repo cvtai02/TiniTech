@@ -1,12 +1,4 @@
-export type CreateProductDto = {
-  name: string;
-  description: string;
-  sku: string;
-  price: number;
-  categoryId: string;
-  images: File[];
-  attributeIds: string[];
-};
+import { ProductStatus } from './product';
 
 // DTOs
 export interface ProductDetailDto {
@@ -14,9 +6,14 @@ export interface ProductDetailDto {
   slug: string;
   name: string;
   price: number;
+  sku: string;
   categoryId: number;
   description: string;
-  imageUrls: string[];
+  images: {
+    id: string;
+    imageUrl: string;
+    orderPriority: number;
+  }[];
   rating: number;
   ratingCount: number;
   stock: number;
@@ -52,12 +49,63 @@ export interface AttributeDto {
   values: AttributeValueDto[];
 }
 
-export type CreateVariantDto = {
-  productId: string;
+export type CreateProductDto = {
+  name: string;
+  description: string;
   sku: string;
   price: number;
-  attributes: {
-    attributeId: string;
-    value: string;
-  }[];
+  categoryId: string;
+  images: File[];
+  attributeIds: string[];
+};
+
+export type UpdateProductImagesDto = {
+  productId: string;
+  addImages?: File[];
+  addImagesOrderPriority?: number[];
+  removeImageIds?: string[];
+  defaultImageUrl?: string;
+  defaultImageIndexInAdding?: number;
+};
+
+export type UpdateProductInfoDto = {
+  productId: string;
+  name?: string;
+  sku?: string;
+  price?: number;
+  categoryId?: string;
+  description?: string;
+  status?: ProductStatus;
+  variants?: {
+    addList?: {
+      price: number;
+      sku: string;
+      attributes: {
+        attributeId: string;
+        value: string;
+      }[];
+    }[];
+    updateList?: {
+      variantsId: string;
+      price?: number;
+      sku?: string;
+      isDeleted?: boolean;
+    }[];
+  };
+  attributes?: {
+    addList?: {
+      attributeId: string;
+      isPrimary: boolean;
+      orderPriority: number;
+      values: {
+        value: string;
+        orderPriority: number;
+        imageUrl?: string;
+      };
+    }[];
+    removeList?: {
+      attributeId: string;
+      values: string[];
+    }[];
+  };
 };

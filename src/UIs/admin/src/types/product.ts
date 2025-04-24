@@ -1,4 +1,4 @@
-export const ProductStatus = [
+export const ProductStatusList = [
   {
     label: 'Active',
     value: 'active',
@@ -12,7 +12,7 @@ export const ProductStatus = [
     value: 'deleted',
   },
 ];
-export const OrderCriteria = [
+export const OrderCriteriaList = [
   {
     label: 'Created Date',
     value: 'createdDate',
@@ -38,7 +38,7 @@ export const OrderCriteria = [
     value: 'featuredPoint',
   },
 ];
-export const OrderDirection = [
+export const OrderDirectionList = [
   {
     label: 'Ascending',
     value: 'ascending',
@@ -48,6 +48,16 @@ export const OrderDirection = [
     value: 'descending',
   },
 ];
+
+export type ProductStatus = 'active' | 'draft' | 'deleted';
+export type OrderCriteria =
+  | 'createdDate'
+  | 'rating'
+  | 'price'
+  | 'sold'
+  | 'stock'
+  | 'featuredPoint';
+export type OrderDirection = 'ascending' | 'descending';
 
 export interface ProductBriefDto {
   id: string;
@@ -64,7 +74,7 @@ export interface ProductBriefDto {
   sold: number;
 }
 
-export class GetProductsQuery {
+export class GetProductsQueryParams {
   page: number = 1;
   pageSize: number = 8;
   search?: string | null;
@@ -73,7 +83,7 @@ export class GetProductsQuery {
   orderBy?: string;
   orderDirection?: string;
 
-  constructor(init?: Partial<GetProductsQuery>) {
+  constructor(init?: Partial<GetProductsQueryParams>) {
     Object.assign(this, init);
   }
 

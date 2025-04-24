@@ -8,9 +8,10 @@ public class ProductDetailDto
     public string Slug { get; set; } = null!;
     public string Name { get; set; } = null!;
     public int Price { get; set; }
+    public string Sku { get; set; } = null!;
     public int CategoryId { get; set; }
     public string Description { get; set; } = null!;
-    public List<string> ImageUrls { get; set; } = [];
+    public List<ProductImageDto> Images { get; set; } = [];
     public float Rating { get; set; }
     public int RatingCount { get; set; }
     public int Stock { get; set; }
@@ -26,11 +27,17 @@ public class ProductDetailDto
             Id = product.Id,
             Slug = product.Slug,
             Name = product.Name,
+            Sku = product.Sku,
             Price = product.Metric.LowestPrice,
             CategoryId = product.CategoryId,
             FeaturedPoint = product.Metric.FeaturedPoint,
             Description = product.Description,
-            ImageUrls = [.. product.Images.Select(i => i.ImageUrl)],
+            Images = [.. product.Images.Select(i => new ProductImageDto
+            {
+                Id = i.Id,
+                ImageUrl = i.ImageUrl,
+                OrderPriority = i.OrderPriority
+            })],
             Rating = product.Metric.RatingAvg,
             RatingCount = product.Metric.RatingCount,
             Stock = product.Metric.Stock,
@@ -92,4 +99,11 @@ public class AttributeDto
     public float OrderPriority { get; set; }
     public bool IsPrimary { get; set; }
     public List<AttributeValueDto> Values { get; set; } = [];
+}
+
+public class ProductImageDto
+{
+    public int Id { get; set; }
+    public string ImageUrl { get; set; } = null!;
+    public float OrderPriority { get; set; }
 }

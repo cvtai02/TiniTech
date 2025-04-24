@@ -74,8 +74,12 @@
 
     -   Name, Description
 
--   Add Variant:
-    -   pick product: by searching. Recommend recently added products
-    -   For each attribute of product. Pick an value then user can fill Price
-    -   Fill: SKU (auto recommended by available toSku())
-    -   User can add Product Attribute and Attribute value while the process
+-   CRUD a Product: CRUD images or (basic infor and variant)
+
+    -   CRD Images
+    -   CRUD Others:
+
+               -   Free to delete/add/update variant
+               -   Create variant need price, SKU
+               -   Remove attribtue value will mark all variant refer to it (in backend) as deleted. Re-add the same value will not re-activate the variant. Noway the variant can re-activate
+               -   Remove attribute will execute delete all values and then delete attribute

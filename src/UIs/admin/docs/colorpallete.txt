@@ -1,6 +1,0 @@
-colors: {
-        light: "#F9F7F7",
-        muted: "#DBE2EF",
-        primary: "#3F72AF",
-        dark: "#112D4E",
-      },
