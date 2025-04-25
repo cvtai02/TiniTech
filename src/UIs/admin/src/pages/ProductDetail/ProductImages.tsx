@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductDetailDto, UpdateProductImagesDto } from '../../types';
 import { updateProductImagesFn } from '../../services/productDetail';
@@ -30,6 +30,19 @@ const ProductImages: React.FC<ProductImagesProps> = ({
     number | undefined
   >(undefined);
 
+  // Initialize mainImageIndex to point to the default image
+  useEffect(() => {
+    if (product.defaultImageUrl) {
+      const defaultIndex = product.images.findIndex(
+        (img) => img.imageUrl === product.defaultImageUrl,
+      );
+
+      if (defaultIndex !== -1) {
+        setMainImageIndex(defaultIndex);
+      }
+    }
+  }, [product.images, product.defaultImageUrl]);
+
   // Set initial default image based on the first product image
   useEffect(() => {
     if (
@@ -40,6 +53,27 @@ const ProductImages: React.FC<ProductImagesProps> = ({
       setDefaultImageUrl(product.images[mainImageIndex].imageUrl);
     }
   }, [product.images, mainImageIndex]);
+
+  // Prepare sorted images with default image prioritized
+  const sortedProductImages = useMemo(() => {
+    const images = [...product.images];
+
+    // Find default image and prioritize it
+    const defaultImageIndex = images.findIndex(
+      (img) => img.imageUrl === product.defaultImageUrl,
+    );
+
+    if (defaultImageIndex !== -1) {
+      // Create a copy of the default image with priority 0
+      const defaultImage = { ...images[defaultImageIndex], orderPriority: 0 };
+
+      // Remove the original and insert the modified one
+      images.splice(defaultImageIndex, 1);
+      images.unshift(defaultImage);
+    }
+
+    return images;
+  }, [product.images, product.defaultImageUrl]);
 
   // Mutation for updating product images
   const updateProductImagesMutation = useMutation({
@@ -167,16 +201,6 @@ const ProductImages: React.FC<ProductImagesProps> = ({
     setImagesToRemove((prev) => [...prev, imageId]);
   };
 
-  const setAsDefaultImage = (imageUrl: string) => {
-    setDefaultImageUrl(imageUrl);
-    setDefaultImageIndexInAdding(undefined);
-  };
-
-  const setAsDefaultNewImage = (index: number) => {
-    setDefaultImageUrl(undefined);
-    setDefaultImageIndexInAdding(index);
-  };
-
   const handleUpdateImage = async () => {
     if (!isEditMode) return;
 
@@ -218,10 +242,6 @@ const ProductImages: React.FC<ProductImagesProps> = ({
     );
   };
 
-  const isImageDefault = (imageUrl: string) => defaultImageUrl === imageUrl;
-  const isNewImageDefault = (index: number) =>
-    defaultImageIndexInAdding === index;
-
   const scrollToThumbnail = (index: number) => {
     const container = document.getElementById('thumbnailContainer');
     const thumbnail = document.getElementById(`thumbnail-${index}`);
@@ -247,7 +267,6 @@ const ProductImages: React.FC<ProductImagesProps> = ({
   const renderThumbnailControls = (
     isNewImage: boolean,
     index: number,
-    imageUrl?: string,
     imageId?: string,
   ) => {
     if (!isEditMode) return null;
@@ -377,78 +396,10 @@ const ProductImages: React.FC<ProductImagesProps> = ({
               </div>
             )}
 
-            {/* Default Image Thumbnail (if exists) */}
-            {product.images.length > 0 &&
-              product.images.map((image, index) => {
-                if (
-                  (defaultImageUrl === image.imageUrl ||
-                    (!defaultImageUrl && mainImageIndex === index)) &&
-                  !imagesToRemove.includes(image.id)
-                ) {
-                  return (
-                    <div
-                      key={image.id}
-                      id={`thumbnail-${index}`}
-                      className={`cursor-pointer rounded-lg mr-2 aspect-square ${
-                        isEditMode ? 'relative group' : ''
-                      }`}
-                      onClick={() => {
-                        setMainImageIndex(index);
-                        scrollToThumbnail(index);
-                      }}
-                    >
-                      <img
-                        src={image.imageUrl}
-                        alt={`${product.name} default thumbnail`}
-                        className={`object-cover w-full h-full rounded-lg border-2 ${
-                          index === mainImageIndex
-                            ? 'border-blue-600'
-                            : image.imageUrl === defaultImageUrl
-                              ? 'border-yellow-500'
-                              : 'border-gray-200'
-                        }`}
-                      />
-                      {renderThumbnailControls(
-                        false,
-                        index,
-                        image.imageUrl,
-                        image.id,
-                      )}
-                    </div>
-                  );
-                }
-                return null;
-              })}
-
-            {/* New Image Thumbnails */}
-            {newImagePreviews.map((preview, index) => (
-              <div
-                key={`new-${index}`}
-                className="cursor-pointer rounded-lg mr-2 aspect-square relative group"
-                onClick={() => setMainImageIndex(-1 - index)}
-              >
-                <img
-                  src={preview}
-                  alt={`New upload ${index + 1}`}
-                  className={`object-cover w-full h-full rounded-lg border-2 ${
-                    defaultImageIndexInAdding === index
-                      ? 'border-yellow-500'
-                      : 'border-green-400'
-                  }`}
-                />
-                {renderThumbnailControls(true, index)}
-              </div>
-            ))}
-
-            {/* Active Product Images (not marked for removal and not default) */}
-            {product.images
-              .filter(
-                (image) =>
-                  !imagesToRemove.includes(image.id) &&
-                  image.imageUrl !== defaultImageUrl &&
-                  product.images.findIndex((img) => img.id === image.id) !==
-                    mainImageIndex,
-              )
+            {/* All Active Product Images (including default) */}
+            {sortedProductImages
+              .filter((image) => !imagesToRemove.includes(image.id))
+              .sort((a, b) => (a.orderPriority || 0) - (b.orderPriority || 0))
               .map((image, index) => {
                 const actualIndex = product.images.findIndex(
                   (img) => img.id === image.id,
@@ -471,22 +422,42 @@ const ProductImages: React.FC<ProductImagesProps> = ({
                       className={`object-cover w-full h-full rounded-lg border-2 ${
                         actualIndex === mainImageIndex
                           ? 'border-blue-600'
-                          : 'border-gray-200'
+                          : image.imageUrl === defaultImageUrl ||
+                              (!defaultImageUrl &&
+                                mainImageIndex === actualIndex)
+                            ? 'border-yellow-500'
+                            : 'border-gray-200'
                       }`}
                     />
-                    {renderThumbnailControls(
-                      false,
-                      actualIndex,
-                      image.imageUrl,
-                      image.id,
-                    )}
+                    {renderThumbnailControls(false, actualIndex, image.id)}
                   </div>
                 );
               })}
 
+            {/* New Image Thumbnails */}
+            {newImagePreviews.map((preview, index) => (
+              <div
+                key={`new-${index}`}
+                className="cursor-pointer rounded-lg mr-2 aspect-square relative group"
+                onClick={() => setMainImageIndex(-1 - index)}
+              >
+                <img
+                  src={preview}
+                  alt={`New upload ${index + 1}`}
+                  className={`object-cover w-full h-full rounded-lg border-2 ${
+                    defaultImageIndexInAdding === index
+                      ? 'border-yellow-500'
+                      : 'border-green-400'
+                  }`}
+                />
+                {renderThumbnailControls(true, index)}
+              </div>
+            ))}
+
             {/* Images marked for removal (at the bottom) */}
-            {product.images
+            {sortedProductImages
               .filter((image) => imagesToRemove.includes(image.id))
+              .sort((a, b) => (a.orderPriority || 0) - (b.orderPriority || 0))
               .map((image, index) => {
                 const actualIndex = product.images.findIndex(
                   (img) => img.id === image.id,
@@ -508,12 +479,7 @@ const ProductImages: React.FC<ProductImagesProps> = ({
                       alt={`${product.name} thumbnail ${index + 1} (removing)`}
                       className="object-cover w-full h-full rounded-lg border-2 border-red-500 opacity-50"
                     />
-                    {renderThumbnailControls(
-                      false,
-                      actualIndex,
-                      image.imageUrl,
-                      image.id,
-                    )}
+                    {renderThumbnailControls(false, actualIndex, image.id)}
                   </div>
                 );
               })}
@@ -525,16 +491,16 @@ const ProductImages: React.FC<ProductImagesProps> = ({
       <div className="col-span-6 bg-white p-4 rounded-lg shadow aspect-square relative">
         {renderMainImage()}
 
-        {/* Update Button - only show in edit mode */}
+        {/* Save Button - only show in edit mode */}
         {isEditMode && (
           <button
             onClick={handleUpdateImage}
             className="absolute bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-lg flex items-center justify-center"
-            title="Update image"
+            title="Save image"
           >
             {isSaving ? (
               <>
-                <FaSpinner className="animate-spin mr-2" /> Updating...
+                <FaSpinner className="animate-spin mr-2" /> Saving...
               </>
             ) : (
               <>
@@ -552,7 +518,7 @@ const ProductImages: React.FC<ProductImagesProps> = ({
                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
                   />
                 </svg>
-                <span className="ml-1">Update</span>
+                <span className="ml-1">Save</span>
               </>
             )}
           </button>
@@ -562,7 +528,7 @@ const ProductImages: React.FC<ProductImagesProps> = ({
         {isEditMode &&
           (defaultImageUrl || defaultImageIndexInAdding !== undefined) && (
             <div className="absolute top-4 left-4 bg-yellow-500 text-white px-2 py-1 rounded-lg shadow-lg">
-              Main Image
+              Default Image
             </div>
           )}
       </div>

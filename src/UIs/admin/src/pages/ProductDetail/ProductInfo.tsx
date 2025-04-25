@@ -7,6 +7,7 @@ import {
 } from '../../types';
 import { updateProductInfoFn } from '../../services/productDetail';
 import { FaSpinner } from 'react-icons/fa';
+import AttributeModal from './AttributeModal';
 
 interface ProductInfoProps {
   product: ProductDetailDto;
@@ -37,6 +38,9 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     null,
   );
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Modal state
+  const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
 
   // Update form data when product data changes
   useEffect(() => {
@@ -135,6 +139,23 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     } catch (error) {
       // Error handling is done in mutation callbacks
     }
+  };
+
+  const openAttributeModal = () => {
+    setIsAttributeModalOpen(true);
+  };
+
+  const closeAttributeModal = () => {
+    setIsAttributeModalOpen(false);
+  };
+
+  const handleAddAttribute = (
+    attributeName: string,
+    attributeValues: string[],
+  ) => {
+    // Logic to add attribute would go here
+    console.log('Adding attribute:', attributeName, attributeValues);
+    closeAttributeModal();
   };
 
   // Sort attributes by orderPriority
@@ -320,7 +341,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
         {isEditMode && (
           <button
             className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
-            onClick={() => alert('Add new attribute')}
+            onClick={openAttributeModal}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -382,7 +403,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
         {isEditMode && (
           <button
             onClick={saveChanges}
-            className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-400 flex items-center justify-center"
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center"
             disabled={isSaving}
           >
             {isSaving ? (
@@ -390,10 +411,17 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                 <FaSpinner className="animate-spin mr-2" /> Saving...
               </>
             ) : (
-              'Save Product Info'
+              'Save'
             )}
           </button>
         )}
+
+        {/* Attribute Modal */}
+        <AttributeModal
+          isOpen={isAttributeModalOpen}
+          onClose={closeAttributeModal}
+          onAddAttribute={handleAddAttribute}
+        />
       </div>
     </div>
   );

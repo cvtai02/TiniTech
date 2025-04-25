@@ -12,9 +12,12 @@ import { fetchCategories } from '../../services/category';
 import { GetProductsQueryParams as GetProductsQuery } from '../../types';
 import ProductList from '../../components/products/WrappableProductList';
 import { getProductsFn } from '../../services/product';
+import AddProduct from '../AddProduct';
 
 const ProductPage: React.FC = () => {
   const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] =
+    useState<boolean>(false);
   const [filters, setFilters] = useState<GetProductsQuery>(
     new GetProductsQuery({
       page: 1,
@@ -92,6 +95,49 @@ const ProductPage: React.FC = () => {
         }),
       );
     }
+  };
+
+  // Handler for opening/closing the add product modal
+  const handleAddProductClick = () => {
+    setIsAddProductModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddProductModalOpen(false);
+  };
+
+  // Add Product Modal Component
+  const AddProductModal = () => {
+    if (!isAddProductModalOpen) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-y-auto">
+        <div className="relative w-full max-w-4xl bg-transparent max-h-10/12 overflow-auto scroll-bar rounded-lg">
+          <button
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            onClick={handleCloseModal}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <AddProduct />
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Filter components - shared between desktop sidebar and mobile dropdown
@@ -242,6 +288,7 @@ const ProductPage: React.FC = () => {
             <button
               type="button"
               className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+              onClick={handleAddProductClick}
             >
               <svg
                 className="h-3.5 w-3.5 mr-2"
@@ -551,6 +598,9 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Render the modal when it should be open */}
+      {isAddProductModalOpen && <AddProductModal />}
     </div>
   );
 };

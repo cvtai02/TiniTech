@@ -7,6 +7,7 @@ export interface ProductDetailDto {
   name: string;
   price: number;
   sku: string;
+  defaultImageUrl: string;
   categoryId: number;
   description: string;
   images: {
@@ -56,7 +57,6 @@ export type CreateProductDto = {
   price: number;
   categoryId: string;
   images: File[];
-  attributeIds: string[];
 };
 
 export type UpdateProductImagesDto = {

@@ -38,6 +38,12 @@ init-webapi:
 	dotnet add WebAPI/WebAPI.csproj package Swashbuckle.AspNetCore
 	dotnet add WebAPI/WebAPI.csproj package Microsoft.EntityFrameworkCore.Design
 
+init-shared-view-models:
+	dotnet new classlib -n SharedViewModels
+	powershell -Command "Remove-Item './SharedViewModels/Class1.cs' -Force -ErrorAction SilentlyContinue"
+	mkdir .\SharedViewModels\ViewModels
+	mkdir .\SharedViewModels\DTOs
+
 init-webmvc:
 	dotnet new mvc -n WebMVC
 	mkdir .\WebMVC\Middlewares
@@ -61,6 +67,7 @@ init-solution:
 	dotnet sln add Application\Application.csproj
 	dotnet sln add Infrastructure\Infrastructure.csproj
 	dotnet sln add Background\Background.csproj
+	dotnet sln add SharedViewModels\SharedViewModels.csproj
 	
 	@echo "Setting up project references..."
 	dotnet add Domain\Domain.csproj reference CrossCutting\CrossCutting.csproj
@@ -72,6 +79,9 @@ init-solution:
 	dotnet add WebMVC\WebMVC.csproj reference Infrastructure\Infrastructure.csproj
 	dotnet add Background\Background.csproj reference Application\Application.csproj
 	dotnet add Background\Background.csproj reference Infrastructure\Infrastructure.csproj
+	
+	dotnet add WebMVC\WebMVC.csproj reference SharedViewModels\SharedViewModels.csproj
+	dotnet add Application\Application.csproj reference SharedViewModels\SharedViewModels.csproj
 
 init-monolith:
 	make init-cross-cutting

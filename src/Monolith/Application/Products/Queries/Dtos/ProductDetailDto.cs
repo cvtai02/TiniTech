@@ -9,6 +9,7 @@ public class ProductDetailDto
     public string Name { get; set; } = null!;
     public int Price { get; set; }
     public string Sku { get; set; } = null!;
+    public string DefaultImageUrl { get; set; } = null!;
     public int CategoryId { get; set; }
     public string Description { get; set; } = null!;
     public List<ProductImageDto> Images { get; set; } = [];
@@ -28,6 +29,7 @@ public class ProductDetailDto
             Slug = product.Slug,
             Name = product.Name,
             Sku = product.Sku,
+            DefaultImageUrl = product.ImageUrl,
             Price = product.Metric.LowestPrice,
             CategoryId = product.CategoryId,
             FeaturedPoint = product.Metric.FeaturedPoint,

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FaPlus, FaTrash, FaStar, FaImage } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaImage } from 'react-icons/fa';
 import { fetchCategories } from '../../services/category';
-import { fetchAttributes } from '../../services/attribute';
 import { CreateProductDto } from '../../types';
 import { validatePostProduct } from './validatePostProduct';
 import { formatVND } from '../../utils/formatCurrency';
 import { toSku } from '../../utils/to-sku';
 import { createProduct } from '../../services/product';
 
-const AddProductPage: React.FC = () => {
+const AddProduct: React.FC = () => {
   // Form state
   const [product, setProduct] = useState<CreateProductDto>({
     name: '',
@@ -18,7 +17,6 @@ const AddProductPage: React.FC = () => {
     sku: '',
     price: 0,
     images: [],
-    attributeIds: [],
   });
 
   // UI state
@@ -26,7 +24,6 @@ const AddProductPage: React.FC = () => {
     useState<string>('');
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [defaultImageIndex, setDefaultImageIndex] = useState<number>(0);
-  const [primaryAttributeId, setPrimaryAttributeId] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -34,11 +31,6 @@ const AddProductPage: React.FC = () => {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
-  });
-
-  const { data: attributes = [] } = useQuery({
-    queryKey: ['attributes'],
-    queryFn: fetchAttributes,
   });
 
   const createProductMutation = useMutation({
@@ -93,35 +85,6 @@ const AddProductPage: React.FC = () => {
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setProduct((prev) => ({ ...prev, categoryId: value }));
-  };
-
-  // Handle attribute selection
-  const handleAttributeToggle = (attributeId: string) => {
-    setProduct((prev) => {
-      const attributeIds = prev.attributeIds.includes(attributeId)
-        ? prev.attributeIds.filter((id) => id !== attributeId)
-        : [...prev.attributeIds, attributeId];
-
-      // If we're removing the primary attribute, reset it
-      if (
-        primaryAttributeId === attributeId &&
-        !attributeIds.includes(attributeId)
-      ) {
-        setPrimaryAttributeId('');
-      }
-
-      return { ...prev, attributeIds };
-    });
-  };
-
-  const handleSetPrimaryAttribute = (attributeId: string) => {
-    // Only set as primary if it's already selected
-    if (product.attributeIds.includes(attributeId)) {
-      setPrimaryAttributeId(attributeId);
-    }
-    if (primaryAttributeId === attributeId) {
-      setPrimaryAttributeId('');
-    }
   };
 
   // Handle image uploads
@@ -194,11 +157,6 @@ const AddProductPage: React.FC = () => {
           product.images[defaultImageIndex],
           ...product.images.filter((_, i) => i !== defaultImageIndex),
         ],
-        //Move primary attribute to the front
-        attributeIds: [
-          primaryAttributeId,
-          ...product.attributeIds.filter((id) => id !== primaryAttributeId),
-        ],
       };
 
       createProductMutation.mutate(finalProduct, {
@@ -216,12 +174,10 @@ const AddProductPage: React.FC = () => {
             sku: '',
             price: 0,
             images: [],
-            attributeIds: [],
           });
           setSelectedParentCategory('');
           setImagePreviewUrls([]);
           setDefaultImageIndex(0);
-          setPrimaryAttributeId('');
           setErrors({});
         },
       });
@@ -236,7 +192,7 @@ const AddProductPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl p-4 bg-gray-800 rounded-lg shadow-md text-white">
       <h1 className="text-2xl font-bold mb-6">Thêm sản phẩm mới</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6 ">
@@ -380,78 +336,6 @@ const AddProductPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Attributes */}
-        <div className="bg-gray-900 p-6 rounded-lg shadow text-white">
-          <h2 className="text-xl font-semibold mb-4">Thêm thuộc tính</h2>
-
-          {attributes.length === 0 ? (
-            <p className="text-gray-500">
-              Hiện không có thuộc tính. Có thể thêm thuộc tính khi tạo biến thể.
-            </p>
-          ) : (
-            <div>
-              <div className="mb-2 text-sm text-gray-500">
-                Chọn thuộc tính cho sản phẩm và chọn thuộc tính chính để hiển
-                thị hình ảnh của các biến thể
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                {attributes.map((attribute) => (
-                  <div
-                    key={attribute.id}
-                    className={`flex items-center justify-between rounded border ${
-                      product.attributeIds.includes(attribute.id)
-                        ? 'border-blue-500 bg-gray-800'
-                        : 'border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center grow ps-4  rounded-sm border-gray-400">
-                      <input
-                        type="checkbox"
-                        id={`attr-${attribute.id}`}
-                        checked={product.attributeIds.includes(attribute.id)}
-                        onChange={() => handleAttributeToggle(attribute.id)}
-                        className="w-4 h-4 text-blue-600 rounded-sm  focus:ring-blue-600 ring-offset-gray-800 focus:ring-2 bg-gray-700 border-gray-600"
-                      />
-                      <label
-                        htmlFor={`attr-${attribute.id}`}
-                        className="w-full py-4 ms-2 text-sm font-medium  text-gray-300"
-                      >
-                        {attribute.name}
-                      </label>
-                    </div>
-
-                    {product.attributeIds.includes(attribute.id) && (
-                      <button
-                        type="button"
-                        onClick={() => handleSetPrimaryAttribute(attribute.id)}
-                        className={`flex items-center mr-4 justify-center h-6 w-6 rounded-full ${
-                          primaryAttributeId === attribute.id
-                            ? 'bg-yellow-600 text-yellow-200'
-                            : 'bg-gray-700 text-gray-400 hover:bg-gray-700'
-                        }`}
-                        title={
-                          primaryAttributeId === attribute.id
-                            ? 'Primary Attribute'
-                            : 'Set as Primary'
-                        }
-                      >
-                        <FaStar className="h-3 w-3" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {errors.attributeIds && (
-                <p className="mt-2 text-sm text-red-500">
-                  {errors.attributeIds}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-
         {/* Images */}
         <div className="bg-gray-900 text-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Hình ảnh</h2>
@@ -555,4 +439,4 @@ const AddProductPage: React.FC = () => {
   );
 };
 
-export default AddProductPage;
+export default AddProduct;
