@@ -19,14 +19,6 @@ export const createProduct = async (data: CreateProductDto) => {
   formData.append('price', data.price.toString());
   formData.append('categoryId', data.categoryId);
 
-  if (data.attributeIds[0] == '') {
-    data.attributeIds[0] = '-1';
-  }
-
-  data.attributeIds.forEach((attributeId) => {
-    formData.append('attributeIds', attributeId);
-  });
-
   data.images.forEach((image) => {
     formData.append('images', image);
   });
@@ -69,4 +61,3 @@ export const getProductsFn = async (
   const body = await res.json();
   return body.data;
 };
-

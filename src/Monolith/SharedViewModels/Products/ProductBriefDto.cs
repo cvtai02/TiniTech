@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
 
-namespace Application.Products.Queries.Dtos;
+namespace SharedViewModels.Products;
 
 public class ProductBriefDto
 {

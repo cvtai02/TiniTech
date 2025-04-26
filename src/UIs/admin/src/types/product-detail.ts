@@ -1,3 +1,4 @@
+import { AttributeDto } from './attribute';
 import { ProductStatus } from './product';
 
 // DTOs
@@ -34,20 +35,6 @@ export interface VariantDto {
 export interface VariantAttributeDto {
   attributeId: string;
   value: string;
-}
-
-export interface AttributeValueDto {
-  orderPriority: number;
-  value: string;
-  imageUrl?: string;
-}
-
-export interface AttributeDto {
-  attributeId: number;
-  name: string;
-  orderPriority: number;
-  isPrimary: boolean;
-  values: AttributeValueDto[];
 }
 
 export type CreateProductDto = {

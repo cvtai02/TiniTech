@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using SharedViewModels.Categories;
 using WebMVC.Models;
 
 namespace WebMVC.Controllers;
@@ -15,7 +17,22 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var category = new CategoryDto
+        {
+            Id = 1,
+            Name = "Electronics",
+            Description = "Devices and gadgets",
+            Slug = "electronics",
+            Status = CategoryStatus.Active,
+            ParentId = null,
+            Subcategories = new List<CategoryDto>
+            {
+                new CategoryDto { Id = 2, Name = "Laptops", Description = "Portable computers", Slug = "laptops" },
+                new CategoryDto { Id = 3, Name = "Phones", Description = "Smartphones", Slug = "phones" }
+            }
+        };
+
+        return View(category);
     }
 
     public IActionResult Privacy()

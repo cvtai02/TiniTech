@@ -24,7 +24,7 @@ const ProductPage: React.FC = () => {
       pageSize: 8,
       orderBy: 'createdDate',
       orderDirection: 'descending',
-      status: ['active', 'draft'],
+      status: ['active'],
     }),
   );
   const [category, setCategory] = useState<Category>();
@@ -112,7 +112,7 @@ const ProductPage: React.FC = () => {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-y-auto">
-        <div className="relative w-full max-w-4xl bg-transparent max-h-10/12 overflow-auto scroll-bar rounded-lg">
+        <div className="relative w-full max-w-4xl bg-transparent max-h-screen overflow-auto scroll-bar rounded-lg">
           <button
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             onClick={handleCloseModal}
@@ -132,7 +132,7 @@ const ProductPage: React.FC = () => {
               />
             </svg>
           </button>
-          <div className="p-6 bg-white rounded-lg shadow-lg">
+          <div className=" bg-white rounded-lg shadow-lg">
             <AddProduct />
           </div>
         </div>

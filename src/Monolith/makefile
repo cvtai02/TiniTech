@@ -81,6 +81,7 @@ init-solution:
 	dotnet add Background\Background.csproj reference Infrastructure\Infrastructure.csproj
 	
 	dotnet add WebMVC\WebMVC.csproj reference SharedViewModels\SharedViewModels.csproj
+	dotnet add SharedViewModels\SharedViewModels.csproj reference Domain\Domain.csproj
 	dotnet add Application\Application.csproj reference SharedViewModels\SharedViewModels.csproj
 
 init-monolith:
@@ -99,6 +100,8 @@ run-webapi-nobuild:
 	dotnet run --project WebAPI/WebAPI.csproj --no-build
 run-webmvc:
 	dotnet run --project WebMVC/WebMVC.csproj
+watch-webmvc:
+	dotnet watch run --project WebMVC/WebMVC.csproj 
 run-unit-tests:
 	dotnet test --project UnitTests/UnitTests.csproj --no-build --verbosity normal --filter "Category=Unit"
 

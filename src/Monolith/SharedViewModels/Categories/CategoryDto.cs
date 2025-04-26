@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Domain.Enums;
 
-namespace Application.Categories.Queries;
+namespace SharedViewModels.Categories;
 
 public class CategoryDto
 {

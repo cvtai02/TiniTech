@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Application.Common.Abstraction;
 using Application.Common.Models;
-using Application.Products.Queries.Dtos;
 using Application.Products.Queries.Enums;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedViewModels.Products;
 
 namespace Application.Products.Queries.GetProducts;
 

@@ -1,9 +1,9 @@
 using Application.Common.Abstraction;
 using Application.Common.Models;
-using Application.Products.Queries.Dtos;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using SharedViewModels.Products;
 
 namespace Application.Products.Queries.GetDetailBySlug;
 

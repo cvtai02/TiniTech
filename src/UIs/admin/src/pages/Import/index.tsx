@@ -1,257 +1,467 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// ImportProductPage.tsx
+import React, { useState } from 'react';
+import { FaSave, FaPaperPlane, FaPlus, FaTrash } from 'react-icons/fa';
 
-// Types
-interface ImportReceipt {
-  id: string;
-  date: string;
-  supplier: string;
-  totalAmount: number;
-  status: 'pending' | 'completed' | 'cancelled';
-  items: number;
+// Define types for our data structures
+interface ProductVariant {
+  id: number;
+  name: string;
 }
 
-const ImportGoodsPage: React.FC = () => {
-  const [receipts, setReceipts] = useState<ImportReceipt[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
+interface Product {
+  id: number;
+  name: string;
+  variants: ProductVariant[];
+}
 
-  useEffect(() => {
-    // Simulate fetching data
-    const fetchData = async () => {
-      try {
-        // Replace with actual API call
-        setTimeout(() => {
-          const dummyData: ImportReceipt[] = [
-            {
-              id: 'IMP-001',
-              date: '2025-04-15',
-              supplier: 'Global Supplies Inc.',
-              totalAmount: 5600.0,
-              status: 'completed',
-              items: 12,
-            },
-            {
-              id: 'IMP-002',
-              date: '2025-04-10',
-              supplier: 'Tech Parts Ltd.',
-              totalAmount: 3200.5,
-              status: 'pending',
-              items: 8,
-            },
-            {
-              id: 'IMP-003',
-              date: '2025-04-05',
-              supplier: 'Wholesale Goods Co.',
-              totalAmount: 1800.75,
-              status: 'completed',
-              items: 5,
-            },
-            {
-              id: 'IMP-004',
-              date: '2025-03-28',
-              supplier: 'Premium Materials',
-              totalAmount: 7200.0,
-              status: 'cancelled',
-              items: 15,
-            },
-          ];
-          setReceipts(dummyData);
-          setIsLoading(false);
-        }, 800);
-      } catch (error) {
-        console.error('Error fetching import receipts:', error);
-        setIsLoading(false);
-      }
+interface ImportItem {
+  id: number;
+  productId: number;
+  productName: string;
+  variantId: number;
+  variantName: string;
+  quantity: number;
+  unitCost: number;
+}
+
+const ImportProductPage: React.FC = () => {
+  // Sample product data
+  const products: Product[] = [
+    {
+      id: 1,
+      name: 'Wireless Headphones',
+      variants: [
+        { id: 1, name: 'Black' },
+        { id: 2, name: 'White' },
+        { id: 3, name: 'Silver' },
+      ],
+    },
+    {
+      id: 2,
+      name: 'Smart Watch',
+      variants: [
+        { id: 1, name: 'Black' },
+        { id: 2, name: 'Silver' },
+        { id: 3, name: 'Gold' },
+      ],
+    },
+    {
+      id: 3,
+      name: 'Bluetooth Speaker',
+      variants: [
+        { id: 1, name: 'Black' },
+        { id: 2, name: 'White' },
+        { id: 3, name: 'Blue' },
+      ],
+    },
+    {
+      id: 4,
+      name: 'Laptop Stand',
+      variants: [
+        { id: 1, name: 'Aluminum' },
+        { id: 2, name: 'Plastic' },
+      ],
+    },
+    {
+      id: 5,
+      name: 'External Hard Drive',
+      variants: [
+        { id: 1, name: '1TB' },
+        { id: 2, name: '2TB' },
+        { id: 3, name: '4TB' },
+      ],
+    },
+  ];
+
+  // Initial import items
+  const initialItems: ImportItem[] = [
+    {
+      id: 1,
+      productId: 1,
+      productName: 'Wireless Headphones',
+      variantId: 1,
+      variantName: 'Black',
+      quantity: 10,
+      unitCost: 49.99,
+    },
+    {
+      id: 2,
+      productId: 2,
+      productName: 'Smart Watch',
+      variantId: 2,
+      variantName: 'Silver',
+      quantity: 5,
+      unitCost: 95.0,
+    },
+    {
+      id: 3,
+      productId: 3,
+      productName: 'Bluetooth Speaker',
+      variantId: 1,
+      variantName: 'Black',
+      quantity: 8,
+      unitCost: 35.0,
+    },
+  ];
+
+  // State variables
+  const [importNumber, setImportNumber] = useState<string>('IMP-2025-0042');
+  const [importDate, setImportDate] = useState<string>('2025-04-25');
+  const [importItems, setImportItems] = useState<ImportItem[]>(initialItems);
+  const [selectedProductId, setSelectedProductId] = useState<number | ''>('');
+  const [selectedVariantId, setSelectedVariantId] = useState<number | ''>('');
+  const [quantity, setQuantity] = useState<string>('1');
+  const [unitCost, setUnitCost] = useState<string>('');
+
+  // Get product variants based on selected product
+  const getVariantsForSelectedProduct = () => {
+    if (selectedProductId === '') return [];
+    const product = products.find((p) => p.id === selectedProductId);
+    return product ? product.variants : [];
+  };
+
+  // Calculate totals
+  const calculateTotals = () => {
+    const totalQuantity = importItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    );
+    const totalCost = importItems.reduce(
+      (sum, item) => sum + item.quantity * item.unitCost,
+      0,
+    );
+    return { totalQuantity, totalCost };
+  };
+
+  // Add a new product to the import list
+  const handleAddProduct = () => {
+    if (
+      selectedProductId === '' ||
+      selectedVariantId === '' ||
+      !quantity ||
+      !unitCost
+    ) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    const selectedProduct = products.find((p) => p.id === selectedProductId);
+    const selectedVariant = selectedProduct?.variants.find(
+      (v) => v.id === selectedVariantId,
+    );
+
+    if (!selectedProduct || !selectedVariant) return;
+
+    const newItem: ImportItem = {
+      id: Math.max(0, ...importItems.map((item) => item.id)) + 1,
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      variantId: selectedVariant.id,
+      variantName: selectedVariant.name,
+      quantity: parseInt(quantity),
+      unitCost: parseFloat(unitCost),
     };
 
-    fetchData();
-  }, []);
+    setImportItems([...importItems, newItem]);
 
-  const ActionButton: React.FC<{
-    text: string;
-    icon: string;
-    onClick: () => void;
-    color: string;
-  }> = ({ text, icon, onClick, color }) => (
-    <button
-      onClick={onClick}
-      className={`flex items-center justify-center p-6 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105 ${color} text-white w-full`}
-    >
-      <span className="mr-3 text-2xl">{icon}</span>
-      <span className="text-lg font-semibold">{text}</span>
-    </button>
-  );
-
-  const handleCreateImportReceipt = () => {
-    console.log('Create new import receipt');
-    // Implementation for creating new import receipt
+    // Reset form
+    setSelectedProductId('');
+    setSelectedVariantId('');
+    setQuantity('1');
+    setUnitCost('');
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  // Remove an item from the import list
+  const handleRemoveItem = (id: number) => {
+    setImportItems(importItems.filter((item) => item.id !== id));
   };
+
+  // Format number to currency
+  const formatCurrency = (value: number) => {
+    return value.toFixed(2);
+  };
+
+  const { totalQuantity, totalCost } = calculateTotals();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Quản lý đơn nhập hàng</h1>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <ActionButton
-          text="Tạo phiếu nhập"
-          icon="📝"
-          onClick={handleCreateImportReceipt}
-          color="bg-blue-600 hover:bg-blue-700"
-        />
-        <ActionButton
-          text="Sản phẩm mới"
-          icon="📦"
-          onClick={() => navigate('/import/new-product')}
-          color="bg-purple-600 hover:bg-purple-700"
-        />
-        <ActionButton
-          text="Thêm biến thể mới"
-          icon="🔄"
-          onClick={() => navigate('/import/new-variant')}
-          color="bg-teal-600 hover:bg-teal-700"
-        />
-      </div>
-
-      {/* Import Receipt History */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold mb-6">Import Receipt History</h2>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className="bg-gray-100 min-h-screen p-6">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-8">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Goods Receipt Note
+        </h1>
+        {/* Form Header */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div>
+            <label
+              htmlFor="import-number"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Number:
+            </label>
+            <input
+              type="text"
+              id="import-number"
+              value={importNumber}
+              onChange={(e) => setImportNumber(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-left">ID</th>
-                  <th className="py-3 px-6 text-left">Date</th>
-                  <th className="py-3 px-6 text-left">Supplier</th>
-                  <th className="py-3 px-6 text-right">Items Count</th>
-                  <th className="py-3 px-6 text-right">Total Amount</th>
-                  <th className="py-3 px-6 text-center">Status</th>
-                  <th className="py-3 px-6 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm">
-                {receipts.map((receipt) => (
-                  <tr
-                    key={receipt.id}
-                    className="border-b border-gray-200 hover:bg-gray-50"
-                  >
-                    <td className="py-4 px-6 text-left">{receipt.id}</td>
-                    <td className="py-4 px-6 text-left">{receipt.date}</td>
-                    <td className="py-4 px-6 text-left">{receipt.supplier}</td>
-                    <td className="py-4 px-6 text-right">{receipt.items}</td>
-                    <td className="py-4 px-6 text-right">
-                      ${receipt.totalAmount.toFixed(2)}
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs ${getStatusColor(receipt.status)}`}
-                      >
-                        {receipt.status.charAt(0).toUpperCase() +
-                          receipt.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-center">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          className="text-blue-600 hover:text-blue-900"
-                          title="View"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          className="text-green-600 hover:text-green-900"
-                          title="Edit"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+
+          <div>
+            <label
+              htmlFor="import-date"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Date:
+            </label>
+            <input
+              type="date"
+              id="import-date"
+              value={importDate}
+              onChange={(e) => setImportDate(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Product Form */}
+        <div className="bg-gray-50 p-6 rounded-md mb-8">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4">
+            Add Product
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+              <label
+                htmlFor="product"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Product:
+              </label>
+              <select
+                id="product"
+                value={selectedProductId}
+                onChange={(e) => {
+                  setSelectedProductId(
+                    e.target.value ? parseInt(e.target.value) : '',
+                  );
+                  setSelectedVariantId('');
+                }}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                required
+              >
+                <option value="">-- Select Product --</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              </select>
+            </div>
 
-        {receipts.length === 0 && !isLoading && (
-          <div className="text-center py-10">
-            <p className="text-gray-500">No import receipts found</p>
+            <div>
+              <label
+                htmlFor="variant"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Variant:
+              </label>
+              <select
+                id="variant"
+                value={selectedVariantId}
+                onChange={(e) =>
+                  setSelectedVariantId(
+                    e.target.value ? parseInt(e.target.value) : '',
+                  )
+                }
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                disabled={selectedProductId === ''}
+                required
+              >
+                <option value="">-- Select Variant --</option>
+                {getVariantsForSelectedProduct().map((variant) => (
+                  <option key={variant.id} value={variant.id}>
+                    {variant.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="quantity"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Quantity:
+              </label>
+              <input
+                type="number"
+                id="quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                min="1"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="unit-cost"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Unit Cost ($):
+              </label>
+              <input
+                type="number"
+                id="unit-cost"
+                value={unitCost}
+                onChange={(e) => setUnitCost(e.target.value)}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
           </div>
-        )}
+
+          <button
+            onClick={handleAddProduct}
+            className="mt-4 flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            <FaPlus className="mr-2" />
+            Add Product
+          </button>
+        </div>
+
+        {/* Products Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  #
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Product
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Variant
+                </th>
+
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Quantity
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Unit Cost ($)
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Total Cost ($)
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {importItems.map((item, index) => (
+                <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.productName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {item.variantName}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {item.quantity}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(item.unitCost)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(item.quantity * item.unitCost)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {/* Total Row */}
+              <tr className="bg-gray-50 font-semibold">
+                <td
+                  colSpan={4}
+                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                >
+                  Total
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {totalQuantity}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {formatCurrency(totalCost)}
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between mt-8">
+          <button
+            onClick={() => alert('Import saved as draft!')}
+            className="flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            <FaSave className="mr-2" />
+            Save as Draft
+          </button>
+
+          <button
+            onClick={() => alert('Import submitted successfully!')}
+            className="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            <FaPaperPlane className="mr-2" />
+            Submit Import
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ImportGoodsPage;
+export default ImportProductPage;

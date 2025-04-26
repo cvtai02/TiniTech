@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  AttributeDto,
+  AttributeValueDto,
   ProductDetailDto,
   UpdateProductInfoDto,
   VariantDto,
@@ -8,6 +10,7 @@ import {
 import { updateProductInfoFn } from '../../services/productDetail';
 import { FaSpinner } from 'react-icons/fa';
 import AttributeModal from './AttributeModal';
+import { toast } from 'react-toastify';
 
 interface ProductInfoProps {
   product: ProductDetailDto;
@@ -17,23 +20,24 @@ interface ProductInfoProps {
 const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   const queryClient = useQueryClient();
 
-  // Form state management
-  const [formData, setFormData] = useState<{
-    name: string;
-    price: number;
-    sku: string;
-    description: string;
-  }>({
-    name: '',
-    price: 0,
-    sku: '',
-    description: '',
+  // Create a clone of the product for edit mode
+  const [productClone, setProductClone] = useState<ProductDetailDto>({
+    ...product,
+  });
+
+  const [formData, setFormData] = useState<UpdateProductInfoDto>({
+    productId: product.id.toString(),
+    name: product.name || '',
+    price: product.price || 0,
+    sku: product.sku || '',
+    description: product.description || '',
   });
 
   // Additional states
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
   >({});
+
   const [selectedVariant, setSelectedVariant] = useState<VariantDto | null>(
     null,
   );
@@ -41,16 +45,25 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
 
   // Modal state
   const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
+  const [isAddingPrimaryAttribute, setIsAddingPrimaryAttribute] =
+    useState(false);
+  const [isAttributeValueModalOpen, setIsAttributeValueModalOpen] =
+    useState(false);
+  const [currentEditingAttribute, setCurrentEditingAttribute] =
+    useState<AttributeDto | null>(null);
+  const [newAttributeValue, setNewAttributeValue] = useState('');
 
-  // Update form data when product data changes
+  // Update product clone and form data when product data changes
   useEffect(() => {
     if (product) {
-      setFormData({
+      setProductClone({ ...product });
+      setFormData((prev) => ({
+        ...prev,
         name: product.name,
         price: product.price,
         sku: product.sku,
         description: product.description,
-      });
+      }));
     }
   }, [product]);
 
@@ -83,7 +96,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     },
     onError: (error) => {
       console.error('Error updating product info:', error);
-      alert('Failed to update product information. Please try again.');
+      toast('Failed to update product information. Please try again.');
       setIsSaving(false);
     },
   });
@@ -92,7 +105,14 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
+
+    // Update both formData and productClone
     setFormData((prev) => ({
+      ...prev,
+      [name]: name === 'price' ? parseFloat(value) : value,
+    }));
+
+    setProductClone((prev) => ({
       ...prev,
       [name]: name === 'price' ? parseFloat(value) : value,
     }));
@@ -114,25 +134,29 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     setIsSaving(true);
 
     try {
-      // Only send data that has changed
+      // Extract changes from productClone to formData
+      const productInfoData: UpdateProductInfoDto = {
+        productId: productClone.id.toString(),
+        name:
+          productClone.name !== product.name ? productClone.name : undefined,
+        price:
+          productClone.price !== product.price ? productClone.price : undefined,
+        sku: productClone.sku !== product.sku ? productClone.sku : undefined,
+        description:
+          productClone.description !== product.description
+            ? productClone.description
+            : undefined,
+      };
+
+      // Only send the request if there are changes
       if (
-        formData.name !== product.name ||
-        formData.price !== product.price ||
-        formData.sku !== product.sku ||
-        formData.description !== product.description
+        productInfoData.name ||
+        productInfoData.price ||
+        productInfoData.sku ||
+        productInfoData.description
       ) {
-        const productInfoData: UpdateProductInfoDto = {
-          productId: product.id.toString(),
-          name: formData.name !== product.name ? formData.name : undefined,
-          price: formData.price !== product.price ? formData.price : undefined,
-          sku: formData.sku !== product.sku ? formData.sku : undefined,
-          description:
-            formData.description !== product.description
-              ? formData.description
-              : undefined,
-        };
         await updateProductInfoMutation.mutateAsync(productInfoData);
-        alert('Product information updated successfully!');
+        toast('Product information updated successfully!');
       } else {
         setIsSaving(false);
       }
@@ -141,7 +165,8 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     }
   };
 
-  const openAttributeModal = () => {
+  const openAttributeModal = (isPrimary: boolean) => {
+    setIsAddingPrimaryAttribute(isPrimary);
     setIsAttributeModalOpen(true);
   };
 
@@ -149,17 +174,75 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     setIsAttributeModalOpen(false);
   };
 
-  const handleAddAttribute = (
-    attributeName: string,
-    attributeValues: string[],
+  const handleAddAttributeValue = (
+    attribute: AttributeDto,
+    value: AttributeValueDto,
   ) => {
-    // Logic to add attribute would go here
-    console.log('Adding attribute:', attributeName, attributeValues);
+    closeAttributeModal();
+
+    // Update the productClone with new attribute value
+    setProductClone((prev) => {
+      const attrIndex = prev.attributes.findIndex(
+        (attr) => attr.name === attribute.name,
+      );
+      if (attrIndex !== -1) {
+        const updatedAttributes = [...prev.attributes];
+        updatedAttributes[attrIndex] = {
+          ...updatedAttributes[attrIndex],
+          values: [...updatedAttributes[attrIndex].values, value],
+        };
+        return { ...prev, attributes: updatedAttributes };
+      }
+      return prev;
+    });
+  };
+
+  const handleAddAttribute = (attribute: AttributeDto) => {
+    // Handle adding a new attribute to the clone
+    if (productClone.attributes.length >= 5) {
+      toast.error('You can only add up to 5 attributes.');
+      return;
+    }
+    if (productClone.attributes.some((attr) => attr.name === attribute.name)) {
+      toast.error(`Attribute ${attribute.name} already exists`);
+      return;
+    }
+
+    setProductClone((prev) => ({
+      ...prev,
+      attributes: [...prev.attributes, attribute],
+    }));
+
+    toast.success(`Added ${attribute.name} attribute`);
     closeAttributeModal();
   };
 
-  // Sort attributes by orderPriority
-  const sortedAttributes = [...product.attributes].sort(
+  const openAttributeValueModal = (attribute: AttributeDto) => {
+    setCurrentEditingAttribute(attribute);
+    setNewAttributeValue('');
+    setIsAttributeValueModalOpen(true);
+  };
+
+  const closeAttributeValueModal = () => {
+    setIsAttributeValueModalOpen(false);
+    setCurrentEditingAttribute(null);
+  };
+
+  const handleAddNewAttributeValue = () => {
+    if (!currentEditingAttribute || !newAttributeValue.trim()) return;
+
+    const newValue: AttributeValueDto = {
+      value: newAttributeValue.trim(),
+    };
+
+    handleAddAttributeValue(currentEditingAttribute, newValue);
+    setNewAttributeValue('');
+    closeAttributeValueModal();
+  };
+
+  // Sort attributes by orderPriority - use productClone in edit mode, otherwise use product
+  const displayProduct = isEditMode ? productClone : product;
+  const sortedAttributes = [...displayProduct.attributes].sort(
     (a, b) => a.orderPriority - b.orderPriority,
   );
 
@@ -289,7 +372,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                         className="bg-red-500 text-white rounded-full p-1"
                         onClick={(e) => {
                           e.stopPropagation();
-                          alert(`Remove ${item.value} option`);
+                          toast.info(`Remove ${item.value} option`);
                         }}
                       >
                         <svg
@@ -313,8 +396,12 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
               ))}
               {isEditMode && (
                 <button
-                  className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center"
-                  onClick={() => alert(`Add new ${attribute.name} option`)}
+                  className="py-2 border border-dashed border-gray-300 rounded-full text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center"
+                  onClick={() => {
+                    const attributeToEdit =
+                      sortedAttributes[sortedAttributes.indexOf(attribute)];
+                    openAttributeValueModal(attributeToEdit);
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +417,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                       d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                     />
                   </svg>
-                  Add Option
                 </button>
               )}
             </div>
@@ -339,26 +425,48 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
 
         {/* Add new attribute */}
         {isEditMode && (
-          <button
-            className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
-            onClick={openAttributeModal}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          <div className="grid grid-cols-2 gap-8 mb-6">
+            <button
+              className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
+              onClick={() => openAttributeModal(true)}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Add Attribute
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Primary Attribute
+            </button>
+            <button
+              className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
+              onClick={() => openAttributeModal(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Attribute
+            </button>
+          </div>
         )}
 
         {!isEditMode && (
@@ -421,7 +529,57 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
           isOpen={isAttributeModalOpen}
           onClose={closeAttributeModal}
           onAddAttribute={handleAddAttribute}
+          imageUrls={
+            isAddingPrimaryAttribute
+              ? product.images.map((img) => img.imageUrl)
+              : undefined
+          }
         />
+
+        {/* Attribute Value Modal */}
+        {isAttributeValueModalOpen && currentEditingAttribute && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+              <div className="p-6">
+                <h3 className="text-lg font-medium mb-4">
+                  Add Value to "{currentEditingAttribute.name}"
+                </h3>
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Value
+                  </label>
+                  <input
+                    type="text"
+                    value={newAttributeValue}
+                    onChange={(e) => setNewAttributeValue(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded"
+                    placeholder="Enter attribute value"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddNewAttributeValue();
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={closeAttributeValueModal}
+                    className="px-4 py-2 border border-gray-300 rounded text-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddNewAttributeValue}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    disabled={!newAttributeValue.trim()}
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
