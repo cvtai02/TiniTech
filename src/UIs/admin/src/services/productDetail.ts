@@ -65,7 +65,7 @@ export const updateProductInfoFn = async (
 ): Promise<string> => {
   console.log('data', data);
   const res = await apiFetch(`${API_URL}/api/products`, {
-    method: 'PATCH',
+    method: 'PUT',
     body: JSON.stringify(data),
   });
 

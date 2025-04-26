@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { AttributeDto, AttributeValueDto } from '../../types/attribute';
+import { ProductAttributeDto, ProductAttributeValueDto } from '../../types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAttributesFn, createAttributeFn } from '../../services/attribute';
+import { toast } from 'react-toastify';
 
 interface AttributeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddAttribute: (attribute: AttributeDto) => void;
+  onAddAttribute: (attribute: ProductAttributeDto) => void;
   imageUrls?: string[];
-}
-
-// Update AttributeValueDto to include image
-interface ExtendedAttributeValueDto extends AttributeValueDto {
-  image?: string;
 }
 
 const AttributeModal: React.FC<AttributeModalProps> = ({
@@ -26,11 +22,10 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
   const [attributeName, setAttributeName] = useState('');
   const [attributeValue, setAttributeValue] = useState('');
   const [attributeValues, setAttributeValues] = useState<
-    ExtendedAttributeValueDto[]
+    ProductAttributeValueDto[]
   >([]);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [selectedAttributeId, setSelectedAttributeId] = useState<string>('');
-  const [isPrimary, setIsPrimary] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -67,7 +62,6 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
       setAttributeValue('');
       setAttributeValues([]);
       setSelectedAttributeId('');
-      setIsPrimary(false);
       setIsCreatingNew(false);
       setSelectedImage(null);
     }
@@ -77,12 +71,10 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
   useEffect(() => {
     if (selectedAttributeId) {
       const selected = existingAttributes.find(
-        (attr) => attr.attributeId === selectedAttributeId,
+        (attr) => attr.id == selectedAttributeId,
       );
       if (selected) {
         setAttributeName(selected.name);
-        setIsPrimary(selected.isPrimary);
-        setAttributeValues(selected.values?.length > 0 ? selected.values : []);
       }
     }
   }, [selectedAttributeId, existingAttributes]);
@@ -94,7 +86,6 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
   const handleCreateNewAttribute = () => {
     setAttributeName('');
     setSelectedAttributeId('');
-    setIsPrimary(false);
     setAttributeValues([]);
     setIsCreatingNew(true);
   };
@@ -115,7 +106,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
     );
 
     if (newAttr) {
-      setSelectedAttributeId(newAttr.attributeId);
+      setSelectedAttributeId(newAttr.id);
     }
   };
 
@@ -128,15 +119,25 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
   // Updated to add both image and value
   const addValue = () => {
     if (attributeValue.trim() || selectedImage) {
-      setAttributeValues((prev) => [
-        ...prev,
-        {
-          value: attributeValue.trim(),
-          image: selectedImage || undefined,
-        },
-      ]);
-      setAttributeValue('');
-      setSelectedImage(null);
+      // Check if this value already exists - only checking the text value
+      const isDuplicate = attributeValues.some(
+        (item) => item.value === attributeValue.trim(),
+      );
+
+      if (!isDuplicate) {
+        setAttributeValues((prev) => [
+          ...prev,
+          {
+            value: attributeValue.trim(),
+            imageUrl: selectedImage || undefined,
+          },
+        ]);
+        setAttributeValue('');
+        setSelectedImage(null);
+      } else {
+        // Provide feedback about duplicate
+        toast.warn('This attribute value text has already been added.');
+      }
     }
   };
 
@@ -149,7 +150,6 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
     setAttributeValue('');
     setAttributeValues([]);
     setSelectedAttributeId('');
-    setIsPrimary(false);
     setIsCreatingNew(false);
     setSelectedImage(null);
     onClose();
@@ -159,7 +159,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
     if (!isImageModalOpen || !imageUrls || imageUrls.length === 0) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div className=" fixed inset-0 bg-black/60 flex items-center justify-center z-50 transition-opacity duration-300}>">
         <div className="bg-white rounded-xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto shadow-2xl transform transition-all duration-300 scale-100">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-semibold text-gray-800">
@@ -273,15 +273,15 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
                   Select Attribute
                 </label>
                 <select
-                  className="w-full p-3 text-lg border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                  value={selectedAttributeId || ''}
+                  value={selectedAttributeId}
                   onChange={(e) =>
                     handleSelectExistingAttribute(e.target.value)
                   }
+                  className="w-full p-3 text-lg border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">Select an attribute</option>
-                  {existingAttributes.map((attr) => (
-                    <option key={attr.attributeId} value={attr.attributeId}>
+                  <option value="">-- Select an attribute --</option>
+                  {existingAttributes.map((attr, index) => (
+                    <option key={index} value={attr.id}>
                       {attr.name}
                     </option>
                   ))}
@@ -373,7 +373,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
                   <button
                     type="button"
                     onClick={addValue}
-                    disabled={!selectedAttributeId}
+                    disabled={!selectedAttributeId || !attributeValue.trim()}
                     className="bg-blue-600 text-white px-4 py-3 text-lg rounded-r-lg hover:bg-blue-700 disabled:bg-gray-300 transition"
                   >
                     Add
@@ -391,9 +391,9 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
                       key={index}
                       className="bg-gray-100 px-3 py-2 rounded-full flex items-center text-base"
                     >
-                      {value.image && (
+                      {value.imageUrl && (
                         <img
-                          src={value.image}
+                          src={value.imageUrl}
                           alt="Attribute"
                           className="h-6 w-6 mr-2 object-cover rounded"
                         />
@@ -425,17 +425,13 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  if (
-                    attributeName.trim() &&
-                    attributeValues.length > 0 &&
-                    selectedAttributeId
-                  ) {
-                    const attributeToAdd: AttributeDto = {
+                  if (attributeValues.length > 0 && selectedAttributeId) {
+                    const attributeToAdd: ProductAttributeDto = {
                       attributeId: selectedAttributeId,
                       name: attributeName,
-                      orderPriority: 0,
-                      isPrimary,
                       values: attributeValues,
+                      isPrimary: imageUrls ? true : false,
+                      orderPriority: 0,
                     };
                     console.log('Adding attribute:', attributeToAdd);
                     onAddAttribute(attributeToAdd);

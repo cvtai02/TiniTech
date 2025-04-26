@@ -11,6 +11,6 @@ public class Payment : BaseAuditableEntity
     public string UserId { get; set; } = null!;
     public int OrderId { get; set; }
     public int PaymentServiceId { get; set; }
-    public int Amount { get; set; }
+    public decimal Amount { get; set; }
     public string Status { get; set; } = null!;
 }

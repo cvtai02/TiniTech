@@ -2,6 +2,7 @@ using Application.Common.Abstraction;
 using Application.Common.Exceptions;
 using Application.Common.Models;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 
@@ -16,11 +17,11 @@ namespace Application.Products.Commands.CreateProductCommand;
 public class CreateProductCommand : IRequest<Result<string>>
 {
     public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; } = string.Empty;
     public string Sku { get; set; } = null!;
-    public int Price { get; set; }
+    public int? Price { get; set; }
     public int CategoryId { get; set; }
-    public List<IFormFile> Images { get; set; } = [];
+    public List<IFormFile>? Images { get; set; } = [];
 }
 
 public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<string>>
@@ -41,22 +42,14 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         {
             Name = request.Name,
             Sku = request.Sku,
-            Description = request.Description,
+            Description = request.Description ?? string.Empty,
+            Status = ProductStatus.Draft,
             CategoryId = request.CategoryId,
             Metric = new ProductMetric
             {
-                LowestPrice = request.Price,
+                LowestPrice = request.Price ?? 0,
             },
         };
-
-        if (product.Attributes[0].AttributeId == -1)
-        {
-            product.Attributes.RemoveAt(0); // Remove the main attribute if it is -1
-        }
-        else
-        {
-            product.Attributes[0].IsPrimary = true; // Set the first attribute as the main attribute
-        }
 
 
         var uploadTasks = request.Images?.Select(async (image, index) =>
@@ -75,14 +68,22 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         }
         else
         {
-            var uploadedImages = await Task.WhenAll(uploadTasks);
-
-            if (uploadedImages.Length == 0)
+            try
             {
-                return new InfrastructureException("No images were uploaded successfully.");
+                var uploadedImages = await Task.WhenAll(uploadTasks);
+
+                if (uploadedImages.Length == 0)
+                {
+                    return new InfrastructureException("No images were uploaded successfully.");
+                }
+                product.Images.AddRange(uploadedImages);
+                product.ImageUrl = uploadedImages.First().ImageUrl;
             }
-            product.Images.AddRange(uploadedImages);
-            product.ImageUrl = uploadedImages.First().ImageUrl; // Set the first image as the main image
+            catch (Exception ex)
+            {
+                return new InfrastructureException("Error uploading images.", ex);
+            }
+            // Set the first image as the main image
         }
 
 

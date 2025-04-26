@@ -20,5 +20,9 @@ public class VariantConfiguration : IEntityTypeConfiguration<Variant>
             .WithOne(va => va.Variant)
             .HasForeignKey(va => va.VariantId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(v => v.Price)
+            .HasColumnType("decimal(18, 2)")
+            .IsRequired();
     }
 }

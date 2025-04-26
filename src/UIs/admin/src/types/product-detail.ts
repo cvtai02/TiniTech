@@ -1,6 +1,3 @@
-import { AttributeDto } from './attribute';
-import { ProductStatus } from './product';
-
 // DTOs
 export interface ProductDetailDto {
   id: number;
@@ -8,6 +5,7 @@ export interface ProductDetailDto {
   name: string;
   price: number;
   sku: string;
+  status: 'active' | 'draft' | 'deleted';
   defaultImageUrl: string;
   categoryId: number;
   description: string;
@@ -21,8 +19,22 @@ export interface ProductDetailDto {
   stock: number;
   sold: number;
   featuredPoint: number;
-  attributes: AttributeDto[];
+  attributes: ProductAttributeDto[];
   variants: VariantDto[];
+}
+
+export interface ProductAttributeDto {
+  attributeId: string;
+  name: string;
+  isPrimary: boolean;
+  orderPriority: number;
+  values: ProductAttributeValueDto[];
+}
+
+export interface ProductAttributeValueDto {
+  value: string;
+  imageUrl?: string;
+  orderPriority?: number;
 }
 
 export interface VariantDto {
@@ -56,43 +68,5 @@ export type UpdateProductImagesDto = {
 };
 
 export type UpdateProductInfoDto = {
-  productId: string;
-  name?: string;
-  sku?: string;
-  price?: number;
-  categoryId?: string;
-  description?: string;
-  status?: ProductStatus;
-  variants?: {
-    addList?: {
-      price: number;
-      sku: string;
-      attributes: {
-        attributeId: string;
-        value: string;
-      }[];
-    }[];
-    updateList?: {
-      variantsId: string;
-      price?: number;
-      sku?: string;
-      isDeleted?: boolean;
-    }[];
-  };
-  attributes?: {
-    addList?: {
-      attributeId: string;
-      isPrimary: boolean;
-      orderPriority: number;
-      values: {
-        value: string;
-        orderPriority: number;
-        imageUrl?: string;
-      };
-    }[];
-    removeList?: {
-      attributeId: string;
-      values: string[];
-    }[];
-  };
+  new: ProductDetailDto;
 };

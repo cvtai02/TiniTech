@@ -24,11 +24,6 @@ export const validatePostProduct = (
     errors.categoryId = 'Vui lòng chọn danh mục sản phẩm';
   }
 
-  // Validate description
-  if (!product.description.trim()) {
-    errors.description = 'Mô tả sản phẩm là bắt buộc';
-  }
-
   // Validate SKU
   if (!product.sku.trim()) {
     errors.sku = 'SKU là bắt buộc';
@@ -40,21 +35,21 @@ export const validatePostProduct = (
 
   // Validate price
   //chekc price is number
-  if (isNaN(product.price)) {
-    errors.price = 'Giá sản phẩm không hợp lệ';
-  } else if (product.price < 0) {
-    errors.price = 'Giá sản phẩm không được âm';
-  } else if (product.price > 1000000000) {
-    errors.price = 'Giá sản phẩm không được vượt quá 1 tỷ đồng';
-  }
+  // if (isNaN(product.price)) {
+  //   errors.price = 'Giá sản phẩm không hợp lệ';
+  // } else if (product.price < 0) {
+  //   errors.price = 'Giá sản phẩm không được âm';
+  // } else if (product.price > 1000000000) {
+  //   errors.price = 'Giá sản phẩm không được vượt quá 1 tỷ đồng';
+  // }
 
-  if (product.price % 1000 !== 0) {
-    errors.price = 'Giá sản phẩm phải là bội số của 1.000đ';
-  }
+  // if (product.price % 1000 !== 0) {
+  //   errors.price = 'Giá sản phẩm phải là bội số của 1.000đ';
+  // }
 
   // Validate images
   if (!product.images.length) {
-    errors.images = 'Please upload at least one product image';
+    // errors.images = 'Please upload at least one product image';
   } else {
     // Validate image types
     const invalidImages = product.images.filter(

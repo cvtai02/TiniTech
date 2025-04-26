@@ -28,5 +28,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
+        builder.HasMany(p => p.Attributes)
+            .WithOne(a => a.Product)
+            .HasForeignKey(a => a.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

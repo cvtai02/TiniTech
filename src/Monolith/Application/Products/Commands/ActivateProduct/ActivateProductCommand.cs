@@ -26,6 +26,7 @@ public class ActivateProductCommandHandler : IRequestHandler<ActivateProductComm
     /// <summary>
     /// Activates a product and its parent category if applicable.
     /// </summary>
+    /// TODO: Add a check to see if the product info is good enough to be activated.
     public async Task<Result<bool>> Handle(ActivateProductCommand request, CancellationToken cancellationToken)
     {
 

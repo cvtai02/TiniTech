@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain.Entities;
+using Domain.Enums;
 
 namespace SharedViewModels.Products;
 
@@ -12,8 +13,9 @@ public class ProductDetailDto
     public int Id { get; set; }
     public string Slug { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public int Price { get; set; }
+    public decimal Price { get; set; }
     public string Sku { get; set; } = null!;
+    public ProductStatus Status { get; set; } = ProductStatus.Draft;
     public string DefaultImageUrl { get; set; } = null!;
     public int CategoryId { get; set; }
     public string Description { get; set; } = null!;
@@ -65,6 +67,7 @@ public class ProductDetailDto
 
             Variants = [.. product.Variants.Select(v => new VariantDto
             {
+                ProductId = v.ProductId,
                 Price = v.Price,
                 Sku = v.Sku,
                 Stock = v.Metric.Stock,
@@ -80,10 +83,34 @@ public class ProductDetailDto
 
 public class VariantDto
 {
-    public int Price { get; set; }
+    public int ProductId { get; set; }
+    public decimal Price { get; set; }
     public string Sku { get; set; } = null!;
     public int Stock { get; set; }
     public List<VariantAttributeDto> VariantAttributes { get; set; } = [];
+
+    //TODO: test this
+    public bool IsSameId(Variant other)
+    {
+        if (VariantAttributes.Count != other.VariantAttributes.Count)
+        {
+            return false;
+        }
+        if (ProductId != other.ProductId)
+        {
+            return false;
+        }
+        foreach (var attribute in VariantAttributes)
+        {
+            var otherAttribute = other.VariantAttributes.FirstOrDefault(a => a.AttributeId == attribute.AttributeId);
+            if (otherAttribute == null || otherAttribute.Value != attribute.Value)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 public class VariantAttributeDto

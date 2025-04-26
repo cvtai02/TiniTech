@@ -7,8 +7,6 @@ using Application.Products.Queries.GetDetailBySlug;
 using Application.Products.Queries.GetProducts;
 using Domain.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controllers.Base;
 
@@ -43,7 +41,7 @@ public class ProductController : ApiController
         );
     }
 
-    [HttpPatch]
+    [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateProductInfoCommand cmd)
     {
         var result = await Sender.Send(cmd);

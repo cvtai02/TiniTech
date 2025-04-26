@@ -16,6 +16,8 @@ public abstract class DbContextAbstract : DbContext
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<VariantAttribute> VariantAttributes { get; set; }
     public DbSet<AttributeEntity> AttributeEntities { get; set; }
+    public DbSet<ImportReceipt> ImportReceipts { get; set; }
+    public DbSet<ImportReceiptItem> ImportReceiptItems { get; set; }
     protected DbContextAbstract(DbContextOptions options) : base(options)
     {
     }

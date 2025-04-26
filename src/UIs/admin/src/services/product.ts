@@ -2,7 +2,6 @@ import { apiFetch, postForm } from './api-interceptor';
 import {
   CreateProductDto,
   ProductBriefDto,
-  ProductDetailDto,
   GetProductsQueryParams as GetProductsQuery,
   PaginatedList,
 } from '../types';

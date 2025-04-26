@@ -1,16 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Permissions;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Base;
 
 namespace Domain.Entities;
 
-public class InventoryReceipt : BaseAuditableEntity
+public class ImportReceipt : BaseAuditableEntity
 {
-    public int Code { get; set; }
-    public string Supplier { get; set; } = null!;
-    public int TotalCost { get; set; }
-    public string Note { get; set; } = null!;
+    [NotMapped]
+    public new int Id { get; set; }
+    [Key]
+    public string Code { get; set; } = null!;
+    public string? Supplier { get; set; }
+    public decimal TotalCost { get; set; }
+    public string? Note { get; set; } = null!;
+    public DateTime ReceiptDate { get; set; }
+    public List<ImportReceiptItem> Items { get; set; } = [];
+
 }

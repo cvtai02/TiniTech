@@ -4,26 +4,16 @@ using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedViewModels.Products;
 
 namespace Application.Products.Commands.UpdateProductInfo;
 
-public class UpdateProductInfoCommand : IRequest<Result<int>>
+public class UpdateProductInfoCommand : IRequest<Result<string>>
 {
-    public int ProductId { get; set; }
-    public string? Name { get; set; }
-    public string? Sku { get; set; }
-    public int? Price { get; set; }
-    public int? CategoryId { get; set; }
-    public string? Description { get; set; }
-    public ProductStatus? Status { get; set; }
-
-    public CrudVariantDto? Variants { get; set; }
-    public CrudProductAttributeDto? Attributes { get; set; }
-
-
+    public ProductDetailDto New { get; set; } = null!;
 }
 
-public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfoCommand, Result<int>>
+public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfoCommand, Result<string>>
 {
     private readonly DbContextAbstract _context;
 
@@ -32,7 +22,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
         _context = dbContext;
     }
 
-    public async Task<Result<int>> Handle(UpdateProductInfoCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(UpdateProductInfoCommand request, CancellationToken cancellationToken)
     {
         // Find the product by id
         var product = await _context.Products
@@ -40,196 +30,112 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
             .Include(p => p.Variants)
             .Include(p => p.Attributes)
                 .ThenInclude(p => p.ProductAttributeValues)
-            .FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == request.New.Id, cancellationToken);
+
 
         if (product == null)
         {
-            return new KeyNotFoundException($"Product with ID {request.ProductId} not found.");
+            return new KeyNotFoundException($"Product {request.New.Id} not found.");
         }
 
-        // Update product properties if they are provided
-        if (request.Name != null)
-            product.Name = request.Name;
+        // Update product properties
+        product.Name = request.New.Name;
+        product.Sku = request.New.Sku;
+        product.Description = request.New.Description ?? string.Empty;
+        product.Status = request.New.Status;
+        product.CategoryId = request.New.CategoryId;
+        product.Metric.LowestPrice = request.New.Price;
+        product.Metric.FeaturedPoint = request.New.FeaturedPoint;
 
-        if (request.Sku != null)
-            product.Sku = request.Sku;
 
-        if (request.Price.HasValue)
-            product.Metric.LowestPrice = request.Price.Value;
-
-        if (request.CategoryId.HasValue)
-            product.CategoryId = request.CategoryId.Value;
-
-        if (request.Description != null)
-            product.Description = request.Description;
-
-        if (request.Status.HasValue)
-            product.Status = request.Status.Value;
-
-        // Add new variants
-
-        if (request.Variants != null)
+        // attributes
+        foreach (var attribute in request.New.Attributes)
         {
-            foreach (var variantDto in request.Variants.AddList)
+            var existingAttribute = product.Attributes.FirstOrDefault(a => a.AttributeId == attribute.AttributeId);
+            // If the attribute already exists, consider the values to be updated
+            if (existingAttribute != null)
             {
-                var variant = new Variant
-                {
-                    ProductId = product.Id,
-                    Price = variantDto.Price,
-                    Sku = variantDto.SKU
-                };
+                // find removed values
+                var valuesToRemove = existingAttribute.ProductAttributeValues
+                    .Where(v => !attribute.Values.Any(av => av.Value == v.Value)).ToList();
 
-                foreach (var attributeDto in variantDto.Attributes)
+                foreach (var value in valuesToRemove)
                 {
-                    var variantAttribute = new VariantAttribute
+                    existingAttribute.ProductAttributeValues.Remove(value);
+                }
+
+                // find added values
+                var valuesToAdd = attribute.Values
+                    .Where(v => !existingAttribute.ProductAttributeValues.Any(av => av.Value == v.Value)).ToList();
+
+                foreach (var value in valuesToAdd)
+                {
+                    existingAttribute.ProductAttributeValues.Add(new ProductAttributeValue
                     {
-                        AttributeId = attributeDto.AttributeId,
-                        Value = attributeDto.Values
-                    };
-
-                    variant.VariantAttributes.Add(variantAttribute);
+                        Value = value.Value,
+                        OrderPriority = value.OrderPriority,
+                        ImageUrl = value.ImageUrl,
+                    });
                 }
-
-                product.Variants.Add(variant);
             }
-
-
-            // Update existing variants
-            foreach (var variantDto in request.Variants.UpdateList)
+            else
             {
-                var variant = product.Variants.Where(x => x.Id == variantDto.VariantsId).FirstOrDefault();
-
-                if (variant != null)
+                product.Attributes.Add(new ProductAttribute
                 {
-                    if (variantDto.Price.HasValue)
-                        variant.Price = variantDto.Price.Value;
-
-                    if (variantDto.SKU != null)
-                        variant.Sku = variantDto.SKU;
-
-                    if (variantDto.IsDeleted.HasValue && variantDto.IsDeleted.Value)
-                        variant.IsDeleted = true;
-                }
+                    AttributeId = attribute.AttributeId,
+                    IsPrimary = attribute.IsPrimary,
+                    OrderPriority = attribute.OrderPriority,
+                    ProductAttributeValues = attribute.Values.Select(v => new ProductAttributeValue
+                    {
+                        Value = v.Value,
+                        OrderPriority = v.OrderPriority,
+                        ImageUrl = v.ImageUrl,
+                    }).ToList(),
+                });
             }
         }
 
-        // Handle product attributes if provided
-        if (request.Attributes != null)
+        // Remove attributes that are not in the new list
+        var attributesToRemove = product.Attributes.Where(a => !request.New.Attributes.Any(na => na.AttributeId == a.AttributeId)).ToList();
+        foreach (var attribute in attributesToRemove)
         {
-            int x = 1;
-            // Add new attributes
-            foreach (var attributeDto in request.Attributes.AddList)
+            product.Attributes.Remove(attribute);
+        }
+
+        // Update variants
+        //TODO: optimize this part, it is not efficient
+        // set isDeleted = true for all variants 
+        foreach (var variant in product.Variants)
+        {
+            variant.IsDeleted = true;
+        }
+        // add new variants
+        foreach (var variant in request.New.Variants)
+        {
+            var existingVariant = product.Variants.FirstOrDefault(v => variant.IsSameId(v));
+            if (existingVariant != null)
             {
-                var productAttribute = product.Attributes.FirstOrDefault(pa => pa.AttributeId == attributeDto.AttributeId);
-                if (productAttribute == null)
-                {
-                    productAttribute = new ProductAttribute
-                    {
-                        IsPrimary = attributeDto.IsPrimary,
-                        AttributeId = attributeDto.AttributeId,
-                        OrderPriority = attributeDto.OrderPriority ?? x++,
-                    };
-
-                    product.Attributes.Add(productAttribute);
-                }
-                else
-                {
-                    productAttribute.IsPrimary = attributeDto.IsPrimary;
-                    productAttribute.OrderPriority = attributeDto.OrderPriority ?? x++;
-                }
-
-
-                foreach (var valueDto in attributeDto.Values)
-                {
-                    var attributeValue = new ProductAttributeValue
-                    {
-                        ProductAttributeId = productAttribute.Id,
-                        Value = valueDto.Value,
-                        OrderPriority = valueDto.OrderPriority ?? x++,
-                        ImageUrl = valueDto.ImageUrl
-                    };
-
-                    productAttribute.ProductAttributeValues.Add(attributeValue);
-                }
+                existingVariant.Price = variant.Price;
+                existingVariant.Sku = variant.Sku;
+                existingVariant.IsDeleted = false;
             }
-
-            // Remove attribute values
-            foreach (var removeDto in request.Attributes.RemoveList)
+            else
             {
-                var productAttributes = await _context.ProductAttributes
-                    .Where(pa => pa.ProductId == product.Id && pa.AttributeId == removeDto.AttributeId)
-                    .ToListAsync(cancellationToken);
-
-                foreach (var productAttribute in productAttributes)
+                product.Variants.Add(new Variant
                 {
-                    var attributeValues = await _context.ProductAttributeValues
-                        .Where(av => av.ProductAttributeId == productAttribute.Id && removeDto.Values.Contains(av.Value))
-                        .ToListAsync(cancellationToken);
-
-                    if (attributeValues.Any())
+                    Sku = variant.Sku,
+                    Price = variant.Price,
+                    VariantAttributes = [.. variant.VariantAttributes.Select(va => new VariantAttribute
                     {
-                        _context.ProductAttributeValues.RemoveRange(attributeValues);
-                    }
-                }
+                        AttributeId = va.AttributeId,
+                        Value = va.Value,
+                    })],
+                });
             }
         }
 
         await _context.SaveChangesAsync(cancellationToken);
-        return product.Id;
+        return product.Slug;
     }
 }
 
-
-public class CrudVariantDto
-{
-    public List<CreateVariantDto> AddList { get; set; } = [];
-    public List<UpdateVariantDto> UpdateList { get; set; } = [];
-}
-
-public class CreateVariantDto
-{
-    public int Price { get; set; }
-    public string SKU { get; set; } = null!;
-    public List<VariantAttributeDto> Attributes { get; set; } = [];
-}
-
-public class VariantAttributeDto
-{
-    public int AttributeId { get; set; }
-    public string Values { get; set; } = null!;
-}
-
-public class UpdateVariantDto
-{
-    public int VariantsId { get; set; }
-    public int? Price { get; set; }
-    public string? SKU { get; set; }
-    public bool? IsDeleted { get; set; }
-}
-
-public class CrudProductAttributeDto
-{
-    public List<CreateProductAttributeDto> AddList { get; set; } = [];
-    public List<DeleteProductAttributeValueDto> RemoveList { get; set; } = [];
-}
-
-public class CreateProductAttributeDto
-{
-    public int AttributeId { get; set; }
-    public bool IsPrimary { get; set; }
-    public float? OrderPriority { get; set; }
-    public List<AttributeValueDto> Values { get; set; } = [];
-}
-
-public class AttributeValueDto
-{
-    public string Value { get; set; } = null!;
-    public float? OrderPriority { get; set; }
-    public string? ImageUrl { get; set; }
-}
-
-public class DeleteProductAttributeValueDto
-{
-    public int AttributeId { get; set; }
-    public List<string> Values { get; set; } = [];
-}

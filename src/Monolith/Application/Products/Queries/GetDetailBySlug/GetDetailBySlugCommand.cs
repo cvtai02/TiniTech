@@ -32,6 +32,9 @@ public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailByS
                 .ThenInclude(v => v.Metric)
             .Include(p => p.Attributes)
                 .ThenInclude(a => a.Attribute)
+
+            .Include(p => p.Attributes)
+                .ThenInclude(a => a.ProductAttributeValues)
             .FirstOrDefaultAsync(p => p.Slug == request.Slug, cancellationToken);
 
         if (product == null) return new KeyNotFoundException($"Product with slug {request.Slug} not found.");

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  AttributeDto,
-  AttributeValueDto,
+  ProductAttributeDto,
+  ProductAttributeValueDto,
   ProductDetailDto,
   UpdateProductInfoDto,
   VariantDto,
@@ -11,6 +11,7 @@ import { updateProductInfoFn } from '../../services/productDetail';
 import { FaSpinner } from 'react-icons/fa';
 import AttributeModal from './AttributeModal';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductInfoProps {
   product: ProductDetailDto;
@@ -19,18 +20,10 @@ interface ProductInfoProps {
 
 const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   const queryClient = useQueryClient();
-
+  const navigate = useNavigate();
   // Create a clone of the product for edit mode
   const [productClone, setProductClone] = useState<ProductDetailDto>({
     ...product,
-  });
-
-  const [formData, setFormData] = useState<UpdateProductInfoDto>({
-    productId: product.id.toString(),
-    name: product.name || '',
-    price: product.price || 0,
-    sku: product.sku || '',
-    description: product.description || '',
   });
 
   // Additional states
@@ -50,20 +43,14 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   const [isAttributeValueModalOpen, setIsAttributeValueModalOpen] =
     useState(false);
   const [currentEditingAttribute, setCurrentEditingAttribute] =
-    useState<AttributeDto | null>(null);
+    useState<ProductAttributeDto | null>(null);
   const [newAttributeValue, setNewAttributeValue] = useState('');
+  const [selectedImageUrl, setSelectedImageUrl] = useState('');
 
-  // Update product clone and form data when product data changes
+  // Update product clone when product data changes
   useEffect(() => {
     if (product) {
       setProductClone({ ...product });
-      setFormData((prev) => ({
-        ...prev,
-        name: product.name,
-        price: product.price,
-        sku: product.sku,
-        description: product.description,
-      }));
     }
   }, [product]);
 
@@ -88,15 +75,15 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   // Mutation for updating product info
   const updateProductInfoMutation = useMutation({
     mutationFn: updateProductInfoFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['productDetail', product.slug],
-      });
-      setIsSaving(false);
+    onSuccess: (result) => {
+      if (result !== product.slug) navigate(`/products/${result}`);
+      toast('Product information updated successfully!');
     },
     onError: (error) => {
       console.error('Error updating product info:', error);
       toast('Failed to update product information. Please try again.');
+    },
+    onSettled: () => {
       setIsSaving(false);
     },
   });
@@ -106,12 +93,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   ) => {
     const { name, value } = e.target;
 
-    // Update both formData and productClone
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'price' ? parseFloat(value) : value,
-    }));
-
+    // Update productClone
     setProductClone((prev) => ({
       ...prev,
       [name]: name === 'price' ? parseFloat(value) : value,
@@ -134,32 +116,11 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     setIsSaving(true);
 
     try {
-      // Extract changes from productClone to formData
+      // Use new UpdateProductInfoDto structure
       const productInfoData: UpdateProductInfoDto = {
-        productId: productClone.id.toString(),
-        name:
-          productClone.name !== product.name ? productClone.name : undefined,
-        price:
-          productClone.price !== product.price ? productClone.price : undefined,
-        sku: productClone.sku !== product.sku ? productClone.sku : undefined,
-        description:
-          productClone.description !== product.description
-            ? productClone.description
-            : undefined,
+        new: productClone,
       };
-
-      // Only send the request if there are changes
-      if (
-        productInfoData.name ||
-        productInfoData.price ||
-        productInfoData.sku ||
-        productInfoData.description
-      ) {
-        await updateProductInfoMutation.mutateAsync(productInfoData);
-        toast('Product information updated successfully!');
-      } else {
-        setIsSaving(false);
-      }
+      await updateProductInfoMutation.mutateAsync(productInfoData);
     } catch (error) {
       // Error handling is done in mutation callbacks
     }
@@ -175,8 +136,8 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
   };
 
   const handleAddAttributeValue = (
-    attribute: AttributeDto,
-    value: AttributeValueDto,
+    attribute: ProductAttributeDto,
+    value: ProductAttributeValueDto,
   ) => {
     closeAttributeModal();
 
@@ -197,7 +158,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     });
   };
 
-  const handleAddAttribute = (attribute: AttributeDto) => {
+  const handleAddAttribute = (attribute: ProductAttributeDto) => {
     // Handle adding a new attribute to the clone
     if (productClone.attributes.length >= 5) {
       toast.error('You can only add up to 5 attributes.');
@@ -217,31 +178,51 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
     closeAttributeModal();
   };
 
-  const openAttributeValueModal = (attribute: AttributeDto) => {
+  const openAttributeValueModal = (attribute: ProductAttributeDto) => {
     setCurrentEditingAttribute(attribute);
     setNewAttributeValue('');
+    setSelectedImageUrl('');
     setIsAttributeValueModalOpen(true);
   };
 
   const closeAttributeValueModal = () => {
     setIsAttributeValueModalOpen(false);
     setCurrentEditingAttribute(null);
+    setSelectedImageUrl('');
   };
 
   const handleAddNewAttributeValue = () => {
     if (!currentEditingAttribute || !newAttributeValue.trim()) return;
 
-    const newValue: AttributeValueDto = {
+    // Check if the value already exists in the attribute's values
+    const valueExists = currentEditingAttribute.values.some(
+      (val) =>
+        val.value.toLowerCase() === newAttributeValue.trim().toLowerCase(),
+    );
+
+    if (valueExists) {
+      toast.warn(
+        `Value "${newAttributeValue}" already exists for this attribute.`,
+      );
+      return;
+    }
+
+    const newValue: ProductAttributeValueDto = {
       value: newAttributeValue.trim(),
+      imageUrl: currentEditingAttribute.isPrimary
+        ? selectedImageUrl
+        : undefined,
     };
 
     handleAddAttributeValue(currentEditingAttribute, newValue);
     setNewAttributeValue('');
+    setSelectedImageUrl('');
     closeAttributeValueModal();
   };
 
   // Sort attributes by orderPriority - use productClone in edit mode, otherwise use product
-  const displayProduct = isEditMode ? productClone : product;
+  // const displayProduct = isEditMode ? productClone : product;
+  const displayProduct = productClone;
   const sortedAttributes = [...displayProduct.attributes].sort(
     (a, b) => a.orderPriority - b.orderPriority,
   );
@@ -255,12 +236,12 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
             <input
               type="text"
               name="name"
-              value={formData.name}
+              value={displayProduct.name}
               onChange={handleFormChange}
               className="text-2xl font-bold w-full border-b-2 border-blue-300 focus:border-blue-500 focus:outline-none pb-1"
             />
           ) : (
-            <h1 className="text-2xl font-bold">{product.name}</h1>
+            <h1 className="text-2xl font-bold">{displayProduct.name}</h1>
           )}
         </div>
 
@@ -271,13 +252,13 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
             <input
               type="text"
               name="sku"
-              value={formData.sku}
+              value={displayProduct.sku}
               onChange={handleFormChange}
               className="w-full p-2 border border-gray-300 rounded"
             />
           ) : (
             <span className="text-gray-800">
-              {selectedVariant?.sku ?? product.sku}
+              {selectedVariant?.sku ?? displayProduct.sku}
             </span>
           )}
         </div>
@@ -290,7 +271,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                 <svg
                   key={i}
                   className={`w-5 h-5 ${
-                    i < Math.floor(product.rating)
+                    i < Math.floor(displayProduct.rating)
                       ? 'text-yellow-400'
                       : 'text-gray-300'
                   }`}
@@ -302,7 +283,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
               ))}
             </div>
             <span className="ml-2 text-gray-600">
-              {product.rating} ({product.ratingCount} reviews)
+              {displayProduct.rating} ({displayProduct.ratingCount} reviews)
             </span>
           </div>
         )}
@@ -312,7 +293,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
           <div className="mb-6 prose max-w-none">
             <h3 className="text-lg font-medium mb-2">Description</h3>
             <div className="text-gray-600 whitespace-pre-line">
-              {product.description}
+              {displayProduct.description}
             </div>
           </div>
         )}
@@ -325,7 +306,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
               <input
                 type="number"
                 name="price"
-                value={formData.price}
+                value={displayProduct.price}
                 onChange={handleFormChange}
                 step="0.01"
                 min="0"
@@ -334,7 +315,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
             </div>
           ) : (
             <div className="text-2xl font-bold text-blue-600">
-              ${selectedVariant?.price ?? product.price}
+              ${selectedVariant?.price ?? displayProduct.price}
             </div>
           )}
         </div>
@@ -368,11 +349,30 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                   {item.value}
                   {isEditMode && (
                     <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100">
-                      <button
+                      <div
                         className="bg-red-500 text-white rounded-full p-1"
                         onClick={(e) => {
-                          e.stopPropagation();
-                          toast.info(`Remove ${item.value} option`);
+                          e.stopPropagation(); // Prevent triggering parent button click
+                          // Remove the attribute value from productClone
+                          setProductClone((prev) => {
+                            const updatedAttributes = [...prev.attributes];
+                            const attrIndex = updatedAttributes.findIndex(
+                              (attr) => attr.name === attribute.name,
+                            );
+
+                            if (attrIndex !== -1) {
+                              updatedAttributes[attrIndex] = {
+                                ...updatedAttributes[attrIndex],
+                                values: updatedAttributes[
+                                  attrIndex
+                                ].values.filter(
+                                  (val) => val.value !== item.value,
+                                ),
+                              };
+                            }
+
+                            return { ...prev, attributes: updatedAttributes };
+                          });
                         }}
                       >
                         <svg
@@ -389,7 +389,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                             d="M6 18L18 6M6 6l12 12"
                           />
                         </svg>
-                      </button>
+                      </div>
                     </div>
                   )}
                 </button>
@@ -426,26 +426,29 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
         {/* Add new attribute */}
         {isEditMode && (
           <div className="grid grid-cols-2 gap-8 mb-6">
-            <button
-              className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
-              onClick={() => openAttributeModal(true)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            {!displayProduct.attributes.find((x) => x.isPrimary) && (
+              <button
+                className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
+                onClick={() => openAttributeModal(true)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Add Primary Attribute
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add Primary Attribute
+              </button>
+            )}
+
             <button
               className="px-4 py-2 border border-dashed border-gray-300 rounded text-gray-500 hover:border-gray-400 hover:text-gray-700 flex items-center justify-center mb-4"
               onClick={() => openAttributeModal(false)}
@@ -471,7 +474,8 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
 
         {!isEditMode && (
           <div className="text-gray-600 mb-4">
-            <span className="font-medium">{product.sold}</span> items sold
+            <span className="font-medium">{displayProduct.sold}</span> items
+            sold
           </div>
         )}
 
@@ -480,13 +484,16 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
           <span className="font-medium text-gray-700">Stock: </span>
           <span
             className={
-              (selectedVariant ? selectedVariant.stock : product.stock) > 0
+              (selectedVariant ? selectedVariant.stock : displayProduct.stock) >
+              0
                 ? 'text-green-600'
                 : 'text-red-600'
             }
           >
-            {selectedVariant ? selectedVariant.stock : product.stock}{' '}
-            {(selectedVariant ? selectedVariant.stock : product.stock) === 1
+            {selectedVariant ? selectedVariant.stock : displayProduct.stock}{' '}
+            {(selectedVariant
+              ? selectedVariant.stock
+              : displayProduct.stock) === 1
               ? 'item'
               : 'items'}
           </span>
@@ -499,7 +506,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
             </label>
             <textarea
               name="description"
-              value={formData.description}
+              value={displayProduct.description}
               onChange={handleFormChange}
               className="w-full p-2 border border-gray-300 rounded"
               rows={4}
@@ -531,7 +538,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
           onAddAttribute={handleAddAttribute}
           imageUrls={
             isAddingPrimaryAttribute
-              ? product.images.map((img) => img.imageUrl)
+              ? displayProduct.images.map((img) => img.imageUrl)
               : undefined
           }
         />
@@ -561,6 +568,31 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                     }}
                   />
                 </div>
+
+                {/* Image selection for primary attributes */}
+                {currentEditingAttribute.isPrimary && (
+                  <div className="mb-4">
+                    <label className="block text-sm text-gray-600 mb-1">
+                      Select Image
+                    </label>
+                    <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                      {displayProduct.images.map((img) => (
+                        <div
+                          key={img.imageUrl}
+                          onClick={() => setSelectedImageUrl(img.imageUrl)}
+                          className={`border p-1 rounded cursor-pointer ${selectedImageUrl === img.imageUrl ? 'border-blue-600 ring-2 ring-blue-300' : 'border-gray-300'}`}
+                        >
+                          <img
+                            src={img.imageUrl}
+                            alt="Option"
+                            className="w-full h-16 object-cover rounded"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={closeAttributeValueModal}
@@ -571,7 +603,10 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, isEditMode }) => {
                   <button
                     onClick={handleAddNewAttributeValue}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    disabled={!newAttributeValue.trim()}
+                    disabled={
+                      !newAttributeValue.trim() ||
+                      (currentEditingAttribute.isPrimary && !selectedImageUrl)
+                    }
                   >
                     Add
                   </button>

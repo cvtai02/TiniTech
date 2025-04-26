@@ -12,7 +12,7 @@ public class ProductBriefDto
     public string Slug { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Sku { get; set; } = null!;
-    public int Price { get; set; }
+    public decimal Price { get; set; }
     public int FeaturedPoint { get; set; }
     public ProductStatus Status { get; set; } = ProductStatus.Active;
     public string ImageUrl { get; set; } = null!;
