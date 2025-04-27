@@ -1,8 +1,9 @@
+@using SharedViewModels.Categories
 @model List<CategoryDto>
 
 <nav class="bg-transparent px-16 flex items-center justify-between shadow-md grow">
     <div>
-        <img src="~/images/logo.png" alt="Logo" class="h-12 w-12" />
+        <img src="~/assets/logo.png" alt="Logo" class="h-12 w-12" />
     </div>
     <ul class="flex gap-16 text-black px-6 py-4">
         @foreach (var category in Model)

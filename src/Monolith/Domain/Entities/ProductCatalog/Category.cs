@@ -1,7 +1,7 @@
 
+using CrossCutting.Extensions;
 using Domain.Base;
 using Domain.Enums;
-using Domain.Extensions;
 
 namespace Domain.Entities;
 

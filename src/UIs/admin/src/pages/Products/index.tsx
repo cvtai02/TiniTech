@@ -15,7 +15,6 @@ import { getProductsFn } from '../../services/product';
 import AddProduct from '../AddProduct';
 
 const ProductPage: React.FC = () => {
-  const [showMobileFilters, setShowMobileFilters] = useState<boolean>(false);
   const [isAddProductModalOpen, setIsAddProductModalOpen] =
     useState<boolean>(false);
   const [filters, setFilters] = useState<GetProductsQuery>(
@@ -23,8 +22,8 @@ const ProductPage: React.FC = () => {
       page: 1,
       pageSize: 8,
       orderBy: 'CreatedDate',
-      orderDirection: 'descending',
-      status: ['active'],
+      orderDirection: 'Descending',
+      status: ['Active'],
     }),
   );
   const [category, setCategory] = useState<Category>();
@@ -67,10 +66,6 @@ const ProductPage: React.FC = () => {
       }),
     );
     return;
-  };
-
-  const toggleMobileFilters = () => {
-    setShowMobileFilters(!showMobileFilters);
   };
 
   const handleSortChange = (sortOption: string) => {

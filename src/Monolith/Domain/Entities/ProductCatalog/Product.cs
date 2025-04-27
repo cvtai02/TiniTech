@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CrossCutting.Extensions;
 using Domain.Base;
-using Domain.Entities;
 using Domain.Enums;
-using Domain.Extensions;
 
 namespace Domain.Entities;
 

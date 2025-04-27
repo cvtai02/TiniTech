@@ -25,7 +25,6 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
   isEditMode,
   setDescription,
 }) => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [productClone, setProductClone] = useState<ProductDetailDto>({
     ...product,

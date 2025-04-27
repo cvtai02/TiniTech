@@ -1,6 +1,5 @@
 using Application.Common.Abstraction;
 using Application.Common.Models;
-using Domain.Extensions;
 using MediatR;
 
 namespace Application.Categories.Commands;

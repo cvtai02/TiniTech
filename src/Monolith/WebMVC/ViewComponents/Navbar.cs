@@ -6,31 +6,36 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SharedViewModels.Categories;
+using WebMVC.Models;
+using WebMVC.Services.Abstractions;
 
 namespace WebMVC.ViewComponents;
 
 public class Navbar : ViewComponent
 {
+    private readonly ICategoryService _categoryService;
+
+    public Navbar(ICategoryService categoryService)
+    {
+        _categoryService = categoryService;
+    }
+
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        // TODO: Replace with service/database call
-        var categories = new List<CategoryDto>
+        try
         {
-            new() {
-                Id = 1, Name = "Electronics", Slug = "electronics",
-                Subcategories =
-                [
-                    new() { Id = 2, Name = "Phones", Slug = "phones" },
-                    new() { Id = 3, Name = "Laptops", Slug = "laptops" }
-                ]
-            },
-            new() {
-                Id = 4, Name = "Clothing", Slug = "clothing"
-            }
-        };
+            var categories = await _categoryService.GetActiveCategoriesAsync(default);
+            return View(categories);
+        }
+        catch (System.Exception ex)
+        {
+            // Log the exception if needed
 
-        await Task.Delay(1); // Simulate async work
+            return View("../../Error", new ErrorViewModel
+            {
+                RequestId = HttpContext.TraceIdentifier,
+            });
+        }
 
-        return View(categories);
     }
 }

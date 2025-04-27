@@ -3,7 +3,7 @@ namespace Domain.Enums;
 public enum ProductStatus
 {
     Active,
-    Inactive,
+    Discontinued,
     Deleted,
     Draft,
 }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Common.Abstraction;
+using Application.Common.Extensions;
 using Application.Common.Models;
 using Application.Products.Queries.Enums;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedViewModels.Common;
 using SharedViewModels.Products;
 
 namespace Application.Products.Queries.GetProducts;
@@ -65,10 +67,8 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<
         query = ApplySorting(query, request.OrderBy, request.OrderDirection);
 
         // Apply pagination
-        var paginatedList = await PaginatedList<Product>.CreateAsync(
-            query,
-            request.PageNumber,
-            request.PageSize);
+        var paginatedList = await query
+            .ToPaginatedListAsync(request.PageNumber, request.PageSize, cancellationToken);
 
         // Map the products to DTOs
         var productDtos = paginatedList.Items.Select(p => ProductBriefDto.FromProduct(p)).ToList();

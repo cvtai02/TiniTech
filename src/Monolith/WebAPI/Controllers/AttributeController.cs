@@ -1,11 +1,9 @@
-using Application.AttributeEntities.Commands;
 using Application.AttributeEntities.Commands.CreatAttribute;
 using Application.AttributeEntities.Commands.DeleteAttribute;
-using Application.AttributeEntities.Queries;
 using Application.AttributeEntities.Queries.GetAll;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedViewModels.Common;
 using WebAPI.Controllers.Base;
 
 namespace WebAPI.Controllers;

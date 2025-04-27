@@ -7,6 +7,7 @@ using Application.Products.Queries.GetProducts;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SharedViewModels.Common;
 using WebAPI.Controllers.Base;
 
 namespace WebAPI.Controllers;
