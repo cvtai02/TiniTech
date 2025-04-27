@@ -1,0 +1,37 @@
+@model List<SharedViewModels.Categories.CategoryDto>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">All Categories</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach (var category in Model)
+        {
+            <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-4">
+                    <h2 class="text-xl font-semibold mb-2">
+                        <a href="/@category.Slug" class="text-blue-600 hover:underline">@category.Name</a>
+                    </h2>
+                    <p class="text-gray-600 mb-4">@category.Description</p>
+                    
+                    @if (category.Subcategories != null && category.Subcategories.Any())
+                    {
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-1">Subcategories:</h3>
+                            <ul class="list-disc list-inside text-gray-700">
+                                @foreach (var subcategory in category.Subcategories)
+                                {
+                                    <li class="ml-2">
+                                        <a href="/@subcategory.Slug" class="text-blue-500 hover:underline">@subcategory.Name</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

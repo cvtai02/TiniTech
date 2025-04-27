@@ -19,7 +19,7 @@ public class CreateProductCommand : IRequest<Result<string>>
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     public string Sku { get; set; } = null!;
-    public int? Price { get; set; }
+    public decimal? Price { get; set; } = 0;
     public int CategoryId { get; set; }
     public List<IFormFile>? Images { get; set; } = [];
 }

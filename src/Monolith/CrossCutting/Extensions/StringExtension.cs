@@ -40,7 +40,7 @@ public static class StringExtensions
         normalizedString = normalizedString.Trim('-');
 
         // Apply max length if specified
-        normalizedString = normalizedString + '-' + identityString;
+        normalizedString = normalizedString + (identityString.Length > 0 ? "-" + identityString : string.Empty);
 
         return normalizedString;
     }
