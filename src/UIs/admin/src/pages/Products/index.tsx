@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSearch, FiFilter, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import {
   Category,
   OrderCriteriaList as OrderCriteria,
@@ -10,7 +10,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategories } from '../../services/category';
 import { GetProductsQueryParams as GetProductsQuery } from '../../types';
-import ProductList from '../../components/products/WrappableProductList';
+import ProductList from '../../components/products/ProductList';
 import { getProductsFn } from '../../services/product';
 import AddProduct from '../AddProduct';
 
@@ -22,7 +22,7 @@ const ProductPage: React.FC = () => {
     new GetProductsQuery({
       page: 1,
       pageSize: 8,
-      orderBy: 'createdDate',
+      orderBy: 'CreatedDate',
       orderDirection: 'descending',
       status: ['active'],
     }),
@@ -251,7 +251,7 @@ const ProductPage: React.FC = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="relative bg-white shadow-md dark:bg-gray-800 ">
+      <div className="relative shadow-md bg-black ">
         <div className="flex flex-col items-center justify-between p-4 space-y-3 md:flex-row md:space-y-0 md:space-x-4">
           <div className="w-full md:w-1/2">
             <form className="flex items-center">
@@ -262,7 +262,7 @@ const ProductPage: React.FC = () => {
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <svg
                     aria-hidden="true"
-                    className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                    className="w-5 h-5 text-gray-400"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     xmlns="http://www.w3.org/2000/svg"
@@ -287,7 +287,7 @@ const ProductPage: React.FC = () => {
           <div className="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
             <button
               type="button"
-              className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+              className="flex items-center hover:bg-gray-800 justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
               onClick={handleAddProductClick}
             >
               <svg

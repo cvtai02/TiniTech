@@ -15,7 +15,7 @@ public class ProductDetailDto
     public string Name { get; set; } = null!;
     public decimal Price { get; set; }
     public string Sku { get; set; } = null!;
-    public ProductStatus Status { get; set; } = ProductStatus.Draft;
+    public ProductStatus Status { get; set; }
     public string DefaultImageUrl { get; set; } = null!;
     public int CategoryId { get; set; }
     public string Description { get; set; } = null!;
@@ -28,7 +28,7 @@ public class ProductDetailDto
     public List<AttributeDto> Attributes { get; set; } = [];
     public List<VariantDto> Variants { get; set; } = [];
 
-    public static ProductDetailDto FromProduct(Product product)
+    public static ProductDetailDto FromEntity(Product product)
     {
         return new ProductDetailDto
         {
@@ -36,6 +36,7 @@ public class ProductDetailDto
             Slug = product.Slug,
             Name = product.Name,
             Sku = product.Sku,
+            Status = product.Status,
             DefaultImageUrl = product.ImageUrl,
             Price = product.Metric.LowestPrice,
             CategoryId = product.CategoryId,
@@ -67,10 +68,12 @@ public class ProductDetailDto
 
             Variants = [.. product.Variants.Select(v => new VariantDto
             {
+                Id = v.Id,
                 ProductId = v.ProductId,
                 Price = v.Price,
+                IsDeleted = v.IsDeleted,
                 Sku = v.Sku,
-                Stock = v.Metric.Stock,
+                Stock = v.Metric?.Stock ?? 0,
                 VariantAttributes = [.. v.VariantAttributes.Select(va => new VariantAttributeDto
                 {
                     AttributeId = va.AttributeId,
@@ -83,8 +86,10 @@ public class ProductDetailDto
 
 public class VariantDto
 {
+    public int Id { get; set; }
     public int ProductId { get; set; }
     public decimal Price { get; set; }
+    public bool IsDeleted { get; set; }
     public string Sku { get; set; } = null!;
     public int Stock { get; set; }
     public List<VariantAttributeDto> VariantAttributes { get; set; } = [];

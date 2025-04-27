@@ -64,7 +64,6 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 
         if (uploadTasks == null || !uploadTasks.Any())
         {
-
         }
         else
         {
@@ -74,16 +73,15 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 
                 if (uploadedImages.Length == 0)
                 {
-                    return new InfrastructureException("No images were uploaded successfully.");
+                    return new ImageUploadFailException("No images were uploaded successfully.");
                 }
-                product.Images.AddRange(uploadedImages);
+                product.Images = uploadedImages.ToList();
                 product.ImageUrl = uploadedImages.First().ImageUrl;
             }
             catch (Exception ex)
             {
-                return new InfrastructureException("Error uploading images.", ex);
+                return new ImageUploadFailException("No images were uploaded successfully: " + ex);
             }
-            // Set the first image as the main image
         }
 
 

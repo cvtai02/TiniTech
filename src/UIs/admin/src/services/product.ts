@@ -4,6 +4,7 @@ import {
   ProductBriefDto,
   GetProductsQueryParams as GetProductsQuery,
   PaginatedList,
+  ProductStatus,
 } from '../types';
 import { toast } from 'react-toastify';
 
@@ -37,7 +38,7 @@ export const createProduct = async (data: CreateProductDto) => {
 
 export const updateProductStatus = async (
   id: string,
-  status: 'Active' | 'Deleted',
+  status: ProductStatus,
 ): Promise<boolean> => {
   const res = await apiFetch(`${API_URL}/api/products/status`, {
     method: 'PATCH',

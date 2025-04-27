@@ -9,6 +9,15 @@ const API_URL = import.meta.env.VITE_CORE_API_URL || '';
 export const fetchCategories = async (): Promise<Category[]> => {
   const res = await apiFetch(`${API_URL}/api/categories`);
   var body = await res.json();
+  const data = body.data as Category[];
+  // Sort categories to show active ones first
+  if (data && data.length > 0) {
+    data.sort((a, b) => {
+      if (a.status === 'Active' && b.status !== 'Active') return -1;
+      if (a.status !== 'Active' && b.status === 'Active') return 1;
+      return 0;
+    });
+  }
   return body.data;
   // return [
   //   {

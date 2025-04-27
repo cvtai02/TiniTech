@@ -21,13 +21,7 @@ const Header: React.FC = () => {
             transform: 'skewX(-8deg)',
           }}
         >
-          <span
-            style={{
-              color: '#f0bd24',
-            }}
-          >
-            Tini
-          </span>
+          <span className="text-primary font-bold">Tini</span>
           Tech
         </div>
       </div>
@@ -37,7 +31,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -50,7 +44,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/orders"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -63,7 +57,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/categories"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -76,7 +70,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/products"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -85,11 +79,11 @@ const Header: React.FC = () => {
               Sản phẩm
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/landing"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -97,12 +91,12 @@ const Header: React.FC = () => {
               <FaStore className="w-5 h-5 mr-2" />
               Trang bán hàng
             </NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink
               to="/users"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -115,7 +109,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/rating-messages"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }
@@ -128,7 +122,7 @@ const Header: React.FC = () => {
             <NavLink
               to="/import"
               className={({ isActive }) =>
-                `flex items-center py-2 px-4 rounded transition duration-200 ease-in-out hover:bg-black hover:text-white ${
+                `flex items-center py-2 px-4 rounded font-medium transition duration-200 ease-in-out hover:bg-black hover:text-white ${
                   isActive ? 'bg-black text-white' : ''
                 }`
               }

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Common.Abstraction;
+using Application.Common.Exceptions;
 using Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ public class ActivateCategoryCommandHandler : IRequestHandler<ActivateCategoryCo
 
         if (category.Status == Domain.Enums.CategoryStatus.Active)
         {
-            return new InvalidOperationException($"Category {request.Id} is already active.");
+            return new NoActionException($"Category {request.Id} is already active.");
         }
         // Activate the category
         category.Status = Domain.Enums.CategoryStatus.Active;

@@ -1,41 +1,45 @@
 export const ProductStatusList = [
   {
     label: 'Active',
-    value: 'active',
+    value: 'Active',
   },
   {
     label: 'Draft',
-    value: 'draft',
+    value: 'Draft',
   },
   {
     label: 'Deleted',
-    value: 'deleted',
+    value: 'Deleted',
+  },
+  {
+    label: 'Discontinued',
+    value: 'Discontinued',
   },
 ];
 export const OrderCriteriaList = [
   {
     label: 'Created Date',
-    value: 'createdDate',
+    value: 'CreatedDate',
   },
   {
     label: 'Rating',
-    value: 'rating',
+    value: 'Rating',
   },
   {
     label: 'Price',
-    value: 'price',
+    value: 'Price',
   },
   {
     label: 'Sold',
-    value: 'sold',
+    value: 'Sold',
   },
   {
     label: 'Stock',
-    value: 'stock',
+    value: 'Stock',
   },
   {
     label: 'Featured Point',
-    value: 'featuredPoint',
+    value: 'FeaturedPoint',
   },
 ];
 export const OrderDirectionList = [
@@ -49,15 +53,15 @@ export const OrderDirectionList = [
   },
 ];
 
-export type ProductStatus = 'active' | 'draft' | 'deleted';
+export type ProductStatus = 'Active' | 'Draft' | 'Deleted' | 'Discontinued';
 export type OrderCriteria =
-  | 'createdDate'
-  | 'rating'
-  | 'price'
-  | 'sold'
-  | 'stock'
-  | 'featuredPoint';
-export type OrderDirection = 'ascending' | 'descending';
+  | 'CreatedDate'
+  | 'Rating'
+  | 'Price'
+  | 'Sold'
+  | 'Stock'
+  | 'FeaturedPoint';
+export type OrderDirection = 'Ascending' | 'Descending';
 
 export interface ProductBriefDto {
   id: string;

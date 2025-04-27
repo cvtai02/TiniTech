@@ -1,6 +1,5 @@
 using Application.Products.Commands.ActivateProductCommand;
 using Application.Products.Commands.CreateProductCommand;
-using Application.Products.Commands.SoftDeleteProductCommand;
 using Application.Products.Commands.UpdateProductImages;
 using Application.Products.Commands.UpdateProductInfo;
 using Application.Products.Queries.GetDetailBySlug;
@@ -77,51 +76,24 @@ public class ProductController : ApiController
         );
     }
 
-    public record PatchStatusData(int Id, ProductStatus Status);
     [HttpPatch("status")]
-    public async Task<IActionResult> UpdateStatus([FromBody] PatchStatusData body)
+    public async Task<IActionResult> UpdateStatus([FromBody] UpdateProductStatusCommand body)
     {
-        if (body.Status == ProductStatus.Deleted)
-        {
-            var result = await Sender.Send(new SoftDeleteProductCommand { Id = body.Id });
 
-            return result.Match(
-                r => Ok(new Response
-                {
-                    Title = "Product Deleted",
-                    Status = "Success",
-                    Detail = "Product status changed to deleted",
-                    Data = r,
-                    Errors = null
-                }),
-                e => HandleFailure<SoftDeleteProductCommand>(e)
-            );
-        }
-        else if (body.Status == ProductStatus.Active)
-        {
-            var result = await Sender.Send(new ActivateProductCommand { Id = body.Id });
+        var result = await Sender.Send(body);
 
-            return result.Match(
-                r => Ok(new Response
-                {
-                    Title = "Product Restored",
-                    Status = "Success",
-                    Detail = "Product status changed to active",
-                    Data = r,
-                    Errors = null
-                }),
-                e => HandleFailure<ActivateProductCommand>(e)
-            );
-        }
-        else return BadRequest(
-            new Response
+        return result.Match(
+            r => Ok(new Response
             {
-                Title = "Bad Request",
-                Status = "Error",
-                Detail = "Invalid Product Status",
-                Data = null,
-                Errors = new[] { "Invalid Product Status" }
-            });
+                Title = "Product Status Updated",
+                Status = "Success",
+                Detail = "Product status changed to " + body.Status.ToString(),
+                Data = r,
+                Errors = null
+            }),
+            e => HandleFailure<UpdateProductStatusCommand>(e)
+        );
+
     }
 
     [HttpGet("{slug}")]

@@ -26,7 +26,7 @@ public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailByS
         var product = await _context.Products
             .Include(p => p.Metric)
             .Include(p => p.Images)
-            .Include(p => p.Variants)
+            .Include(p => p.Variants.Where(v => v.IsDeleted == false))
                 .ThenInclude(v => v.VariantAttributes)
             .Include(p => p.Variants)
                 .ThenInclude(v => v.Metric)
@@ -39,7 +39,7 @@ public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailByS
 
         if (product == null) return new KeyNotFoundException($"Product with slug {request.Slug} not found.");
 
-        var productDetail = ProductDetailDto.FromProduct(product);
+        var productDetail = ProductDetailDto.FromEntity(product);
 
         return productDetail;
 

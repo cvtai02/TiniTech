@@ -62,7 +62,7 @@ public class UpdateProductImagesCommandHandler : IRequestHandler<UpdateProductIm
 
             if (uploadedImages.Length == 0)
             {
-                return new InfrastructureException("No images were uploaded successfully.");
+                return new ImageUploadFailException("No images were uploaded successfully.");
             }
             product.Images.AddRange(uploadedImages);
         }

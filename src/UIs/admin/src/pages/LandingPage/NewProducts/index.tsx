@@ -6,7 +6,7 @@ import {
   PaginatedList,
   ProductBriefDto,
 } from '../../../types';
-import WrappableProductList from '../../../components/products/WrappableProductList';
+import WrappableProductList from '../../../components/products/ProductList';
 
 const NewProducts: React.FC = () => {
   const {

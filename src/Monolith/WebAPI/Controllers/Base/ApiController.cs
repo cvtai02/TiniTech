@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Common.Exceptions;
+using Application.Common.Exceptions.Base;
 using Application.Common.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -34,29 +35,21 @@ public abstract class ApiController : ControllerBase
                     validationException.Errors));
         }
 
-
-        if (result.Exception is KeyNotFoundException keyNotFoundException)
+        if (result.Exception is AbstractException abstractException)
         {
-            return NotFound(
+            return BadRequest(
                 CreateProblemDetails(
-                    "Not Found",
-                    StatusCodes.Status404NotFound,
-                    keyNotFoundException));
-        }
+                    abstractException.Title,
+                    abstractException.StatusCode,
+                    abstractException));
 
-        if (result.Exception is RestrictDeleteException restrictDeleteException)
-        {
-            return NotFound(
-                CreateProblemDetails(
-                    restrictDeleteException.Message,
-                    StatusCodes.Status400BadRequest,
-                    restrictDeleteException));
+
         }
 
         return BadRequest(
             CreateProblemDetails(
-                "Bad Request",
-                StatusCodes.Status400BadRequest,
+                "Something went wrong",
+                StatusCodes.Status500InternalServerError,
                 result.Exception));
     }
 

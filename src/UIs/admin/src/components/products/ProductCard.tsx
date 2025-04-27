@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import { ProductBriefDto } from '../../types';
-import { MdDelete, MdEdit, MdMoreVert } from 'react-icons/md';
-import { formatVND } from '../../utils/formatCurrency';
+import {
+  MdDelete,
+  MdEdit,
+  MdMoreVert,
+  MdStar,
+  MdStarOutline,
+  MdLocalShipping,
+  MdInventory,
+} from 'react-icons/md';
+import { formatUSD, formatVND } from '../../utils/formatCurrency';
 import { updateProductStatus } from '../../services/product';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: ProductBriefDto;
-  onProductDeleted?: () => void; // Add this new prop
+  onProductDeleted?: () => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -53,49 +61,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="relative flex aspect-square overflow-hidden mb-4 rounded-lg ">
         <img
           className="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105 "
-          src={product.imageUrl}
-          alt="product image"
+          src={product.imageUrl === '' ? '/default.png' : product.imageUrl}
+          alt="image not found"
         />
       </div>
       <div className="flex-grow flex justify-between items-end">
         <div className="">
-          <h3 className="font-medium ">{product.name}</h3>
-          <div className="flex items-center gap-1 text-sm text-yellow-500 ">
-            {'★'.repeat(product.rating)}
-            {'☆'.repeat(5 - product.rating)}{' '}
-            <span className="text-gray-500 text-xs">
-              ({product.ratingCount})
-            </span>
-          </div>
-          <p className="mt-2 flex justify-between items-center font-bold">
-            {formatVND(product.price)}
-          </p>
-        </div>
-        <div className="relative">
-          <MdMoreVert
-            onClick={toggleOptions}
-            size={24}
-            className="text-gray-600 cursor-pointer hover:text-gray-800"
-          />
-
-          {showOptions && (
-            <div className="absolute right-0 mt-1 w-32 bg-white border rounded-md shadow-lg z-10">
-              <ul>
-                <li
-                  className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={handleUpdate}
-                >
-                  <MdEdit className="mr-2" /> Update
-                </li>
-                <li
-                  className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer text-red-600"
-                  onClick={handleDelete}
-                >
-                  <MdDelete className="mr-2" /> Delete
-                </li>
-              </ul>
+          <h3 className="font-bold">{product.name}</h3>
+          <div className="flex flex-col gap-1 mt-1">
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) =>
+                i < product.rating ? (
+                  <MdStar key={i} className="text-yellow-500 text-lg" />
+                ) : (
+                  <MdStarOutline key={i} className="text-yellow-400 text-lg" />
+                ),
+              )}
+              <span className="ml-2 text-gray-600 text-xs font-medium">
+                ({product.ratingCount})
+              </span>
             </div>
-          )}
+            <div className="mt-2 flex gap-4 text-xs font-medium">
+              <div className="flex items-center  rounded-md">
+                <MdLocalShipping className="mr-1" />
+                <span>Sold: {product.sold}</span>
+              </div>
+              <div
+                className={`flex items-center rounded-md ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`}
+              >
+                <MdInventory className="mr-1" />
+                <span>Stock: {product.stock}</span>
+              </div>
+            </div>
+          </div>
+          <p className="mt-2 text-primary flex justify-between items-center font-bold">
+            {formatUSD(product.price)}
+          </p>
         </div>
       </div>
     </div>

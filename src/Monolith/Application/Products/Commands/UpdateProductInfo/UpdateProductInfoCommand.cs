@@ -1,3 +1,4 @@
+using System.Windows.Markup;
 using Application.Common.Abstraction;
 using Application.Common.Models;
 using Domain.Entities;
@@ -42,7 +43,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
         product.Name = request.New.Name;
         product.Sku = request.New.Sku;
         product.Description = request.New.Description ?? string.Empty;
-        product.Status = request.New.Status;
+        // product.Status = request.New.Status;     not allow to update status
         product.CategoryId = request.New.CategoryId;
         product.Metric.LowestPrice = request.New.Price;
         product.Metric.FeaturedPoint = request.New.FeaturedPoint;
@@ -67,7 +68,6 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
                 // find added values
                 var valuesToAdd = attribute.Values
                     .Where(v => !existingAttribute.ProductAttributeValues.Any(av => av.Value == v.Value)).ToList();
-
                 foreach (var value in valuesToAdd)
                 {
                     existingAttribute.ProductAttributeValues.Add(new ProductAttributeValue
@@ -107,7 +107,10 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
         // set isDeleted = true for all variants 
         foreach (var variant in product.Variants)
         {
-            variant.IsDeleted = true;
+            if (variant.IsDeleted == false)
+            {
+                variant.IsDeleted = true;
+            }
         }
         // add new variants
         foreach (var variant in request.New.Variants)
@@ -118,6 +121,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
                 existingVariant.Price = variant.Price;
                 existingVariant.Sku = variant.Sku;
                 existingVariant.IsDeleted = false;
+
             }
             else
             {
@@ -130,7 +134,13 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
                         AttributeId = va.AttributeId,
                         Value = va.Value,
                     })],
+                    Metric = new VariantMetric()
                 });
+
+            }
+            if (product.Metric.LowestPrice > variant.Price)
+            {
+                product.Metric.LowestPrice = variant.Price;
             }
         }
 

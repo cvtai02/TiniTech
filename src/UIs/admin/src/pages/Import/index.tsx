@@ -1,22 +1,28 @@
 // ImportProductPage.tsx
 import React, { useState } from 'react';
-import { FaSave, FaPaperPlane, FaPlus, FaTrash } from 'react-icons/fa';
+import {
+  FaSave,
+  FaPaperPlane,
+  FaPlus,
+  FaTrash,
+  FaSearch,
+} from 'react-icons/fa';
+import ProductSearch from '../../components/products/ProductSearching';
+import { ProductBriefDto } from '../../types/product';
 
-// Define types for our data structures
+// Define proper interfaces
 interface ProductVariant {
   id: number;
   name: string;
 }
 
-interface Product {
-  id: number;
-  name: string;
+interface Product extends ProductBriefDto {
   variants: ProductVariant[];
 }
 
 interface ImportItem {
   id: number;
-  productId: number;
+  productId: string;
   productName: string;
   variantId: number;
   variantName: string;
@@ -25,99 +31,32 @@ interface ImportItem {
 }
 
 const ImportProductPage: React.FC = () => {
-  // Sample product data
-  const products: Product[] = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      variants: [
-        { id: 1, name: 'Black' },
-        { id: 2, name: 'White' },
-        { id: 3, name: 'Silver' },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      variants: [
-        { id: 1, name: 'Black' },
-        { id: 2, name: 'Silver' },
-        { id: 3, name: 'Gold' },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Bluetooth Speaker',
-      variants: [
-        { id: 1, name: 'Black' },
-        { id: 2, name: 'White' },
-        { id: 3, name: 'Blue' },
-      ],
-    },
-    {
-      id: 4,
-      name: 'Laptop Stand',
-      variants: [
-        { id: 1, name: 'Aluminum' },
-        { id: 2, name: 'Plastic' },
-      ],
-    },
-    {
-      id: 5,
-      name: 'External Hard Drive',
-      variants: [
-        { id: 1, name: '1TB' },
-        { id: 2, name: '2TB' },
-        { id: 3, name: '4TB' },
-      ],
-    },
-  ];
-
-  // Initial import items
-  const initialItems: ImportItem[] = [
-    {
-      id: 1,
-      productId: 1,
-      productName: 'Wireless Headphones',
-      variantId: 1,
-      variantName: 'Black',
-      quantity: 10,
-      unitCost: 49.99,
-    },
-    {
-      id: 2,
-      productId: 2,
-      productName: 'Smart Watch',
-      variantId: 2,
-      variantName: 'Silver',
-      quantity: 5,
-      unitCost: 95.0,
-    },
-    {
-      id: 3,
-      productId: 3,
-      productName: 'Bluetooth Speaker',
-      variantId: 1,
-      variantName: 'Black',
-      quantity: 8,
-      unitCost: 35.0,
-    },
-  ];
+  // Empty products array using proper types
+  const products: Product[] = [];
 
   // State variables
   const [importNumber, setImportNumber] = useState<string>('IMP-2025-0042');
   const [importDate, setImportDate] = useState<string>('2025-04-25');
-  const [importItems, setImportItems] = useState<ImportItem[]>(initialItems);
-  const [selectedProductId, setSelectedProductId] = useState<number | ''>('');
+  const [importItems, setImportItems] = useState<ImportItem[]>([]); // Empty initial items
+  const [selectedProductId, setSelectedProductId] = useState<string | ''>('');
+  const [selectedProductName, setSelectedProductName] = useState<string>('');
   const [selectedVariantId, setSelectedVariantId] = useState<number | ''>('');
   const [quantity, setQuantity] = useState<string>('1');
   const [unitCost, setUnitCost] = useState<string>('');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // Get product variants based on selected product
   const getVariantsForSelectedProduct = () => {
     if (selectedProductId === '') return [];
     const product = products.find((p) => p.id === selectedProductId);
     return product ? product.variants : [];
+  };
+
+  // Handle product selection from the modal
+  const handleProductSelect = (product: ProductBriefDto) => {
+    setSelectedProductId(product.id);
+    setSelectedProductName(product.name);
+    setIsModalOpen(false);
   };
 
   // Calculate totals
@@ -166,6 +105,7 @@ const ImportProductPage: React.FC = () => {
 
     // Reset form
     setSelectedProductId('');
+    setSelectedProductName('');
     setSelectedVariantId('');
     setQuantity('1');
     setUnitCost('');
@@ -240,25 +180,24 @@ const ImportProductPage: React.FC = () => {
               >
                 Product:
               </label>
-              <select
-                id="product"
-                value={selectedProductId}
-                onChange={(e) => {
-                  setSelectedProductId(
-                    e.target.value ? parseInt(e.target.value) : '',
-                  );
-                  setSelectedVariantId('');
-                }}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="">-- Select Product --</option>
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name}
-                  </option>
-                ))}
-              </select>
+              <div className="flex">
+                {!selectedProductId && (
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                  >
+                    <FaSearch className="mr-2" />
+                    Search Products
+                  </button>
+                )}
+
+                {selectedProductName && (
+                  <span className="ml-2 text-gray-700">
+                    {selectedProductName}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div>
@@ -336,6 +275,26 @@ const ImportProductPage: React.FC = () => {
             Add Product
           </button>
         </div>
+
+        {/* Product Search Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+            <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-3/4 max-w-4xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-white">
+                  Search Product
+                </h3>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ×
+                </button>
+              </div>
+              <ProductSearch onProductSelect={handleProductSelect} />
+            </div>
+          </div>
+        )}
 
         {/* Products Table */}
         <div className="overflow-x-auto">

@@ -1,4 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap');
 @import 'tailwindcss';
+:root {
+  --font-primary: 'Noto Sans', sans-serif;
+}
+html,
+body {
+  font-family: var(--font-primary);
+}
 @theme {
   --color-primary: oklch(0.82 0.1605 87.85);
   --color-secondary: oklch(0.72 0.15 60); /* approx #f28c18 */

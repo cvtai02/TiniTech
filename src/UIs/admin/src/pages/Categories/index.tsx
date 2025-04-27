@@ -416,7 +416,7 @@ const CategoriesPage: React.FC = () => {
             <div
               className={`relative group grow flex items-center gap-x-3 ${category.status === 'Deleted' ? 'text-red-400' : ''}`}
             >
-              <h2 className="text-lg font-medium">{category.name}</h2>
+              <h2 className="text-lg font-bold">{category.name}</h2>
               <FaInfoCircle className="text-gray-500 dark:text-gray-300 hover:text-gray-700 cursor-pointer" />
               <div className="bg-gray-800 w-fit text-white text-sm px-2 py-1 rounded  opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                 <strong>Slug:</strong> {category.slug}

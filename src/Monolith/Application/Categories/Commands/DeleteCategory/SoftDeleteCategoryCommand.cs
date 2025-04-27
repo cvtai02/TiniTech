@@ -38,9 +38,9 @@ public class SoftDeleteCategoryCommandHandler : IRequestHandler<SoftDeleteCatego
         }
 
         // Check if category is used by any products
-        if (category.Products.Any(x => x.Status != ProductStatus.Deleted))
+        if (category.Products.Any(x => x.Status == ProductStatus.Active))
         {
-            return new RestrictDeleteException("Cannot delete category that is used by products which are not deleted");
+            return new RestrictDeleteException("Cannot delete category that is used by products are active");
         }
 
         category.Status = CategoryStatus.Deleted;

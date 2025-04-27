@@ -5,7 +5,7 @@ export interface ProductDetailDto {
   name: string;
   price: number;
   sku: string;
-  status: 'active' | 'draft' | 'deleted';
+  status: 'Active' | 'Draft' | 'Deleted' | 'Discontinued';
   defaultImageUrl: string;
   categoryId: number;
   description: string;
@@ -24,7 +24,7 @@ export interface ProductDetailDto {
 }
 
 export interface ProductAttributeDto {
-  attributeId: string;
+  attributeId: number;
   name: string;
   isPrimary: boolean;
   orderPriority: number;
@@ -38,6 +38,7 @@ export interface ProductAttributeValueDto {
 }
 
 export interface VariantDto {
+  id: number;
   price: number;
   sku: string;
   stock: number;
@@ -45,7 +46,7 @@ export interface VariantDto {
 }
 
 export interface VariantAttributeDto {
-  attributeId: string;
+  attributeId: number;
   value: string;
 }
 

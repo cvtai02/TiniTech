@@ -2,22 +2,21 @@ import React from 'react';
 import ProductCard from './ProductCard';
 import { ProductBriefDto } from '../../types/product';
 import { useQueryClient } from '@tanstack/react-query';
-import styles from './scrollableproductlist.module.css';
+import styles from './productlist.module.css';
 
 interface ProductListProps {
   products: ProductBriefDto[];
 }
 
-const ScrollableProductList: React.FC<ProductListProps> = ({ products }) => {
+const ProductList: React.FC<ProductListProps> = ({ products }) => {
   const queryClient = useQueryClient();
 
   const handleProductDeleted = () => {
     queryClient.invalidateQueries({ queryKey: ['products'] });
   };
-
   return (
     <div className={styles.container}>
-      <div className={styles.scrollContainer}>
+      <div className={styles.child}>
         {products.map((product) => (
           <ProductCard
             key={product.id}
@@ -30,4 +29,4 @@ const ScrollableProductList: React.FC<ProductListProps> = ({ products }) => {
   );
 };
 
-export default ScrollableProductList;
+export default ProductList;
