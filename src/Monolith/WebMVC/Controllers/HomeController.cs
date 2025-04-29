@@ -2,37 +2,32 @@ using System.Diagnostics;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using SharedViewModels.Categories;
+using SharedViewModels.ViewModels;
 using WebMVC.Models;
+using WebMVC.Services.Abstractions;
 
 namespace WebMVC.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly IProductService _productService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(IProductService productService)
     {
-        _logger = logger;
+        _productService = productService;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> IndexAsync(CancellationToken cancellationToken)
     {
-        var category = new CategoryDto
-        {
-            Id = 1,
-            Name = "Electronics",
-            Description = "Devices and gadgets",
-            Slug = "electronics",
-            Status = CategoryStatus.Active,
-            ParentId = null,
-            Subcategories = new List<CategoryDto>
-            {
-                new CategoryDto { Id = 2, Name = "Laptops", Description = "Portable computers", Slug = "laptops" },
-                new CategoryDto { Id = 3, Name = "Phones", Description = "Smartphones", Slug = "phones" }
-            }
-        };
+        var bestSellerProducts = await _productService.GetBestSellerAsync(cancellationToken);
+        var highlightedProducts = await _productService.GetHighlightedAsync(cancellationToken);
 
-        return View(category);
+
+        return View(new HomeViewModel
+        {
+            BestSellers = bestSellerProducts,
+            HighlightedProducts = highlightedProducts
+        });
     }
 
     public IActionResult Privacy()

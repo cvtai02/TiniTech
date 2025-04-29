@@ -27,7 +27,7 @@ public class Navbar : ViewComponent
             var categories = await _categoryService.GetActiveCategoriesAsync(default);
             return View(categories);
         }
-        catch (System.Exception ex)
+        catch 
         {
             // Log the exception if needed
 

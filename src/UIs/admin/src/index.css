@@ -9,7 +9,6 @@ body {
 }
 @theme {
   --color-primary: oklch(0.82 0.1605 87.85);
-  --color-secondary: oklch(0.72 0.15 60); /* approx #f28c18 */
 }
 @layer utilities {
   .animate-star-movement-bottom {

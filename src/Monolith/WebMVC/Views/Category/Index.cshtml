@@ -12,7 +12,7 @@
             <div class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div class="p-4">
                     <h2 class="text-xl font-semibold mb-2">
-                        <a href="/@category.Slug" class="text-blue-600 hover:underline">@category.Name</a>
+                        <a href="category/@category.Slug" class="text-blue-600 hover:underline">@category.Name</a>
                     </h2>
                     <p class="text-gray-600 mb-4">@category.Description</p>
                     
@@ -24,7 +24,7 @@
                                 @foreach (var subcategory in category.Subcategories)
                                 {
                                     <li class="ml-2">
-                                        <a href="/@subcategory.Slug" class="text-blue-500 hover:underline">@subcategory.Name</a>
+                                        <a href="category/@subcategory.Slug" class="text-blue-500 hover:underline">@subcategory.Name</a>
                                     </li>
                                 }
                             </ul>

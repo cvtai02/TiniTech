@@ -1,0 +1,29 @@
+.container {
+    container-type: inline-size;
+}
+.child {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: grid;
+    gap: calc(var(--spacing) * 4);
+    justify-items: center;
+}
+@container (width > 32rem) {
+    .child {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@container (width > 48em) {
+    .child {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@container (width > 64em) {
+    .child {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+@container (width > 80em) {
+    .child {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}

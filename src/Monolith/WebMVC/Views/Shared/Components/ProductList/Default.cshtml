@@ -1,0 +1,10 @@
+@model List<SharedViewModels.Products.ProductBriefDto>
+
+<div class="container">
+    <div class="child">
+        @foreach (var product in Model)
+        {
+            <partial name="Components/ProductCard/Default" model="product" />
+        }
+    </div>
+</div>

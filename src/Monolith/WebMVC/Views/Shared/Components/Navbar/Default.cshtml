@@ -1,51 +1,68 @@
 @using SharedViewModels.Categories
 @model List<CategoryDto>
 <link rel="stylesheet" href="~/css/navbar.css" />
-<nav class="navbar">
-    <div class="logo-container">
-        <img src="~/assets/logo.png" alt="Logo" />
-    </div>
-    <ul class="menu-list">
-        @foreach (var category in Model)
-        {
-            <li class="menu-item">
-                <a
-                    href="/category/@category.Slug"
-                    class="menu-item-link"
-                    title="@category.Description">
-                    @category.Name
-                </a>
-                <ul class="dropdown-menu">
-                    @foreach (var sub in category.Subcategories)
-                    {
-                        <li>
+
+    <nav id="navbar" class="navbar ">
+        <a href="/" class="logo-container flex items-center gap-2"> 
+            <img src="~/images/logo.png" alt="Logo" />
+            <div class="logo-text">
+                <span class="text-primary">Tini</span>Tech
+            </div>
+        </a>
+        <ul class="menu-list">
+            @foreach (var category in Model)
+            {
+                <li class="menu-item">
+                    <a
+                        href="#landing-@category.Slug"
+                        class="menu-item-link"
+                        title="@category.Description">
+                        @category.Name
+                    </a>
+                    <ul class="dropdown-menu flex flex-col ">
+                        <li class="grow">
                             <a
-                                href="/category/@sub.Slug"
-                                title="@sub.Description"
-                                class="dropdown-item-link">
-                                @sub.Name
+                                href="/category/@category.Slug"
+                                title="@category.Description"
+                                class="dropdown-item-link ">
+                                All
                             </a>
-                        </li>
-                    }
-                </ul>
+                        </li >
+                        @foreach (var sub in category.Subcategories)
+                        {
+                            <li class="grow">
+                                <a
+                                    href="/category/@sub.Slug"
+                                    title="@sub.Description"
+                                    class="dropdown-item-link text-nowrap">
+                                    @sub.Name
+                                </a>
+                            </li>
+                        }
+                        
+                    </ul>
+                </li>
+            }
+            <li class="menu-item">
+                <a href="#landing-best-seller" class="menu-item-link">Best seller</a>
             </li>
-        }
-    </ul>
-    <div class="search-container">
-        <input
-            type="text"
-            placeholder="Tìm kiếm sản phẩm..."
-            class="search-input" />
-        <div class="search-icon">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor">
-                <path
-                    fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 8z"
-                    clip-rule="evenodd" />
-            </svg>
+            <li class="menu-item">
+                <a href="#landing-highlighted" class="menu-item-link">Hightlighted</a>
+            </li>
+        </ul>
+        <div class="search-container">
+            <div class="search-icon  hover:cursor-pointer" >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    onclick="window.location.href='/category/all'"
+                    class="hover:cursor-pointer hover:text-[#b09880]">
+                    <path
+                        fill-rule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 8z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>

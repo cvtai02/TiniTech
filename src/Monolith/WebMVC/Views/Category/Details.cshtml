@@ -16,7 +16,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach (var subcategory in Model.Subcategories)
                 {
-                    <a href="/@subcategory.Slug" class="block p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <a href="category/@subcategory.Slug" class="block p-4 border rounded-lg hover:shadow-md transition-shadow">
                         <h3 class="font-medium">@subcategory.Name</h3>
                         <p class="text-sm text-gray-500">@subcategory.Description</p>
                     </a>
