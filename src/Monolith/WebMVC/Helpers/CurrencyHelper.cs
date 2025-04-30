@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebMVC.Views.Helpers;
+namespace WebMVC.Helpers;
 public static class CurrencyHelper
 {
     /// <summary>

@@ -16,12 +16,12 @@ public class ApiService
         _httpClient = httpClient;
     }
 
-    public async Task<T> GetDataAsync<T>(string endpoint)
+    public async Task<T> GetDataAsync<T>(string endpoint, CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
-            var jsonString = await response.Content.ReadAsStringAsync();
+            var jsonString = await response.Content.ReadAsStringAsync(cancellationToken);
             return JsonSerializer.Deserialize<T>(jsonString, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -34,9 +34,9 @@ public class ApiService
         }
     }
 
-    public async Task<TResponse> PostDataAsync<TRequest, TResponse>(string endpoint, TRequest data)
+    public async Task<TResponse> PostDataAsync<TRequest, TResponse>(string endpoint, TRequest data, CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(endpoint, data);
+        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(endpoint, data, cancellationToken);
         if (response.IsSuccessStatusCode)
         {
             var jsonString = await response.Content.ReadAsStringAsync();

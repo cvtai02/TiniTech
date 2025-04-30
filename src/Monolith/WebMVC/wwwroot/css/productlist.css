@@ -1,28 +1,30 @@
-.container {
+.list-container {
     container-type: inline-size;
 }
 .child {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     display: grid;
-    gap: calc(var(--spacing) * 4);
+    gap: 1rem;
     justify-items: center;
+    padding-left: auto;
+    padding-right: auto;
 }
-@container (width > 32rem) {
+@container (width > 512px) {
     .child {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
-@container (width > 48em) {
+@container (width > 768px) {
     .child {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
-@container (width > 64em) {
+@container (width > 1024px) {
     .child {
         grid-template-columns: repeat(5, minmax(0, 1fr));
     }
 }
-@container (width > 80em) {
+@container (width > 1280px) {
     .child {
         grid-template-columns: repeat(6, minmax(0, 1fr));
     }

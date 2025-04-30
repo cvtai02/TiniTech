@@ -20,13 +20,13 @@ public class HomeController : Controller
     public async Task<IActionResult> IndexAsync(CancellationToken cancellationToken)
     {
         var bestSellerProducts = await _productService.GetBestSellerAsync(cancellationToken);
-        var highlightedProducts = await _productService.GetHighlightedAsync(cancellationToken);
+        var highlightedProducts = await _productService.GetFeaturedAsync(cancellationToken);
 
 
         return View(new HomeViewModel
         {
             BestSellers = bestSellerProducts,
-            HighlightedProducts = highlightedProducts
+            FeaturedProducts = highlightedProducts
         });
     }
 

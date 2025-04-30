@@ -2,13 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SharedViewModels.Common;
+using SharedViewModels.Dtos.Products;
+using SharedViewModels.Enums;
 using SharedViewModels.Products;
 using WebMVC.Services.Abstractions;
+using WebMVC.Services.Base;
 
 namespace WebMVC.Services.Specifications;
 
 public class ProductService : IProductService
 {
+    private readonly ApiService _apiService;
+
+    public ProductService(ApiService apiService)
+    {
+        _apiService = apiService;
+    }
+    public async Task<PaginatedList<ProductBriefDto>> GetByQueryAsync(ProductQueryParameters parameters, CancellationToken cancellationToken)
+    {
+
+        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{GetQueryString(parameters)}", cancellationToken);
+        return response.Data ?? new PaginatedList<ProductBriefDto>();
+    }
+
     public Task<List<ProductBriefDto>> GetBestSellerAsync(CancellationToken cancellationToken)
     {
         //mock
@@ -19,14 +36,14 @@ public class ProductService : IProductService
                 Id = 1,
                 Name = "Product 1",
                 Price = 100.00m,
-                ImageUrl = "https://stock.adobe.com/search/images?k=no+image+available",
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
             },
             new ProductBriefDto
             {
                 Id = 2,
                 Name = "Product 2",
                 Price = 200.00m,
-                ImageUrl = "https://stock.adobe.com/search/images?k=no+image+available",
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
             }
 
         };
@@ -34,7 +51,174 @@ public class ProductService : IProductService
         return Task.FromResult(products);
     }
 
-    public Task<List<ProductBriefDto>> GetHighlightedAsync(CancellationToken cancellationToken)
+    public Task<ProductDetailDto> GetBySlugAsync(string slug, CancellationToken cancellationToken)
+    {
+        //mock
+        var product = new ProductDetailDto
+        {
+            Id = 1,
+            Name = "Product 1",
+            Price = 100.00m,
+            DefaultImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+            Description = "This is a sample product description.",
+            Images = new List<ProductImageDto>
+            {
+                new ProductImageDto
+                {
+                    Id = 1,
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+                    OrderPriority = 1
+                },
+                new ProductImageDto
+                {
+                    Id = 2,
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+                    OrderPriority = 2
+                }
+                ,
+                new ProductImageDto
+                {
+                    Id = 3,
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+                    OrderPriority = 2
+                },
+                new ProductImageDto
+                {
+                    Id = 4,
+                    ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+                    OrderPriority = 2
+                }
+            },
+            Attributes =
+            [
+                new AttributeDto
+                {
+                    AttributeId = 1,
+                    Name = "Color",
+                    OrderPriority = 1,
+                    IsPrimary = true,
+                    Values = new List<AttributeValueDto>
+                    {
+                        new AttributeValueDto
+                        {
+                            OrderPriority = 1,
+                            Value = "Red",
+                            ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                        },
+                        new AttributeValueDto
+                        {
+                            OrderPriority = 2,
+                            Value = "Blue",
+                            ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                        }
+                    }
+                },
+                new AttributeDto {
+                    AttributeId = 2,
+                    Name = "Size",
+                    OrderPriority = 1,
+                    IsPrimary = false,
+                    Values = new List<AttributeValueDto>
+                    {
+                        new AttributeValueDto
+                        {
+                            OrderPriority = 1,
+                            Value = "L",
+                        },
+                        new AttributeValueDto
+                        {
+                            OrderPriority = 2,
+                            Value = "M",
+                        }
+                    }
+                }
+            ],
+            Variants = new List<VariantDto>
+            {
+                new VariantDto
+                {
+                    Id = 1,
+                    Price = 100.00m,
+                    Stock = 10,
+                    Sku = "SKU-001",
+                    VariantAttributes =
+                    [
+                        new VariantAttributeDto
+                        {
+                            AttributeId = 1,
+                            Value = "Red",
+                        },
+                        new VariantAttributeDto
+                        {
+                            AttributeId = 2,
+                            Value = "L",
+                        }
+                    ]
+                },
+                new VariantDto
+                {
+                    Id = 1,
+                    Price = 100.00m,
+                    Stock = 10,
+                    Sku = "SKU-001",
+                    VariantAttributes =
+                    [
+                        new VariantAttributeDto
+                        {
+                            AttributeId = 1,
+                            Value = "Blue",
+                        },
+                        new VariantAttributeDto
+                        {
+                            AttributeId = 2,
+                            Value = "M",
+                        }
+                    ]
+                },
+            }
+        };
+
+        return Task.FromResult(product);
+
+    }
+
+    private string GetQueryString(ProductQueryParameters parameters)
+    {
+        var query = $"?status=active&pageNumber={parameters.Page}&pageSize={parameters.PageSize}";
+        if (!string.IsNullOrEmpty(parameters.Search))
+        {
+            query += $"&search={parameters.Search}";
+        }
+        if (parameters.SortOrder == FrontStoreOrderEnum.PriceLowToHigh)
+        {
+            query += $"&orderBy=price&orderDirection=ascending";
+        }
+        else if (parameters.SortOrder == FrontStoreOrderEnum.PriceHighToLow)
+        {
+            query += $"&orderBy=price&orderDirection=decscending";
+        }
+        else if (parameters.SortOrder == FrontStoreOrderEnum.BestSelling)
+        {
+            query += $"&orderBy=sold&orderDirection=descending";
+        }
+        else if (parameters.SortOrder == FrontStoreOrderEnum.HighestRated)
+        {
+            query += $"&orderBy=rating&orderDirection=descending";
+        }
+        else if (parameters.SortOrder == FrontStoreOrderEnum.MostFeatured)
+        {
+            // the default order is most featured
+            // query += $"&orderBy=rating&orderDirection=descending";
+        }
+        if (!string.IsNullOrEmpty(parameters.CategorySlug))
+        {
+            query += $"&categorySlug={parameters.CategorySlug}";
+        }
+        return query;
+    }
+
+
+    public Task<List<ProductBriefDto>> GetFeaturedAsync(CancellationToken cancellationToken)
     {
         //mock
         var products = new List<ProductBriefDto>
@@ -44,14 +228,32 @@ public class ProductService : IProductService
                 Id = 1,
                 Name = "Product 1",
                 Price = 100.00m,
-                ImageUrl = "https://example.com/image1.jpg",
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
             },
             new ProductBriefDto
             {
                 Id = 2,
                 Name = "Product 2",
                 Price = 200.00m,
-                ImageUrl = "https://example.com/image2.jpg",
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+            },new ProductBriefDto
+            {
+                Id = 2,
+                Name = "Product 2",
+                Price = 200.00m,
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+            },new ProductBriefDto
+            {
+                Id = 2,
+                Name = "Product 2",
+                Price = 200.00m,
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+            },new ProductBriefDto
+            {
+                Id = 2,
+                Name = "Product 2",
+                Price = 200.00m,
+                ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
             }
 
         };

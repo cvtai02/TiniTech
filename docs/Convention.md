@@ -1,1 +1,2 @@
 -   Do not use system exception. Catch and return customException (implement abstractionException)
+-   Mock data factory method for DTOs, ViewModels

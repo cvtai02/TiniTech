@@ -1,14 +1,18 @@
 using System.Net.Http.Headers;
+using WebMVC.ExceptionFilters;
 using WebMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<GlobalExceptionFilter>();
+});
+
 builder.Services.AddRazorPages();
-builder.AddDataServices();
 builder.Services.AddAuthorization();
 
+builder.AddDataServices();
 
 var app = builder.Build();
 

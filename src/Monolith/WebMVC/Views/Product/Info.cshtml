@@ -1,0 +1,358 @@
+@using SharedViewModels.ViewModels
+@model ProductViewModel
+
+@{
+    var product = Model.Product;
+    var relatedProducts = Model.RelatedProducts;
+
+    var sortedProductImages = product.Images
+        .OrderBy(img => img.ImageUrl == product.DefaultImageUrl ? 0 : img.OrderPriority)
+        .ToList();
+    
+    // Initialize main image index to the default image
+    var mainImageIndex = 0;
+    if (product.DefaultImageUrl != null)
+    {
+        var defaultIndex = product.Images.FindIndex(img => img.ImageUrl == product.DefaultImageUrl);
+        if (defaultIndex >= 0)
+        {
+            mainImageIndex = defaultIndex;
+        }
+    }
+}
+
+<div class="grid grid-cols-2 gap-4 max-w-[1280px] mx-auto mt-24">
+    <div class="col-span-2 md:col-span-1 grid grid-cols-7">
+        <!-- Thumbnail Images - Left side -->
+        <div class="col-span-1 relative">
+            <div id="thumbnailContainer" 
+                 class="overflow-y-auto pr-2 scrollbar-thin rounded aspect-[1/6]
+                        [&::-webkit-scrollbar]:w-2
+                        [&::-webkit-scrollbar-track]:rounded-full
+                        [&::-webkit-scrollbar-thumb]:rounded-full
+                        [&::-webkit-scrollbar-track]:bg-neutral-700
+                        [&::-webkit-scrollbar-thumb]:bg-neutral-500">
+                <div class="flex flex-col gap-2">
+                    @foreach (var (image, index) in sortedProductImages.Select((img, i) => (img, i)))
+                    {
+                        var actualIndex = Array.FindIndex(product.Images.ToArray(), img => img.Id == image.Id);
+                        var isDefault = image.ImageUrl == product.DefaultImageUrl;
+                        
+                        <div id="thumbnail-@actualIndex" 
+                             class="cursor-pointer rounded-lg mr-2 aspect-square"
+                             onclick="selectMainImage(@actualIndex)">
+                            <img src="@image.ImageUrl" 
+                                 alt="@product.Name thumbnail @(index + 1)" 
+                                 class="object-cover w-full h-full rounded-lg border-2 @(actualIndex == mainImageIndex ? "border-blue-600" : isDefault ? "border-yellow-500" : "border-gray-200")" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Product Image - Right side -->
+        <div class="col-span-6 bg-white p-4 rounded-lg aspect-square relative">
+            <img id="mainImage" 
+                 src="@(product.Images.Count > 0 ? product.Images[mainImageIndex].ImageUrl : "")" 
+                 alt="@product.Name" 
+                 class="w-full h-full object-cover rounded" 
+                 onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center bg-gray-100 rounded\'><p class=\'text-gray-500\'>No image available</p></div>';" />
+            
+            @if (product.DefaultImageUrl != null)
+            {
+                <div class="absolute top-4 left-4 bg-yellow-500 text-white px-2 py-1 rounded-lg shadow-lg">
+                    Default Image
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-span-2 md:col-span-1">
+        <div class="bg-white p-8 rounded-xl transition-all duration-300">
+            <!-- Name -->
+            <div class="mb-6 flex items-center">
+                <h1 class="text-3xl font-medium text-gray-800">@product.Name</h1>
+            </div>
+
+            <!-- Inventory -->
+            <div class="flex flex-wrap items-center gap-6 mb-6 pb-1 border-b">
+                <div class="flex justify-between w-full gap-2 items-center">
+                    <div>
+                        <label class="font-medium text-gray-700 mr-2">SKU: </label>
+                        @if (product.Attributes.Count > 0)
+                        {
+                            <span class="text-gray-800 font-semibold" id="selectedSku">
+                                @(ViewBag.SelectedVariant != null ? ViewBag.SelectedVariant.Sku : "This combination has no variant")
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-gray-800 font-semibold">@product.Sku</span>
+                        }
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <div class="border-l pl-1 border-gray-300 flex items-center">
+                            <span class="font-medium text-blue-700">@product.Sold</span>
+                            <span class="text-blue-600 ml-1">sold</span>
+                        </div>
+                        <div class="border-l pl-1 border-gray-300 flex items-center">
+                            @{ 
+                                var stockCount = ViewBag.SelectedVariant != null ? ViewBag.SelectedVariant.Stock : product.Stock;
+                                var stockClass = stockCount > 0 ? "text-green-700" : "text-red-700";
+                            }
+                            <span class="font-medium @stockClass">
+                                @stockCount left
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center mb-6 rounded-lg">
+                <div class="flex text-yellow-400">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <svg class="w-5 h-5 @(i < Math.Floor(product.Rating) ? "text-yellow-400" : "text-gray-300")"
+                             fill="currentColor"
+                             viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                    }
+                </div>
+                <span class="ml-3 text-gray-600 font-medium">
+                    @product.Rating <span class="text-gray-500">(@product.RatingCount reviews)</span>
+                </span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-8 rounded-r-lg w-full">
+                @if (product.Attributes.Count > 0)
+                {
+                    @if (ViewBag.SelectedVariant != null)
+                    {
+                        <div class="text-3xl font-bold text-primary" id="selectedPrice">$@ViewBag.SelectedVariant.Price</div>
+                    }
+                    else
+                    {
+                        <div class="text-3xl font-bold text-gray-600">$</div>
+                    }
+                }
+                else
+                {
+                    <div class="text-3xl font-bold text-primary">$@product.Price</div>
+                }
+            </div>
+
+            <div class="space-y-8 mb-8">
+                @foreach (var attribute in product.Attributes.OrderBy(a => a.OrderPriority))
+                {
+                    <div class="bg-white hover:border-gray-200 transition-all duration-300">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-medium text-gray-800">@(attribute.Name)</h3>
+                        </div>
+                        <div class="flex gap-4 flex-wrap">
+                            @foreach (var item in attribute.Values)
+                            {
+                                <button class="attribute-select border rounded-sm flex gap-4 items-center justify-center h-12 min-w-12 p-2 relative transition-all duration-200"
+                                        data-attribute-id="@(attribute.AttributeId)"
+                                        data-value="@item.Value"
+                                        onclick="selectAttribute(@(attribute.AttributeId), '@item.Value')">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.Value" class="inline-block w-auto h-full aspect-square object-cover rounded" />
+                                    }
+                                    <span class="">@item.Value</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+                
+                <!-- Quantity Selector -->
+                <div class="bg-white hover:border-gray-200 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-medium text-gray-800">Quantity</h3>
+                    </div>
+                    <div class="flex items-center border border-gray-300 rounded-md w-36">
+                        <button type="button" 
+                                onclick="decreaseQuantity()" 
+                                class="flex-shrink-0 text-gray-600 hover:text-gray-800 w-10 h-10 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                        </button>
+                        <input type="number" 
+                               min="1" 
+                               value="1" 
+                               id="quantityInput"
+                               class="text-center w-full border-0 focus:ring-0 px-0"
+                               oninput="validateQuantity(this)">
+                        <button type="button" 
+                                onclick="increaseQuantity()" 
+                                class="flex-shrink-0 text-gray-600 hover:text-gray-800 w-10 h-10 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <script>
+                    function increaseQuantity() {
+                        const input = document.getElementById('quantityInput');
+                        const maxStock = @(ViewBag.SelectedVariant != null ? ViewBag.SelectedVariant.Stock : product.Stock);
+                        const currentVal = parseInt(input.value);
+                        if (currentVal < maxStock) {
+                            input.value = currentVal + 1;
+                        }
+                    }
+
+                    function decreaseQuantity() {
+                        const input = document.getElementById('quantityInput');
+                        const currentVal = parseInt(input.value);
+                        if (currentVal > 1) {
+                            input.value = currentVal - 1;
+                        }
+                    }
+
+                    function validateQuantity(el) {
+                        const maxStock = @(ViewBag.SelectedVariant != null ? ViewBag.SelectedVariant.Stock : product.Stock);
+                        if (el.value <= 0) el.value = 1;
+                        if (el.value > maxStock) el.value = maxStock;
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-2 mt-8 p-4 bg-white shadow-md rounded-lg">
+        <h2 class="text-xl font-semibold text-gray-800 border-b-2 border-black mb-4">
+            Description
+        </h2>
+        <p class="">@product.Description</p>
+    </div>
+</div>
+
+<script>
+    function selectMainImage(index) {
+        // Update main image
+        const mainImageEl = document.getElementById('mainImage');
+        const images = @Html.Raw(Json.Serialize(product.Images));
+        
+        if (index >= 0 && index < images.length) {
+            mainImageEl.src = images[index].imageUrl;
+            mainImageEl.alt = '@product.Name';
+            
+            // Update thumbnails highlighting
+            document.querySelectorAll('[id^="thumbnail-"]').forEach(thumb => {
+                const img = thumb.querySelector('img');
+                if (img) {
+                    // Remove blue border from all thumbnails
+                    img.classList.remove('border-blue-600');
+                    // Add back appropriate border
+                    if (thumb.id === `thumbnail-${index}`) {
+                        img.classList.add('border-blue-600');
+                    }
+                }
+            });
+            
+            // Scroll the thumbnail into view
+            scrollToThumbnail(index);
+        }
+    }
+    
+    function scrollToThumbnail(index) {
+        const container = document.getElementById('thumbnailContainer');
+        const thumbnail = document.getElementById(`thumbnail-${index}`);
+        
+        if (container && thumbnail) {
+            // Calculate positioning to center the clicked thumbnail
+            const containerHeight = container.clientHeight;
+            const thumbnailTop = thumbnail.offsetTop;
+            const thumbnailHeight = thumbnail.clientHeight;
+            
+            // Calculate the scroll position that centers the thumbnail
+            const scrollPosition = thumbnailTop - containerHeight / 2 + thumbnailHeight / 2;
+            
+            // Smooth scroll to the calculated position
+            container.scrollTo({
+                top: scrollPosition,
+                behavior: 'smooth'
+            });
+        }
+    }
+</script>
+
+@section Scripts {
+    <script>
+        // Store product data for client-side processing
+        const product = @Html.Raw(Json.Serialize(product));
+        let selectedAttributes = {};
+        let selectedVariant = null;
+        
+        // Initialize default attribute selection
+        function initializeAttributes() {
+            product.attributes.forEach(attr => {
+                if (attr.values.length > 0) {
+                    selectedAttributes[attr.attributeId] = attr.values[0].value;
+                    highlightSelected(attr.attributeId, attr.values[0].value);
+                }
+            });
+            updateSelectedVariant();
+        }
+        
+        function selectAttribute(attributeId, value) {
+            selectedAttributes[attributeId] = value;
+            highlightSelected(attributeId, value);
+            updateSelectedVariant();
+        }
+        
+        function highlightSelected(attributeId, value) {
+            document.querySelectorAll(`[data-attribute-id="${attributeId}"]`).forEach(el => {
+                if (el.getAttribute('data-value') === value) {
+                    el.classList.add('border-black', 'border-2', 'text-primary', 'shadow-sm');
+                    el.classList.remove('border-gray-200', 'hover:border-gray-400', 'hover:bg-gray-50');
+                } else {
+                    el.classList.remove('border-black', 'border-2', 'text-primary', 'shadow-sm');
+                    el.classList.add('border-gray-200', 'hover:border-gray-400', 'hover:bg-gray-50');
+                }
+            });
+        }
+        
+        function updateSelectedVariant() {
+            const attributeIds = Object.keys(selectedAttributes);
+            selectedVariant = null;
+            
+            if (attributeIds.length === product.attributes.length) {
+                product.variants.forEach(variant => {
+                    if (variant.variantAttributes.length === attributeIds.length) {
+                        const isMatch = variant.variantAttributes.every(attr => {
+                            return selectedAttributes[attr.attributeId] === attr.value &&
+                                product.attributes.some(a => a.attributeId === attr.attributeId);
+                        });
+                        
+                        if (isMatch) {
+                            selectedVariant = variant;
+                        }
+                    }
+                });
+            }
+            
+            // Update the UI
+            const priceElement = document.getElementById('selectedPrice');
+            const skuElement = document.getElementById('selectedSku');
+            
+            if (selectedVariant) {
+                if (priceElement) priceElement.textContent = '$' + selectedVariant.price;
+                if (skuElement) skuElement.textContent = selectedVariant.sku;
+            } else {
+                if (priceElement) priceElement.textContent = '$';
+                if (skuElement) skuElement.textContent = 'This combination has no variant';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeAttributes);
+    </script>
+}

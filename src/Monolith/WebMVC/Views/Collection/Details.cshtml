@@ -1,0 +1,72 @@
+@model SharedViewModels.ViewModels.CollectionViewModel
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="min-h-screen pt-16 max-w-[1280px] mx-auto">
+    <section id="landing-featured" class="py-12 "> 
+        <div class="container mx-auto flex justify-between max-w-[1280px]">
+            @* Category dropdown *@
+            <div class="mb-4"> 
+                <div class="sort-filter-item relative">
+                    <div class="sort-button cursor-pointer font-medium inline-flex items-center text-3xl px-5 py-2.5  hover:bg-gray-50 transition-colors">
+                        Category
+                        <svg class="w-2.5 h-2.5 ms-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                        </svg>
+                    </div>
+                    <ul class="sort-dropdown-menu py-2 text-sm text-gray-700">
+                        @foreach (var category in Model.Categories )
+                        {
+                            <li class="category-item">
+                                <a href="/collections/@category.Slug" class="block">@category.Name</a>
+                                @if (category.Subcategories?.Count > 0)
+                                {
+                                    <ul class="subcategory-menu py-2 text-sm text-gray-700">
+                                        @foreach (var subcategory in category.Subcategories)
+                                        {
+                                            <li>
+                                                <a href="/collections/@subcategory.Slug" class="block px-4 py-2 hover:text-primary">
+                                                    @subcategory.Name
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                        <li>
+                            <a href="/collections" class="block px-4 py-2 hover:text-primary">All Products</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            @* Sort & Filter options *@
+            <div class="mb-4"> 
+                <div class="sort-filter-item relative">
+                    <div class="sort-button cursor-pointer font-medium inline-flex items-center text-sm px-5 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                        Sort Options
+                        <svg class="w-2.5 h-2.5 ms-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                        </svg>
+                    </div>
+                    <div class="sort-dropdown-menu">
+                        <ul class="py-2 text-sm text-gray-700">
+                            <li><a href="#" class="block px-4 py-2 hover:text-primary">Newest</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:text-primary">Price: High to Low</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:text-primary">Price: Low to High</a></li>
+                            <li><a href="#" class="block px-4 py-2 hover:text-primary">Most Popular</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @await Component.InvokeAsync("ProductList", new { products = Model.Products.Items })
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Additional JavaScript can be added here if needed
+    </script>
+}

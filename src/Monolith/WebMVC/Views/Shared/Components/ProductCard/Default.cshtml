@@ -1,45 +1,38 @@
 @model SharedViewModels.Products.ProductBriefDto
 
-<div class="bg-white rounded-lg shadow-md p-4 w-full max-w-sm flex flex-col hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
+<div class=" rounded-[0.2rem] bg-white p-4 w-full flex flex-col hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
     <div class="relative flex aspect-square overflow-hidden mb-4 rounded-lg">
         <img class="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105"
-             src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/default.png" : Model.ImageUrl)"
+             src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://vi.m.wikipedia.org/wiki/T%E1%BA%ADp_tin:No_image_available.svg" : Model.ImageUrl)"
              alt="image not found" />
     </div>
-    <div class="flex-grow flex justify-between items-end">
-        <div>
-            <h3 class="font-bold">@Model.Name</h3>
-            <div class="flex flex-col gap-1 mt-1">
-                <div class="flex items-center">
-                    @for (int i = 0; i < 5; i++)
+    <div class="flex-grow flex-col gap-2 justify-between items-end">
+        <h3 class="">@Model.Name</h3>
+        <div class="flex flex-col w-full gap-1 mt-1">
+            <div class="flex items-center">
+                @for (int i = 0; i < 5; i++)
+                {
+                    if (i < Model.Rating)
                     {
-                        if (i < Model.Rating)
-                        {
-                            <i class="fa-solid fa-star text-yellow-500 text-lg"></i>
-                        }
-                        else
-                        {
-                            <i class="fa-regular fa-star text-yellow-400 text-lg"></i>
-                        }
+                        <i class="fa-solid fa-star text-yellow-500 text-xs"></i>
                     }
-                    <span class="ml-2 text-gray-600 text-xs font-medium">
-                        (@Model.RatingCount)
-                    </span>
-                </div>
-                <div class="mt-2 flex gap-4 text-xs font-medium">
-                    <div class="flex items-center rounded-md">
-                        <i class="fa-solid fa-truck mr-1"></i>
-                        <span>Sold: @Model.Sold</span>
-                    </div>
-                    <div class="flex items-center rounded-md @(Model.Stock > 0 ? "text-green-500" : "text-red-500")">
-                        <i class="fa-solid fa-box-archive mr-1"></i>
-                        <span>Stock: @Model.Stock</span>
-                    </div>
+                    else
+                    {
+                        <i class="fa-regular fa-star text-yellow-400 text-xs"></i>
+                    }
+                }
+                <span class="ml-2 text-gray-600 text-sm font-medium">
+                    (@Model.RatingCount reviews)
+                </span>
+            </div>
+            <div class="mt-2 flex gap-4 items-end justify-between  w-full">
+                <p class="mt-2 text-primary text-lg flex items-center font-bold">
+                    @WebMVC.Helpers.CurrencyHelper.FormatUSD(Model.Price)
+                </p>
+                <div class="flex items-center text-sm  rounded-md">
+                    <span>@Model.Sold sold</span>
                 </div>
             </div>
-            <p class="mt-2 text-primary flex justify-between items-center font-bold">
-                @WebMVC.Views.Helpers.CurrencyHelper.FormatUSD(Model.Price)
-            </p>
         </div>
     </div>
 </div>
