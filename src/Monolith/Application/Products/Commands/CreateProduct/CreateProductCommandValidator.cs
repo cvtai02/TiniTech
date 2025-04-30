@@ -22,8 +22,8 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
                     image
                         .Must(file => allowImageContentTypes.Contains(file.ContentType))
                         .WithMessage("Image content type is not supported.")
-                        .Must(file => file.Length <= 5 * 1024 * 1024).WithMessage("Image size must not exceed 5MB.")
-                        .Must(file => file.Length > 800 * 800).WithMessage("Image quality is too low.");
+                        .Must(file => file.Length <= 5 * 1024 * 1024).WithMessage("Image size must not exceed 5MB.");
+                    // .Must(file => file.Length > 800 * 800).WithMessage("Image quality is too low.");
                 });
         }
     }

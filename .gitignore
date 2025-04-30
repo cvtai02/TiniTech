@@ -2,3 +2,5 @@
 
 # is this needed?
 src/uis/admin/.git/* 
+
+assets/*

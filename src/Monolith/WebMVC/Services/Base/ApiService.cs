@@ -50,4 +50,10 @@ public class ApiService
             throw new Exception($"API call failed: {response.StatusCode}");
         }
     }
+
+    public string BaseUrl
+    {
+        get => _httpClient.BaseAddress?.ToString() ?? string.Empty;
+        set => _httpClient.BaseAddress = new Uri(value);
+    }
 }

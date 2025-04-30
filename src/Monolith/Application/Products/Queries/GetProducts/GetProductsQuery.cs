@@ -24,6 +24,11 @@ public class GetProductsQuery : IRequest<Result<PaginatedList<ProductBriefDto>>>
     public List<ProductStatus>? Status { get; set; }
     public OrderCriteria OrderBy { get; set; } = OrderCriteria.CreatedDate;
     public OrderDirection OrderDirection { get; set; } = Enums.OrderDirection.Descending;
+
+    public override string ToString()
+    {
+        return $"PageNumber: {PageNumber}, PageSize: {PageSize}, Search: {Search}, CategorySlug: {CategorySlug}, Status: {Status.Count}, OrderBy: {OrderBy}, OrderDirection: {OrderDirection}";
+    }
 }
 
 
@@ -39,6 +44,7 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<
 
     public async Task<Result<PaginatedList<ProductBriefDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"GetProductsQuery: {request}");
         // Query for products ordered by creation date (newest first)
         var query = _context.Products.Include(p => p.Metric)
             .AsQueryable();
@@ -72,7 +78,7 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<
 
         // Map the products to DTOs
         var productDtos = paginatedList.Items.Select(p => ProductBriefDto.FromProduct(p)).ToList();
-
+        Console.WriteLine($"GetProductsQuery: {request} - Total Products: {paginatedList.TotalCount}");
         return new PaginatedList<ProductBriefDto>(
             productDtos,
             paginatedList.TotalCount,

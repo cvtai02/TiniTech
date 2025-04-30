@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Domain.Enums;
 using SharedViewModels.Common;
 using SharedViewModels.Dtos.Products;
 using SharedViewModels.Enums;
@@ -21,8 +23,9 @@ public class ProductService : IProductService
     }
     public async Task<PaginatedList<ProductBriefDto>> GetByQueryAsync(ProductQueryParameters parameters, CancellationToken cancellationToken)
     {
-
+        Console.WriteLine($"GetByQueryAsync: {_apiService.BaseUrl}api/products{GetQueryString(parameters)}");
         var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{GetQueryString(parameters)}", cancellationToken);
+        Console.WriteLine($"GetByQueryAsync: {JsonSerializer.Serialize(response)}");
         return response.Data ?? new PaginatedList<ProductBriefDto>();
     }
 
@@ -182,9 +185,9 @@ public class ProductService : IProductService
 
     }
 
-    private string GetQueryString(ProductQueryParameters parameters)
+    private static string GetQueryString(ProductQueryParameters parameters)
     {
-        var query = $"?status=active&pageNumber={parameters.Page}&pageSize={parameters.PageSize}";
+        var query = $"?Status={ProductStatus.Active}&PageNumber={parameters.Page}&PageSize={parameters.PageSize}";
         if (!string.IsNullOrEmpty(parameters.Search))
         {
             query += $"&search={parameters.Search}";

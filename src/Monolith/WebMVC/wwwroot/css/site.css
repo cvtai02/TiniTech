@@ -153,3 +153,72 @@ q {
 .sort-dropdown-menu a:hover {
     color: var(--color-primary);
 }
+
+.mask-r-from {
+    mask-image: var(--tw-mask-linear), var(--tw-mask-radial),
+        var(--tw-mask-conic);
+    mask-composite: intersect;
+    --tw-mask-linear: var(--tw-mask-left), var(--tw-mask-right),
+        var(--tw-mask-bottom), var(--tw-mask-top);
+    --tw-mask-right: linear-gradient(
+        to right,
+        var(--tw-mask-right-from-color) var(--tw-mask-right-from-position),
+        var(--tw-mask-right-to-color) var(--tw-mask-right-to-position)
+    );
+    --tw-mask-right-from-position: 70%;
+}
+@property --tw-mask-linear {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-radial {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-conic {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-left {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-right {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-bottom {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-top {
+    syntax: "*";
+    inherits: false;
+    initial-value: linear-gradient(#fff, #fff);
+}
+@property --tw-mask-right-from-position {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0%;
+}
+@property --tw-mask-right-to-position {
+    syntax: "*";
+    inherits: false;
+    initial-value: 100%;
+}
+@property --tw-mask-right-from-color {
+    syntax: "*";
+    inherits: false;
+    initial-value: black;
+}
+@property --tw-mask-right-to-color {
+    syntax: "*";
+    inherits: false;
+    initial-value: transparent;
+}

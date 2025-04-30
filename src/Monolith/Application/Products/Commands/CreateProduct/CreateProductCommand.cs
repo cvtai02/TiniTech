@@ -19,7 +19,7 @@ public class CreateProductCommand : IRequest<Result<string>>
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     public string Sku { get; set; } = null!;
-    public decimal? Price { get; set; } = 0;
+    public decimal? Price { get; set; } = 0m;
     public int CategoryId { get; set; }
     public List<IFormFile>? Images { get; set; } = [];
 }
@@ -47,7 +47,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             CategoryId = request.CategoryId,
             Metric = new ProductMetric
             {
-                LowestPrice = request.Price ?? 0,
+                LowestPrice = request.Price ?? 0m,
             },
         };
 
