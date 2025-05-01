@@ -1,14 +1,15 @@
+@using WebMVC.Extensions
 @model SharedViewModels.Products.ProductBriefDto
 
-<div class=" rounded-[0.2rem] bg-white p-4 w-full flex flex-col hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
-    <div class="relative flex aspect-square overflow-hidden mb-4 rounded-lg">
+<div class=" rounded-[0.2rem] flex flex-col bg-white p-4 h-full w-full hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
+    <div class="relative flex  aspect-square overflow-hidden mb-4 rounded-lg">
         <img class="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105"
              src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://vi.m.wikipedia.org/wiki/T%E1%BA%ADp_tin:No_image_available.svg" : Model.ImageUrl)"
              alt="image not found" />
     </div>
-    <div class="flex-grow flex-col gap-2 justify-between items-end">
-        <h3 class="">@Model.Name</h3>
-        <div class="flex flex-col w-full gap-1 mt-1">
+    <div class="flex flex-col grow justify">
+        <h3 class="flex grow">@Model.Name</h3>
+        <div class="flex flex-col justify-end grow gap-1 mt-1">
             <div class="flex items-center">
                 @for (int i = 0; i < 5; i++)
                 {
@@ -25,9 +26,9 @@
                     (@Model.RatingCount reviews)
                 </span>
             </div>
-            <div class="mt-2 flex gap-4 items-end justify-between  w-full">
+            <div class="mt-2 flex gap-4 justify-between  w-full">
                 <p class="mt-2 text-primary text-lg flex items-center font-bold">
-                    @WebMVC.Helpers.CurrencyHelper.FormatUSD(Model.Price)
+                    @Model.Price.FormatUSD()
                 </p>
                 <div class="flex items-center text-sm  rounded-md">
                     <span>@Model.Sold sold</span>

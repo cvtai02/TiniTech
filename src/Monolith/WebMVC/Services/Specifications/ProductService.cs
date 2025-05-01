@@ -23,8 +23,7 @@ public class ProductService : IProductService
     }
     public async Task<PaginatedList<ProductBriefDto>> GetByQueryAsync(ProductQueryParameters parameters, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"GetByQueryAsync: {_apiService.BaseUrl}api/products{GetQueryString(parameters)}");
-        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{GetQueryString(parameters)}", cancellationToken);
+        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{GetApiQueryString(parameters)}", cancellationToken);
         Console.WriteLine($"GetByQueryAsync: {JsonSerializer.Serialize(response)}");
         return response.Data ?? new PaginatedList<ProductBriefDto>();
     }
@@ -185,35 +184,36 @@ public class ProductService : IProductService
 
     }
 
-    private static string GetQueryString(ProductQueryParameters parameters)
+
+    public static string GetApiQueryString(ProductQueryParameters parameters)
     {
         var query = $"?Status={ProductStatus.Active}&PageNumber={parameters.Page}&PageSize={parameters.PageSize}";
         if (!string.IsNullOrEmpty(parameters.Search))
         {
             query += $"&search={parameters.Search}";
         }
-        if (parameters.SortOrder == FrontStoreOrderEnum.PriceLowToHigh)
+        if (parameters.Order == FrontStoreOrderEnum.PriceLowToHigh)
         {
             query += $"&orderBy=price&orderDirection=ascending";
         }
-        else if (parameters.SortOrder == FrontStoreOrderEnum.PriceHighToLow)
+        else if (parameters.Order == FrontStoreOrderEnum.PriceHighToLow)
         {
             query += $"&orderBy=price&orderDirection=decscending";
         }
-        else if (parameters.SortOrder == FrontStoreOrderEnum.BestSelling)
+        else if (parameters.Order == FrontStoreOrderEnum.BestSelling)
         {
             query += $"&orderBy=sold&orderDirection=descending";
         }
-        else if (parameters.SortOrder == FrontStoreOrderEnum.HighestRated)
+        else if (parameters.Order == FrontStoreOrderEnum.HighestRated)
         {
             query += $"&orderBy=rating&orderDirection=descending";
         }
-        else if (parameters.SortOrder == FrontStoreOrderEnum.MostFeatured)
+        else if (parameters.Order == FrontStoreOrderEnum.MostFeatured)
         {
             // the default order is most featured
             // query += $"&orderBy=rating&orderDirection=descending";
         }
-        if (!string.IsNullOrEmpty(parameters.CategorySlug))
+        if (!string.IsNullOrEmpty(parameters.CategorySlug) && parameters.CategorySlug != "whatever")
         {
             query += $"&categorySlug={parameters.CategorySlug}";
         }
