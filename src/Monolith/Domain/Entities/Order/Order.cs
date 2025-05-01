@@ -10,7 +10,7 @@ namespace Domain.Entities;
 
 public class Order : BaseAuditableEntity
 {
-    public string UserId { get; set; } = null!;
+    public string? User { get; set; } = null!;
     public Address ShippingAddress { get; set; } = null!;
     public string OrderNumber { get; set; } = null!;
     public string Status { get; set; } = null!;

@@ -8,12 +8,13 @@ namespace Domain.ValueObjects;
 
 public class Address : ValueObject
 {
-    public string City { get; }
-    public string District { get; }
-    public string Ward { get; }
-    public string PhoneNumber { get; }
-    public string ReceiverName { get; }
-    public string DetailAddress { get; }
+    public string ReceiverName { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string District { get; set; } = string.Empty;
+    public string Ward { get; set; } = string.Empty;
+    public string DetailAddress { get; set; } = string.Empty; 
 
     public Address(string city, string district, string ward, string phoneNumber, string receiverName, string detailAddress)
     {

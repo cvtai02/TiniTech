@@ -29,6 +29,7 @@ public class ProductController : Controller
         try
         {
             var product = await _productService.GetBySlugAsync(slug, cancellationToken);
+            Console.WriteLine($"Product: {product}");
             return View(new ProductViewModel
             {
                 Product = product,

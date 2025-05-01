@@ -15,19 +15,21 @@
                 {
                     if (i < Model.Rating)
                     {
-                        <i class="fa-solid fa-star text-yellow-500 text-xs"></i>
+                        <span class="text-yellow-500">★</span>
+                        @* <i class="fa-solid fa-star text-yellow-500 text-xs"></i> *@
                     }
                     else
                     {
-                        <i class="fa-regular fa-star text-yellow-400 text-xs"></i>
+                        <span class="text-yellow-500">☆</span>
+                        @* <i class="fa-regular fa-star text-yellow-400 text-xs"></i> *@
                     }
                 }
-                <span class="ml-2 text-gray-600 text-sm font-medium">
-                    (@Model.RatingCount reviews)
+                <span class="ml-2 text-sm">
+                    @Model.RatingCount reviews
                 </span>
             </div>
             <div class="mt-2 flex gap-4 justify-between  w-full">
-                <p class="mt-2 text-primary text-lg flex items-center font-bold">
+                <p class="mt-2 text-primary text-lg flex items-center font-medium">
                     @Model.Price.FormatUSD()
                 </p>
                 <div class="flex items-center text-sm  rounded-md">

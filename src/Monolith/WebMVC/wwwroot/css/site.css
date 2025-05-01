@@ -81,7 +81,6 @@ q {
     quotes: none;
 }
 
-
 .mask-r-from {
     mask-image: var(--tw-mask-linear), var(--tw-mask-radial),
         var(--tw-mask-conic);
@@ -165,4 +164,56 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration {
     display: none;
+}
+
+input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    background: transparent;
+}
+/* Remove the 'x' (clear) icon in WebKit browsers (Chrome, Safari, Edge) */
+input::-webkit-search-decoration,
+input::-webkit-search-cancel-button,
+input::-webkit-search-results-button,
+input::-webkit-search-results-decoration {
+    display: none;
+}
+
+.proceed-button {
+    background: #fff;
+    border: 1px black solid;
+    padding: 10px 20px;
+    display: inline-block;
+    font-size: 15px;
+    font-weight: 600;
+    width: 120px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: black;
+}
+
+.proceed-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 100%;
+    left: 0;
+    background: rgb(20, 20, 20);
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.5s;
+}
+
+.proceed-button:hover {
+    color: #fff;
+}
+
+.proceed-button:hover::before {
+    left: 0;
+    right: 0;
+    opacity: 1;
 }
