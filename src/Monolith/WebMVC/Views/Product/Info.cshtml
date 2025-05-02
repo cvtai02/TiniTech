@@ -21,7 +21,7 @@
     }
 }
 
-<div class="grid grid-cols-2 gap-4 max-w-[1280px] mx-auto mt-8">
+<div class="grid grid-cols-2 gap-4 max-w-[1280px] mx-auto my-8">
     <div class="col-span-2 md:col-span-1 grid grid-cols-7">
         <!-- Thumbnail Images - Left side -->
         <div class="col-span-1 relative">
@@ -43,7 +43,7 @@
                              onclick="selectMainImage(@actualIndex)">
                             <img src="@image.ImageUrl" 
                                  alt="@product.Name thumbnail @(index + 1)" 
-                                 class="object-cover w-full h-full rounded-lg border-2 @(actualIndex == mainImageIndex ? "border-blue-600" : isDefault ? "border-yellow-500" : "border-gray-200")" />
+                                 class="object-cover w-full h-full rounded border-2 @(actualIndex == mainImageIndex ? "border-blue-600":"")" />
                         </div>
                     }
                 </div>
@@ -85,8 +85,7 @@
                     </div>
                     <div class="flex gap-4 items-center">
                         <div class="border-l pl-1 border-gray-300 flex items-center">
-                            <span class="font-medium text-blue-700">@product.Sold</span>
-                            <span class="text-blue-600 ml-1">sold</span>
+                            <span id="soldDisplay" class="font-medium text-blue-700">@product.Sold sold</span>
                         </div>
                         <div class="border-l pl-1 border-gray-300 flex items-center">
                             <span id="stockDisplay" class="font-medium text-green-700">
@@ -129,9 +128,9 @@
             <div class="space-y-8 mb-8">
                 @foreach (var attribute in product.Attributes.OrderBy(a => a.OrderPriority))
                 {
-                    <div class="bg-white hover:border-gray-200 transition-all duration-300">
+                    <div class="">
                         <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-medium text-gray-800">@(attribute.Name)</h3>
+                            <h3 class="font-medium">@(attribute.Name)</h3>
                         </div>
                         <div class="flex gap-4 flex-wrap">
                             @foreach (var item in attribute.Values)
@@ -143,9 +142,10 @@
                                     onclick="selectAttribute(@(attribute.AttributeId), '@item.Value', this)">
                                     @if (!string.IsNullOrEmpty(item.ImageUrl))
                                     {
-                                        <img src="@item.ImageUrl" alt="@item.Value" class="inline-block w-auto h-full aspect-square object-cover rounded" />
+                                        <img src="@item.ImageUrl" alt="@item.Value" class="inline-block w-auto h-full aspect-square object-cover rounded-sm" />
                                     }
                                     <span class="">@item.Value</span>
+                                    
                                 </button>
                             }
                         </div>
@@ -156,6 +156,7 @@
                 <div class="bg-white hover:border-gray-200 transition-all duration-300">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="font-medium text-gray-800">Quantity</h3>
+                        
                     </div>
                     <div class="flex items-center border border-gray-300 rounded-sm w-36">
                         <button type="button" 
@@ -302,7 +303,6 @@
         <div class="container mx-auto max-w-[1280px]">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-2xl font-bold text-black">Related Products</h2>
-                <a href="/collection" class="text-primary font-medium hover:underline">View More</a>
             </div>
             
             @if (relatedProducts != null && relatedProducts.Any())
@@ -318,45 +318,51 @@
 </div>
 
 <!-- Address Modal -->
-<div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+<div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center hidden">
     <div class="bg-white rounded-lg w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <!-- Modal Header with Login/Register -->
         <div class="flex justify-between items-center mb-6 pb-3 border-b">
             <h3 class="text-xl font-semibold text-gray-800">Shipping Information</h3>
             <div class="flex gap-2">
-                <a href="/Identity/Account/Login" class="text-blue-600 hover:text-blue-800 font-medium">Login</a>
+                <a href="/Identity/Account/Login" class="text-primary hover:text-black font-medium">Login</a>
                 <span class="text-gray-500">|</span>
-                <a href="/Identity/Account/Register" class="text-blue-600 hover:text-blue-800 font-medium">Register</a>
+                <a href="/Identity/Account/Register" class="text-primary hover:text-black font-medium">Register</a>
             </div>
         </div>
         
         <!-- Address Form -->
         <form id="addressForm" class="space-y-4">
-            <div>
+            <div class="border-b-black border-b">
                 <label for="receiverName" class="block text-sm font-medium text-gray-700">Receiver Name</label>
                 <input type="text" id="receiverName" name="receiverName" required
-                       class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                       class="block w-full text-primary rounded-sm shadow-sm ">
             </div>
             
-            <div>
+            <div class="border-b-black border-b">
                 <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input type="tel" id="phoneNumber" name="phoneNumber" required
-                       class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                       class="block w-full rounded-sm text-primary border-gray-300 shadow-sm focus:border-black focus:ring-black">
+            </div>
+
+            <div class="border-b-black border-b">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required
+                       class="block w-full rounded-sm text-primary border-gray-300 shadow-sm focus:border-black focus:ring-black">
             </div>
             
-            <div>
+            <div class="border-b-black border-b">
                 <label for="city" class="block text-sm font-medium text-gray-700">City</label>
                 <input type="text" id="city" name="city" required
-                       class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                       class="block w-full rounded-sm text-primary border-gray-300 shadow-sm focus:border-black focus:ring-black">
             </div>
             
-            <div>
+            <div class="border-b-black border-b">
                 <label for="district" class="block text-sm font-medium text-gray-700">District</label>
                 <input type="text" id="district" name="district" required
-                       class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                       class="block w-full rounded-sm text-primary border-gray-300 shadow-sm focus:border-black focus:ring-black">
             </div>
             
-            <div>
+            <div class="border-b-black border-b">
                 <label for="ward" class="block text-sm font-medium text-gray-700">
                     Ward
                 </label>
@@ -365,21 +371,21 @@
                     id="ward" 
                     name="ward" 
                     required
-                    class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                    class="block w-full text-primary rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
                 >
             </div>
             
-            <div>
+            <div class="border-b-black border-b">
                 <label for="detailAddress" class="block text-sm font-medium text-gray-700">
                     Detail Address
                 </label>
-                <textarea 
+                <input 
                     id="detailAddress" 
                     name="detailAddress" 
                     rows="2" 
                     required
-                    class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
-                ></textarea>
+                    class="block w-full text-primary rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                ></input>
             </div>
             
             <div class="flex justify-between gap-3 pt-4">
@@ -401,258 +407,29 @@
     </div>
 </div>
 
-<script>
-    function selectMainImage(index) {
-        // Update main image
-        const mainImageEl = document.getElementById('mainImage');
-        const images = @Html.Raw(Json.Serialize(product.Images));
-        
-        if (index >= 0 && index < images.length) {
-            mainImageEl.src = images[index].imageUrl;
-            mainImageEl.alt = '@product.Name';
-            
-            // Update thumbnails highlighting
-            document.querySelectorAll('[id^="thumbnail-"]').forEach(thumb => {
-                const img = thumb.querySelector('img');
-                if (img) {
-                    // Remove blue border from all thumbnails
-                    img.classList.remove('border-blue-600');
-                    // Add back appropriate border
-                    if (thumb.id === `thumbnail-${index}`) {
-                        img.classList.add('border-blue-600');
-                    }
-                }
-            });
-            
-            // Scroll the thumbnail into view
-            scrollToThumbnail(index);
-        }
+<style>
+    .invalid-value-button::after {
+        content: '';
+        position: absolute;
+        top: -20.75%;
+        width: 1px; 
+        height: 141.5%;
+        background-color: black;
+        transform: rotate(45deg);
+        transform-origin: middle;
     }
-    
-    function scrollToThumbnail(index) {
-        const container = document.getElementById('thumbnailContainer');
-        const thumbnail = document.getElementById(`thumbnail-${index}`);
-        
-        if (container && thumbnail) {
-            // Calculate positioning to center the clicked thumbnail
-            const containerHeight = container.clientHeight;
-            const thumbnailTop = thumbnail.offsetTop;
-            const thumbnailHeight = thumbnail.clientHeight;
-            
-            // Calculate the scroll position that centers the thumbnail
-            const scrollPosition = thumbnailTop - containerHeight / 2 + thumbnailHeight / 2;
-            
-            // Smooth scroll to the calculated position
-            container.scrollTo({
-                top: scrollPosition,
-                behavior: 'smooth'
-            });
-        }
-    }
-
-    // Modal functions
-    function showAddressModal() {
-        document.getElementById('addressModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function closeAddressModal() {
-        document.getElementById('addressModal').classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-</script>
+</style>
 
 @section Scripts {
     <script>
-        // Store product data for client-side processing
-        const product = @Html.Raw(Json.Serialize(product));
-        let selectedAttributes = {};
-        let selectedVariant = null;
-        
-        // Initialize default attribute selection
-        function initializeAttributes() {
-            // First pass - set initial values
-            product.attributes.forEach(attr => {
-                if (attr.values.length > 0) {
-                    selectedAttributes[attr.attributeId] = attr.values[0].value;
-                }
-            });
-            
-            // Second pass - update UI after all initial values are set
-            updateValidCombinations();
-            product.attributes.forEach(attr => {
-                if (attr.values.length > 0) {
-                    highlightSelected(attr.attributeId, attr.values[0].value);
-                }
-            });
-            updateSelectedVariant();
-        }
-        
-        function getValidValuesByAttributeId(attributeId) {
-            // Get all other selected attributes
-            const otherSelections = { ...selectedAttributes };
-            delete otherSelections[attributeId];
-            
-            // Find all variants that match the other selections
-            const validValues = new Set();
-            
-            product.variants.forEach(variant => {
-                // Check if this variant matches all other selected attributes
-                const matchesOtherSelections = Object.entries(otherSelections).every(([attrId, value]) => {
-                    const varAttr = variant.variantAttributes.find(va => va.attributeId == attrId);
-                    return varAttr && varAttr.value === value;
-                });
-                
-                if (matchesOtherSelections) {
-                    // Add this variant's value for the current attribute to valid values
-                    const thisAttrValue = variant.variantAttributes.find(va => va.attributeId == attributeId);
-                    if (thisAttrValue) {
-                        validValues.add(thisAttrValue.value);
-                    }
-                }
-            });
-            
-            return validValues;
-        }
-        
-        function updateValidCombinations() {
-            // For each attribute, determine valid values based on other selections
-            product.attributes.forEach(attr => {
-                const attributeId = attr.attributeId;
-                const validValues = getValidValuesByAttributeId(attributeId);
-                
-                // Update UI for each value of this attribute
-                document.querySelectorAll(`[data-attribute-id="${attributeId}"]`).forEach(el => {
-                    const value = el.getAttribute('data-value');
-                    
-                    if (validValues.size === 0 || validValues.has(value)) {
-                        // This is a valid option
-                        el.disabled = false;
-                        el.classList.remove('opacity-50', 'cursor-not-allowed');
-                    } else {
-                        // This would lead to no variants - disable it
-                        el.disabled = true;
-                        el.classList.add('opacity-50', 'cursor-not-allowed');
-                        
-                        // If this was selected, select a valid option instead
-                        if (selectedAttributes[attributeId] === value) {
-                            // Find first valid value and select it
-                            if (validValues.size > 0) {
-                                const firstValid = validValues.values().next().value;
-                                selectedAttributes[attributeId] = firstValid;
-                                highlightSelected(attributeId, firstValid);
-                            }
-                        }
-                    }
-                });
-            });
-        }
-        
-        function selectAttribute(attributeId, value, element) {
-            // If this option is disabled, don't select it
-            if (element && element.disabled) {
-                return;
-            }
-            
-            selectedAttributes[attributeId] = value;
-            highlightSelected(attributeId, value);
-            
-            // After selecting an attribute, need to update which combinations are valid
-            updateValidCombinations();
-            updateSelectedVariant();
-        }
-        
-        function highlightSelected(attributeId, value) {
-            document.querySelectorAll(`[data-attribute-id="${attributeId}"]`).forEach(el => {
-                if (el.getAttribute('data-value') === value) {
-                    el.classList.add('border-black', 'border-2', 'text-primary', 'shadow-sm');
-                    el.classList.remove('border-gray-200', 'hover:border-gray-400', 'hover:bg-gray-50');
-                } else {
-                    el.classList.remove('border-black', 'border-2', 'text-primary', 'shadow-sm');
-                    el.classList.add('border-gray-200', 'hover:border-gray-400', 'hover:bg-gray-50');
-                }
-            });
-        }
-        
-        function updateSelectedVariant() {
-            const attributeIds = Object.keys(selectedAttributes);
-            selectedVariant = null;
-            
-            if (attributeIds.length === product.attributes.length) {
-                product.variants.forEach(variant => {
-                    if (variant.variantAttributes.length === attributeIds.length) {
-                        const isMatch = variant.variantAttributes.every(attr => {
-                            return selectedAttributes[attr.attributeId] === attr.value &&
-                                product.attributes.some(a => a.attributeId === attr.attributeId);
-                        });
-                        
-                        if (isMatch) {
-                            selectedVariant = variant;
-                        }
-                    }
-                });
-            }
-            
-            // Update the UI
-            const priceElement = document.getElementById('selectedPrice');
-            const skuElement = document.getElementById('selectedSku');
-            const stockElement = document.getElementById('stockDisplay');
-            
-            if (selectedVariant) {
-                if (priceElement) priceElement.textContent = '$' + selectedVariant.price;
-                if (skuElement) skuElement.textContent = selectedVariant.sku;
-                if (stockElement) {
-                    stockElement.textContent = selectedVariant.stock + ' left';
-                    stockElement.className = 'font-medium ' + (selectedVariant.stock > 0 ? 'text-green-700' : 'text-red-700');
-                }
-            } else {
-                if (priceElement) priceElement.textContent = '$' + product.price;
-                if (skuElement) skuElement.textContent = 'This combination has no variant';
-                if (stockElement) {
-                    stockElement.textContent = product.stock + ' left';
-                    stockElement.className = 'font-medium ' + (product.stock > 0 ? 'text-green-700' : 'text-red-700');
-                }
-            }
-            
-            // Update quantity constraints
-            const quantityInput = document.getElementById('quantityInput');
-            if (quantityInput) {
-                const maxStock = selectedVariant ? selectedVariant.stock : product.stock;
-                if (parseInt(quantityInput.value) > maxStock) {
-                    quantityInput.value = maxStock;
-                }
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeAttributes();
-            
-            const addressForm = document.getElementById('addressForm');
-            if (addressForm) {
-                addressForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const formData = {
-                        receiverName: document.getElementById('receiverName').value,
-                        phoneNumber: document.getElementById('phoneNumber').value,
-                        city: document.getElementById('city').value,
-                        district: document.getElementById('district').value,
-                        ward: document.getElementById('ward').value,
-                        detailAddress: document.getElementById('detailAddress').value
-                    };
-                    
-                    addToCart();
-                    
-                    console.log('Proceeding to checkout with address:', formData);
-                    
-                    const queryParams = new URLSearchParams({
-                        receiverName: formData.receiverName,
-                        phoneNumber: formData.phoneNumber
-                    }).toString();
-                    
-                    window.location.href = '/checkout?' + queryParams;
-                });
-            }
-        });
+        // Product data for JS to use
+        const productData = @Html.Raw(Json.Serialize(product));
+        const productImages = @Html.Raw(Json.Serialize(product.Images));
+        const productName = "@product.Name";
+        const productId = "@product.Id";
+        const productPrice = parseFloat("@product.Price");
+        const productStock = @product.Stock;
+        const mainImageUrl = "@(product.Images.Count > 0 ? product.Images[mainImageIndex].ImageUrl : "")";
     </script>
+    <script src="~/js/product-detail.js"></script>
 }

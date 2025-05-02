@@ -1,0 +1,43 @@
+@model IEnumerable<SharedViewModels.Products.ProductDetailDto>
+
+<div class="cart-items-container">
+    @if (Model != null && Model.Any())
+    {
+        <div class="cart-items">
+            @foreach (var product in Model)
+            {
+                @await Component.InvokeAsync("ProductCartItem", new { product })
+            }
+        </div>
+        
+        <div class="cart-summary mt-3 p-3 border-top">
+            <div class="d-flex justify-content-between">
+                <h5>Subtotal:</h5>
+                <h5 class="cart-subtotal" id="cartSubtotal">@Model.Sum(i => i.Price).ToString("C")</h5>
+            </div>
+            <div class="d-flex justify-content-between mt-2">
+                <span>Shipping:</span>
+                <span id="shipping">Calculated at checkout</span>
+            </div>
+            <div class="d-flex justify-content-between mt-2 fw-bold">
+                <h5>Total:</h5>
+                <h5 id="finalTotal">@Model.Sum(i => i.Price).ToString("C")</h5>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <a href="@Url.Action("Index", "Products")" class="btn btn-outline-secondary me-2">Continue Shopping</a>
+                <a href="@Url.Action("Checkout", "Order")" class="btn btn-primary">Proceed to Checkout</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-cart-x fs-1"></i>
+            <h3 class="mt-3">Your cart is empty</h3>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <a href="@Url.Action("Index", "Products")" class="btn btn-primary mt-2">
+                Continue Shopping
+            </a>
+        </div>
+    }
+</div>

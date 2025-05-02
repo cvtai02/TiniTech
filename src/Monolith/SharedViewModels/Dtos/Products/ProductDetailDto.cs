@@ -74,6 +74,7 @@ public class ProductDetailDto
                 IsDeleted = v.IsDeleted,
                 Sku = v.Sku,
                 Stock = v.Metric?.Stock ?? 0,
+                Sold = v.Metric?.Sold ?? 0,
                 VariantAttributes = [.. v.VariantAttributes.Select(va => new VariantAttributeDto
                 {
                     AttributeId = va.AttributeId,
@@ -92,6 +93,7 @@ public class VariantDto
     public bool IsDeleted { get; set; }
     public string Sku { get; set; } = null!;
     public int Stock { get; set; }
+    public int Sold { get; set; }
     public List<VariantAttributeDto> VariantAttributes { get; set; } = [];
 
     //TODO: test this

@@ -33,13 +33,6 @@
                     @category.Name
                 </a>
                 <ul class="dropdown-menu flex flex-col">
-                    <li class="grow">
-                        <a href="/collections/@category.Slug"
-                           title="@category.Description"
-                           class="dropdown-item-link">
-                            @category.Name
-                        </a>
-                    </li>
                     @foreach (var sub in category.Subcategories)
                     {
                         <li class="grow">
@@ -60,7 +53,7 @@
             <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.MostFeatured).ToCollectionHref())" class="menu-item-link">Featured</a>
         </li>
     </ul>
-    <div class="search-icon hover:cursor-pointer hover:text-primary">
+    <div title="Go to search page" class="search-icon hover:cursor-pointer hover:text-primary">
         <svg width="20"
                 height="20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +79,8 @@
                     clip-rule="evenodd" />
         </svg>
     </div>
-    <div class="hover:text-primary relative cart-icon w-9 h-9 flex flex-col justify-center items-center cursor-pointer">
+    <div onclick="window.location.href='/cart'" 
+        class="hover:text-primary relative cart-icon w-9 h-9 flex flex-col justify-center items-center cursor-pointer">
         <div id="cart-indicator" class="cart-count text-primary font-bold text-[9px] ml-[3px] mb-[-10px]">0</div>
         <div class="cursor-pointer hidden md:block">
             <svg width="20"

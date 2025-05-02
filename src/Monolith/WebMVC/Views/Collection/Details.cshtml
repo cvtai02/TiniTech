@@ -43,7 +43,7 @@
 }
 
 <link rel="stylesheet" href="~/css/collection.css" />
-<div class="min-h-screen max-w-[1280px] mt-8 mx-auto">
+<div class="max-w-[1280px] my-8 mx-auto">
     <section class=""> 
         <div class="container mx-auto border-b border-gray pb-1 mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[1280px]">
             @* Category dropdown *@
@@ -174,7 +174,8 @@
                 </div>
             </div>
         </div>
-        @await Component.InvokeAsync("ProductList", new { products = Model.Products.Items })
+        
+        <partial name="Components/ProductList/Default" model="Model.Products.Items" />
 
         <nav aria-label="Collections pagination" class="flex items-center justify-center mt-4">
             <ul class="flex items-center -space-x-px h-8 text-sm">
