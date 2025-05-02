@@ -33,6 +33,13 @@
                     @category.Name
                 </a>
                 <ul class="dropdown-menu flex flex-col">
+                    <li class="grow">
+                        <a href="/collections/@category.Slug"
+                           title="@category.Description"
+                           class="dropdown-item-link">
+                            @category.Name
+                        </a>
+                    </li>
                     @foreach (var sub in category.Subcategories)
                     {
                         <li class="grow">
