@@ -12,6 +12,8 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         var metadataProvider = new EmptyModelMetadataProvider();
 
+        Console.WriteLine("GlobalExceptionFilter: " + context.Exception.ToString());
+
         context.Result = new ViewResult
         {
             ViewName = "Error",

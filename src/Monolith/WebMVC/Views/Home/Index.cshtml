@@ -1,5 +1,15 @@
-﻿@{
+﻿@using SharedViewModels.Dtos.Products
+@using SharedViewModels.Enums
+@using WebMVC.Extensions
+@{
     ViewData["Title"] = "TiniTech";
+    var tempQuery = new ProductQueryParameters
+    {
+        Order = FrontStoreOrderEnum.MostFeatured,
+        PageSize = 10,
+        Page = 1,
+        CategorySlug = "whatever"
+    };
 }
 @model SharedViewModels.ViewModels.HomeViewModel
 
@@ -7,18 +17,18 @@
 <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
 
 <div class="flex flex-col landing-page bg-white">
-    <section id="landing-accessory" class="relative grid md:grid-cols-2 sm:grid-cols-1 w-full bg-black">
-        <div class="absolute z-0 right-0 bottom-0  h-[40rem] max-h-screen md:w-7/12 rounded-full bg-[radial-gradient(circle_300px_at_50%_300px,#c0c0c036,#000)]">
+    <section id="landing-accessory" class="relative py-8 grid md:grid-cols-2 sm:grid-cols-1 w-full bg-black">
+        <div class="absolute z-0 right-0 bottom-0  h-[42rem] max-h-screen md:w-7/12 rounded-full bg-[radial-gradient(circle_300px_at_50%_300px,#c0c0c036,#000)]">
         </div>
         <div class="absolute z-0  bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
         </div>
         
-        <div class="col-span-1 flex text-white justify-center z-10 items-center p-8 ">
+        <div class="col-span-1 flex text-white justify-center items-center p-8 ">
             <div class="flex flex-col gap-4">
                 <h1 class="">Accessory</h1>
                 <q class=" ">Enjoy the little things.</q>
                 <blockquote  class=" ">Jewelry is the art you don't hang on walls - it's the masterpiece you wear everyday.</blockquote>
-                <a href="/collections/accessory" class="banner-button">Discovery</a>
+                <a href="@(tempQuery.SetCloneCategorySlug("accessory").ToCollectionHref())" class="banner-button">Discovery</a>
             </div>
         </div>
         <div class="flex items-center justify-center w-full z-10">
@@ -38,7 +48,7 @@
                 <h1 class="">Fashion</h1>
                 <q class=" ">Be yourself</q>
                 <blockquote class=" ">What you wear is how you present yourself to the world.</blockquote>
-                <a href="/collections/fashion" class="banner-button">Discovery</a>
+                <a href="@(tempQuery.SetCloneCategorySlug("fashion").ToCollectionHref())" class="banner-button">Discovery</a>
             </div>
         </div>
     </section>
@@ -48,7 +58,7 @@
                 <h1 class="">Home</h1>
                 <q class=" ">Is not a place, it's a feeling.</q>
                 <blockquote class=" ">Where your heart is happy and your worries melt away.</blockquote>
-                <a href="/collections/home-living" class="banner-button">Discovery</a>
+                <a href="/@(tempQuery.SetCloneCategorySlug("home-living").ToCollectionHref())" class="banner-button">Discovery</a>
             </div>
         </div>
         <div 
@@ -62,7 +72,7 @@
         <div class="container mx-auto  max-w-[1280px]">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold">Best Sellers</h2>
-                <a href="/collections?sort=bestseller" class="text-primary font-medium hover:underline">View All</a>
+                <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.BestSelling).ToCollectionHref())" class="text-primary font-medium hover:underline">View All</a>
             </div>
             
             <partial name="Components/ProductList/Default" model="Model.BestSellers" />
@@ -72,13 +82,32 @@
         <div class="container mx-auto  max-w-[1280px]">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold">Featured Products</h2>
-                <a href="/collections?sort=featured" class="text-primary font-medium hover:underline">View All</a>
+                <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.MostFeatured).ToCollectionHref())" class="text-primary font-medium hover:underline">View All</a>
             </div>
             
             <partial name="Components/ProductList/Default" model="Model.FeaturedProducts" />
         </div>
     </section>
 </div>
+
+@* 5 floor dock *@
+<div class="home-dock">
+    <div class="relative flex flex-col">
+        <a href="#landing-accessory" class="home-dock-item rotate-x-50 rotate-z-45">
+        </a>
+        <a href="#landing-fashion" class="home-dock-item">
+        </a>
+        <a href="#landing-home-living" class="home-dock-item">
+        </a>
+        <a href="#landing-best-seller" class="home-dock-item">
+        </a>
+        <a href="/#landing-featured" class="home-dock-item rotate-x-50 rotate-z-45">
+        </a>
+        
+    </div>
+</div>
+
+
 @* <script>
     // Initialize an IntersectionObserver to detect when each section is in view
     const observer = new IntersectionObserver((entries) => {

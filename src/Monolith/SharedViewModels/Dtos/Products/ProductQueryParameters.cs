@@ -21,30 +21,35 @@ public class ProductQueryParameters
 
     public ProductQueryParameters SetCloneSearch(string? search)
     {
-        Search = search;
-        return this.ShallowClone();
+        var r = this.ShallowClone();
+        r.Search = search;
+        return r;
     }
     public ProductQueryParameters SetCloneOrder(FrontStoreOrderEnum order)
     {
-        Order = order;
-        return this.ShallowClone();
+        var r = this.ShallowClone();
+        r.Order = order;
+        return r;
     }
 
     public ProductQueryParameters SetCloneCategorySlug(string? categorySlug)
     {
-        CategorySlug = categorySlug;
-        return this.ShallowClone();
+        var r = this.ShallowClone();
+        r.CategorySlug = categorySlug;
+        return r;
     }
 
     public ProductQueryParameters SetClonePage(int page)
     {
-        Page = page;
-        return this.ShallowClone();
+        var r = this.ShallowClone();
+        r.Page = page;
+        return r;
     }
 
     public ProductQueryParameters SetClonePageSize(int pageSize)
     {
-        PageSize = pageSize;
-        return this.ShallowClone();
+        var r = this.ShallowClone();
+        r.PageSize = pageSize;
+        return r;
     }
 }

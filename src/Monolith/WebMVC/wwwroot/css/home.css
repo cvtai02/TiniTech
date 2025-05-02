@@ -39,3 +39,101 @@
     right: 0;
     opacity: 1;
 }
+
+.home-dock {
+    position: fixed;
+    right: 1rem;
+    top: 50vh;
+    transform: translateY(-50%);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+}
+
+.home-dock a {
+    text-decoration: none;
+    background-color: black;
+    font-size: 1.5rem;
+    transition: all 0.3s ease-in-out;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.2rem;
+    rotate: 1 0 1 45deg;
+    transform: skew(-20deg);
+    margin-top: -0.5rem;
+    margin-bottom: -0.5rem;
+    z-index: 100;
+    border: 3px solid white;
+}
+
+.home-dock a:nth-child(2) {
+    z-index: 90;
+}
+.home-dock a:nth-child(3) {
+    z-index: 80;
+}
+.home-dock a:nth-child(4) {
+    z-index: 70;
+}
+.home-dock a:nth-child(5) {
+    z-index: 60;
+}
+
+.home-dock a:hover {
+    background-color: var(--color-primary);
+    margin-top: 0;
+    margin-bottom: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.mask-r-from {
+    mask-image: var(--tw-mask-linear), var(--tw-mask-radial),
+        var(--tw-mask-conic);
+    mask-composite: intersect;
+    --tw-mask-linear: var(--tw-mask-left), var(--tw-mask-right),
+        var(--tw-mask-bottom), var(--tw-mask-top);
+    --tw-mask-right: linear-gradient(
+        to right,
+        var(--tw-mask-right-from-color) var(--tw-mask-right-from-position),
+        var(--tw-mask-right-to-color) var(--tw-mask-right-to-position)
+    );
+    --tw-mask-right-from-position: 70%;
+}
+
+@media screen and (max-width: 768px) {
+    .mask-r-from {
+        mask-image: var(--tw-mask-linear), var(--tw-mask-radial),
+            var(--tw-mask-conic);
+        mask-composite: intersect;
+        --tw-mask-linear: var(--tw-mask-left), var(--tw-mask-right),
+            var(--tw-mask-bottom), var(--tw-mask-top);
+        --tw-mask-right: linear-gradient(
+            to bottom,
+            var(--tw-mask-right-from-color) var(--tw-mask-right-from-position),
+            var(--tw-mask-right-to-color) var(--tw-mask-right-to-position)
+        );
+        --tw-mask-right-from-position: 60%;
+    }
+}
+
+@property --tw-rotate-x {
+    syntax: "*";
+    inherits: false;
+}
+@property --tw-rotate-y {
+    syntax: "*";
+    inherits: false;
+}
+@property --tw-rotate-z {
+    syntax: "*";
+    inherits: false;
+}
+@property --tw-skew-x {
+    syntax: "*";
+    inherits: false;
+}
+@property --tw-skew-y {
+    syntax: "*";
+    inherits: false;
+}

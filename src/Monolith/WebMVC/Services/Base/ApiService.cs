@@ -19,6 +19,8 @@ public class ApiService
     public async Task<T> GetDataAsync<T>(string endpoint, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint, cancellationToken);
+        Console.WriteLine($"Request URL: {endpoint}");
+        Console.WriteLine($"Response Status Code: {response.StatusCode}");
         if (response.IsSuccessStatusCode)
         {
             var jsonString = await response.Content.ReadAsStringAsync(cancellationToken);

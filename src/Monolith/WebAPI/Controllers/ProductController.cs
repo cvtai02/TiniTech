@@ -4,6 +4,7 @@ using Application.Products.Commands.UpdateProductImages;
 using Application.Products.Commands.UpdateProductInfo;
 using Application.Products.Queries.GetDetailBySlug;
 using Application.Products.Queries.GetProducts;
+using Application.Products.Queries.GetRelated;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -115,6 +116,23 @@ public class ProductController : ApiController
         );
     }
 
+    [HttpGet("related")]
+    public async Task<IActionResult> GetRelated([FromQuery] GetProductRelatedQuery query)
+    {
+        var result = await Sender.Send(query);
+
+        return result.Match(
+            r => Ok(new Response
+            {
+                Title = "Ok",
+                Status = "Success",
+                Detail = "Related Products Retrieved Successfully",
+                Data = r,
+                Errors = null
+            }),
+            e => HandleFailure<GetProductRelatedQuery>(e)
+        );
+    }
 
     [HttpGet]
     public async Task<IActionResult> Search([FromQuery] GetProductsQuery query)

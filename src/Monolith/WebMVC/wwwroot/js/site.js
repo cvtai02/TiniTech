@@ -3,6 +3,25 @@
 
 // Write your JavaScript code.
 
-$(document).ready(function () {
-    document.getElementById("cart-indicator").innerHTML = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")).length : 0;
-})
+document.addEventListener("DOMContentLoaded", function () {
+    updateCartCount();
+
+    const hrefs = window.location.href.split("/");
+
+    //remove domain from hrefs
+    const hrefsWithoutDomain = hrefs.slice(3);
+    if (hrefsWithoutDomain.length > 1) {
+        document.getElementById("header").classList.remove("fixed");
+    }
+});
+
+function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+    const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+
+    // Update cart indicator if it exists
+    const cartIndicator = document.getElementById("cart-indicator");
+    if (cartIndicator) {
+        cartIndicator.innerHTML = totalItems;
+    }
+}

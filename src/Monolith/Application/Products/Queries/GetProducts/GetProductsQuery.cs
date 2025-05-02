@@ -27,7 +27,7 @@ public class GetProductsQuery : IRequest<Result<PaginatedList<ProductBriefDto>>>
 
     public override string ToString()
     {
-        return $"PageNumber: {PageNumber}, PageSize: {PageSize}, Search: {Search}, CategorySlug: {CategorySlug}, Status: {Status.Count}, OrderBy: {OrderBy}, OrderDirection: {OrderDirection}";
+        return $"PageNumber: {PageNumber}, PageSize: {PageSize}, Search: {Search}, CategorySlug: {CategorySlug}, Status: {Status?.Count}, OrderBy: {OrderBy}, OrderDirection: {OrderDirection}";
     }
 }
 

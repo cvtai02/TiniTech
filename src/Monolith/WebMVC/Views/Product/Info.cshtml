@@ -21,7 +21,7 @@
     }
 }
 
-<div class="grid grid-cols-2 gap-4 max-w-[1280px] mx-auto mt-24">
+<div class="grid grid-cols-2 gap-4 max-w-[1280px] mx-auto mt-8">
     <div class="col-span-2 md:col-span-1 grid grid-cols-7">
         <!-- Thumbnail Images - Left side -->
         <div class="col-span-1 relative">
@@ -102,7 +102,7 @@
                 <div class="flex text-yellow-400">
                     @for (var i = 0; i < 5; i++)
                     {
-                        <svg class="w-5 h-5 @(i < Math.Floor(product.Rating) ? "text-yellow-400" : "text-gray-300")"
+                        <svg class="w-5 h-5 @(i < Math.Round(product.Rating) ? "text-yellow-400" : "text-gray-300")"
                              fill="currentColor"
                              viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -245,13 +245,13 @@
                             quantity,
                             selectedAttributes,
                             name: '@product.Name',
-                            price: selectedVariant ? selectedVariant.price : @product.Price,
+                            price: selectedVariant ? selectedVariant.price : parseFloat(@product.Price),
                             imageUrl: '@(product.Images.Count > 0 ? product.Images[mainImageIndex].ImageUrl : "")',
                             timestamp: new Date().getTime()
                         };
                         
                         // Get existing cart or initialize new one
-                        let cart = JSON.parse(localStorage.getItem('tinitech_cart') || '[]');
+                        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
                         
                         // Check if product+variant already exists in cart
                         const existingItemIndex = cart.findIndex(item => 
@@ -268,35 +268,20 @@
                         }
                         
                         // Save back to localStorage
-                        localStorage.setItem('tinitech_cart', JSON.stringify(cart));
+                        localStorage.setItem('cart', JSON.stringify(cart));
                         
                         // Update cart count indicator
                         updateCartCount();
                         
                         // Show confirmation message
-                        alert('Product added to your cart!');
+                        toast('Product added to your cart!');
                     }
                     
                     // Function to update the cart count in the UI
-                    function updateCartCount() {
-                        const cart = JSON.parse(localStorage.getItem('tinitech_cart') || '[]');
-                        const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-                        
-                        // Update cart indicator if it exists
-                        const cartIndicator = document.getElementById('cart-indicator');
-                        if (cartIndicator) {
-                            cartIndicator.textContent = totalItems;
-                            
-                            // Show/hide based on count
-                            if (totalItems > 0) {
-                                cartIndicator.classList.remove('hidden');
-                            } else {
-                                cartIndicator.classList.add('hidden');
-                            }
-                        }
-                    }
+                    
                     
                     function buyNow() {
+                        console.log('Buy Now clicked!');
                         // Show the address modal instead of immediately redirecting
                         showAddressModal();
                     }
@@ -310,6 +295,25 @@
             Description
         </h2>
         <p class="">@product.Description</p>
+    </div>
+    
+    <!-- Related Products Section -->
+    <div class="col-span-2 mt-8">
+        <div class="container mx-auto max-w-[1280px]">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-black">Related Products</h2>
+                <a href="/collection" class="text-primary font-medium hover:underline">View More</a>
+            </div>
+            
+            @if (relatedProducts != null && relatedProducts.Any())
+            {
+                <partial name="Components/ProductList/Default" model="relatedProducts" />
+            }
+            else
+            {
+                <p class="text-gray-500 text-center py-8">No related products found</p>
+            }
+        </div>
     </div>
 </div>
 
@@ -353,24 +357,43 @@
             </div>
             
             <div>
-                <label for="ward" class="block text-sm font-medium text-gray-700">Ward</label>
-                <input type="text" id="ward" name="ward" required
-                       class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black">
+                <label for="ward" class="block text-sm font-medium text-gray-700">
+                    Ward
+                </label>
+                <input 
+                    type="text" 
+                    id="ward" 
+                    name="ward" 
+                    required
+                    class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                >
             </div>
             
             <div>
-                <label for="detailAddress" class="block text-sm font-medium text-gray-700">Detail Address</label>
-                <textarea id="detailAddress" name="detailAddress" rows="2" required
-                          class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"></textarea>
+                <label for="detailAddress" class="block text-sm font-medium text-gray-700">
+                    Detail Address
+                </label>
+                <textarea 
+                    id="detailAddress" 
+                    name="detailAddress" 
+                    rows="2" 
+                    required
+                    class="mt-1 block w-full rounded-sm border-gray-300 shadow-sm focus:border-black focus:ring-black"
+                ></textarea>
             </div>
             
             <div class="flex justify-between gap-3 pt-4">
-                <button type="button" onclick="closeAddressModal()"
-                        class="px-4 py-2 border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                <button 
+                    type="button" 
+                    onclick="closeAddressModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                >
                     Cancel
                 </button>
-                <button type="submit"
-                        class="px-4 py-2 bg-black text-white rounded-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                <button 
+                    type="submit"
+                    class="px-4 py-2 bg-black text-white rounded-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                >
                     Proceed to Checkout
                 </button>
             </div>

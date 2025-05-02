@@ -25,8 +25,8 @@ public class HomeController : Controller
 
         return View(new HomeViewModel
         {
-            BestSellers = bestSellerProducts,
-            FeaturedProducts = highlightedProducts
+            BestSellers = bestSellerProducts.Items,
+            FeaturedProducts = highlightedProducts.Items
         });
     }
 

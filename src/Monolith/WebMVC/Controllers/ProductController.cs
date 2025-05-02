@@ -29,11 +29,11 @@ public class ProductController : Controller
         try
         {
             var product = await _productService.GetBySlugAsync(slug, cancellationToken);
-            Console.WriteLine($"Product: {product}");
+            var relatedProducts = await _productService.GetRelated(product.Id, cancellationToken);
             return View(new ProductViewModel
             {
                 Product = product,
-                RelatedProducts = []
+                RelatedProducts = relatedProducts,
             });
         }
         catch (Exception ex)
