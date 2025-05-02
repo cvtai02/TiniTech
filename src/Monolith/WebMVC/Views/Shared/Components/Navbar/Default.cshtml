@@ -1,5 +1,19 @@
 @using SharedViewModels.Categories
+@using SharedViewModels.Dtos.Products
+@using SharedViewModels.Enums
+@using WebMVC.Extensions
 @model List<CategoryDto>
+
+@{
+    var tempQuery = new ProductQueryParameters
+    {
+        Order = FrontStoreOrderEnum.MostFeatured,
+        PageSize = 10,
+        Page = 1,
+        CategorySlug = "whatever"
+    };
+}
+
 <link rel="stylesheet" href="~/css/navbar.css" />
 
 <nav id="navbar" class="navbar">
@@ -9,18 +23,18 @@
             <span class="text-primary">Tini</span>Tech
         </div>
     </a>
-    <ul class="menu-list">
+    <ul id="navbar-list" class="menu-list">
         @foreach (var category in Model)
         {
             <li class="menu-item">
-                <a href="#landing-@category.Slug"
+                <a href="@(tempQuery.SetCloneCategorySlug(category.Slug).ToCollectionHref())"
                    class="menu-item-link"
                    title="@category.Description">
                     @category.Name
                 </a>
                 <ul class="dropdown-menu flex flex-col">
                     <li class="grow">
-                        <a href="/collections/@category.Slug"
+                        <a href="@(tempQuery.SetCloneCategorySlug(category.Slug).ToCollectionHref())"
                            title="@category.Description"
                            class="dropdown-item-link">
                             @category.Name
@@ -29,21 +43,21 @@
                     @foreach (var sub in category.Subcategories)
                     {
                         <li class="grow">
-                            <a href="/collections/@sub.Slug"
+                            <a href="@(tempQuery.SetCloneCategorySlug(sub.Slug).ToCollectionHref())"
                                title="@sub.Description"
                                class="dropdown-item-link text-nowrap">
                                 @sub.Name
                             </a>
                         </li>
                     }
-                </ul>
+                </ul>   
             </li>
         }
         <li class="menu-item">
-            <a href="#landing-best-seller" class="menu-item-link">Best seller</a>
+            <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.BestSelling).ToCollectionHref())" class="menu-item-link">Best seller</a>
         </li>
         <li class="menu-item">
-            <a href="#landing-featured" class="menu-item-link">Featured</a>
+            <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.MostFeatured).ToCollectionHref())" class="menu-item-link">Featured</a>
         </li>
     </ul>
     <div class="search-icon hover:cursor-pointer hover:text-primary">
