@@ -9,7 +9,7 @@ namespace Domain.Entities;
 public class CartItem : BaseAuditableEntity
 {
     public string UserId { get; set; } = null!;
-    public int ProductVariantId { get; set; }
+    public int ProductId { get; set; }
+    public int? VariantId { get; set; }
     public int Quantity { get; set; }
-    public Variant? Variant { get; set; } = null!;
 }

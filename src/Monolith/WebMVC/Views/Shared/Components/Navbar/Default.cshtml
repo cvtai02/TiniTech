@@ -46,75 +46,78 @@
                 </ul>   
             </li>
         }
-        <li class="menu-item">
+        @* <li class="menu-item">
             <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.BestSelling).ToCollectionHref())" class="menu-item-link">Best seller</a>
         </li>
         <li class="menu-item">
             <a href="@(tempQuery.SetCloneOrder(FrontStoreOrderEnum.MostFeatured).ToCollectionHref())" class="menu-item-link">Featured</a>
-        </li>
+        </li> *@
     </ul>
-    <div title="Go to search page" class="search-icon hover:cursor-pointer hover:text-primary">
-        <svg width="20"
-                height="20"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                onclick="window.location.href='/collections/whatever'">
-                class="hover:cursor-pointer">
-            <path fill-rule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 8z"
-                    clip-rule="evenodd" />
-        </svg>
-    </div>
-    <div class="account-icon hover:cursor-pointer hover:text-primary">
-        <svg width="20"
-                height="20"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                onclick="window.location.href='/account'"
-                class="hover:cursor-pointer">
-            <path fill-rule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clip-rule="evenodd" />
-        </svg>
-    </div>
-    <div onclick="window.location.href='/cart'" 
-        class="hover:text-primary relative cart-icon w-9 h-9 flex flex-col justify-center items-center cursor-pointer">
-        <div id="cart-indicator" class="cart-count text-primary font-bold text-[9px] ml-[3px] mb-[-10px]">0</div>
-        <div class="cursor-pointer hidden md:block">
+    
+    <div  class="flex flex-row gap-16 items-center">
+         <div title="Go to search page" class="search-icon">
             <svg width="20"
-                 height="20"
-                 viewBox="0 0 20 16"
-                 fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1H2.83766C2.91259 1 2.98751 1.06244 3 1.13736L4.33617 9.70383C4.33617 9.77876 4.41109 9.8412 4.49851 9.8412H17.5C17.5749 9.8412 17.6499 9.79125 17.6623 9.70383L19.2483 1.3996"
-                      stroke="black"
-                      stroke-width="1.5"
-                      stroke-miterlimit="10"
-                      stroke-linecap="round" />
-                <path d="M6.73274 15.3366C7.8569 15.3366 8.76821 14.4253 8.76821 13.3011C8.76821 12.1769 7.8569 11.2656 6.73274 11.2656C5.60858 11.2656 4.69727 12.1769 4.69727 13.3011C4.69727 14.4253 5.60858 15.3366 6.73274 15.3366Z"
-                      fill="black" />
-                <path d="M15.2738 15.3366C16.3979 15.3366 17.3092 14.4253 17.3092 13.3011C17.3092 12.1769 16.3979 11.2656 15.2738 11.2656C14.1496 11.2656 13.2383 12.1769 13.2383 13.3011C13.2383 14.4253 14.1496 15.3366 15.2738 15.3366Z"
-                      fill="black" />
+                    height="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    onclick="window.location.href='/collections/whatever'">
+                <path fill-rule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.817-4.817A6 6 0 012 8z"
+                        clip-rule="evenodd" />
             </svg>
         </div>
-        <div class="cursor-pointer md:hidden">
+        <div class="account-icon hover:cursor-pointer ">
             <svg width="20"
-                 height="20"
-                 viewBox="0 0 20 16"
-                 fill="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1H2.83766C2.91259 1 2.98751 1.06244 3 1.13736L4.33617 9.70383C4.33617 9.77876 4.41109 9.8412 4.49851 9.8412H17.5C17.5749 9.8412 17.6499 9.79125 17.6623 9.70383L19.2483 1.3996"
-                      stroke="black"
-                      stroke-width="1.5"
-                      stroke-miterlimit="10"
-                      stroke-linecap="round" />
-                <path d="M6.73274 15.3366C7.8569 15.3366 8.76821 14.4253 8.76821 13.3011C8.76821 12.1769 7.8569 11.2656 6.73274 11.2656C5.60858 11.2656 4.69727 12.1769 4.69727 13.3011C4.69727 14.4253 5.60858 15.3366 6.73274 15.3366Z"
-                      fill="black" />
-                <path d="M15.2738 15.3366C16.3979 15.3366 17.3092 14.4253 17.3092 13.3011C17.3092 12.1769 16.3979 11.2656 15.2738 11.2656C14.1496 11.2656 13.2383 12.1769 13.2383 13.3011C13.2383 14.4253 14.1496 15.3366 15.2738 15.3366Z"
-                      fill="black" />
+                    height="20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    onclick="window.location.href='/account'"
+                    class="hover:cursor-pointer">
+                <path fill-rule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clip-rule="evenodd" />
             </svg>
         </div>
+        <div onclick="window.location.href='/cart'" 
+            class="hover:text-primary relative cart-icon w-9 h-9 flex flex-col justify-center items-center cursor-pointer">
+            <div id="cart-indicator" class="cart-count text-primary font-bold text-[9px] ml-[3px] mb-[-10px]">0</div>
+            <div class="cursor-pointer hidden md:block">
+                <svg width="20"
+                    height="20"
+                    viewBox="0 0 20 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1H2.83766C2.91259 1 2.98751 1.06244 3 1.13736L4.33617 9.70383C4.33617 9.77876 4.41109 9.8412 4.49851 9.8412H17.5C17.5749 9.8412 17.6499 9.79125 17.6623 9.70383L19.2483 1.3996"
+                        stroke="black"
+                        stroke-width="1.5"
+                        stroke-miterlimit="10"
+                        stroke-linecap="round" />
+                    <path d="M6.73274 15.3366C7.8569 15.3366 8.76821 14.4253 8.76821 13.3011C8.76821 12.1769 7.8569 11.2656 6.73274 11.2656C5.60858 11.2656 4.69727 12.1769 4.69727 13.3011C4.69727 14.4253 5.60858 15.3366 6.73274 15.3366Z"
+                        fill="black" />
+                    <path d="M15.2738 15.3366C16.3979 15.3366 17.3092 14.4253 17.3092 13.3011C17.3092 12.1769 16.3979 11.2656 15.2738 11.2656C14.1496 11.2656 13.2383 12.1769 13.2383 13.3011C13.2383 14.4253 14.1496 15.3366 15.2738 15.3366Z"
+                        fill="black" />
+                </svg>
+            </div>
+            <div class="cursor-pointer md:hidden">
+                <svg width="20"
+                    height="20"
+                    viewBox="0 0 20 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1H2.83766C2.91259 1 2.98751 1.06244 3 1.13736L4.33617 9.70383C4.33617 9.77876 4.41109 9.8412 4.49851 9.8412H17.5C17.5749 9.8412 17.6499 9.79125 17.6623 9.70383L19.2483 1.3996"
+                        stroke="black"
+                        stroke-width="1.5"
+                        stroke-miterlimit="10"
+                        stroke-linecap="round" />
+                    <path d="M6.73274 15.3366C7.8569 15.3366 8.76821 14.4253 8.76821 13.3011C8.76821 12.1769 7.8569 11.2656 6.73274 11.2656C5.60858 11.2656 4.69727 12.1769 4.69727 13.3011C4.69727 14.4253 5.60858 15.3366 6.73274 15.3366Z"
+                        fill="black" />
+                    <path d="M15.2738 15.3366C16.3979 15.3366 17.3092 14.4253 17.3092 13.3011C17.3092 12.1769 16.3979 11.2656 15.2738 11.2656C14.1496 11.2656 13.2383 12.1769 13.2383 13.3011C13.2383 14.4253 14.1496 15.3366 15.2738 15.3366Z"
+                        fill="black" />
+                </svg>
+            </div>
+        </div>
     </div>
+   
 </nav>

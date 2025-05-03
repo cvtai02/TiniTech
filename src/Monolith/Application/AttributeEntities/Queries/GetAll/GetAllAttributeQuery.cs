@@ -2,6 +2,7 @@ using Application.Common.Abstraction;
 using Application.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedViewModels.Dtos.Attributes;
 
 namespace Application.AttributeEntities.Queries.GetAll;
 

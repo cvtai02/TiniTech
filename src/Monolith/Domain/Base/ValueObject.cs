@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Base;
 
+
 public abstract class ValueObject
 {
     protected static bool EqualOperator(ValueObject left, ValueObject right)

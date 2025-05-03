@@ -2,6 +2,7 @@ using Application.Common.Abstraction;
 using Infrastructure.CloudinaryService;
 using Infrastructure.Data;
 using Infrastructure.Data.Interceptors;
+using Infrastructure.ShippingService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitializer>();
         builder.Services.AddScoped<IImageService, CloudinaryImageService>();
+        builder.Services.AddScoped<IShippingFeeCalculator, ShippingFeeCalculator>();
         builder.Services.AddSingleton(TimeProvider.System);
     }
 }

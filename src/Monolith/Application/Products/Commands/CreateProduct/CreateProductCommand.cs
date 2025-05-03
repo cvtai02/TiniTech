@@ -87,6 +87,8 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 
         _context.Products.Add(product);
 
+        // try catch and remove image if savechange fails
+
         await _context.SaveChangesAsync(cancellationToken);
         return product.Slug;
     }

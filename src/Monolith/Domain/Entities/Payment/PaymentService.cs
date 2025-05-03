@@ -6,7 +6,7 @@ using Domain.Base;
 
 namespace Domain.ValueObjects;
 
-public class PaymentService : BaseEntity
+public class PaymentGateway : BaseEntity
 {
     public string Name { get; set; } = null!;
     public string ImageUrl { get; set; } = null!;

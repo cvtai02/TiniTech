@@ -14,7 +14,7 @@ public class ProductMetricConfiguration : IEntityTypeConfiguration<ProductMetric
 
         builder.Property(p => p.LowestPrice)
             .HasColumnType("decimal(18, 2)")
-            .HasDefaultValue(0.0m);
+            .HasDefaultValue(0.00m);
 
     }
 }

@@ -6,15 +6,13 @@
     -   ctrl+z feature on edit product detail
     -   fix the input of variant sku, price in edit product page (done)
 
--   backend:
-
-    -   Add productId to order
-
 -   feat:
 
     -   View deleted variant
 
 -   background jobs
-    -   delete imgage
-    -   backup db
-    -   
+
+    -   delete redundance imgage
+    -   backup db, infras
+
+-   cache api query data (mvc)
