@@ -1,0 +1,42 @@
+@using WebMVC.Extensions
+@model WebSharedModels.Dtos.Products.ProductBriefDto
+
+<div class=" rounded-[0.2rem] flex flex-col bg-white p-4 h-full w-full hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
+    <div class="relative flex  aspect-square overflow-hidden mb-4 rounded-lg">
+        <img class="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105"
+             src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://vi.m.wikipedia.org/wiki/T%E1%BA%ADp_tin:No_image_available.svg" : Model.ImageUrl)"
+             alt="image not found" />
+    </div>
+    <div class="flex flex-col grow justify">
+        <h3 class="flex grow">@Model.Name</h3>
+        <div class="flex flex-col justify-end grow gap-1 mt-1">
+            <div class="flex items-baseline">
+                @for (int i = 0; i < 5; i++)
+                {
+                    if (i < MathF.Round(Model.Rating))
+                    {
+                        <span class="text-yellow-500 ">★</span>
+                        @* <i class="fa-solid fa-star text-yellow-500 text-xs"></i> *@
+                    }
+                    else
+                    {
+                        <span class="text-yellow-500">☆</span>
+                        @* <i class="fa-regular fa-star text-yellow-400 text-xs"></i> *@
+                    }
+                }
+                
+                <span class="ml-1 text-xs">
+                    @Model.Rating
+                </span>
+            </div>
+            <div class="mt-2 flex gap-4 justify-between  w-full">
+                <p class="mt-2 text-primary text-lg flex items-center font-medium">
+                    @Model.Price.FormatUSD()
+                </p>
+                <div class="flex items-center text-xs rounded-md">
+                    <span>@Model.Sold sold</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

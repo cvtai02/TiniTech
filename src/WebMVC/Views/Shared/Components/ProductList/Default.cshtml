@@ -1,0 +1,10 @@
+@model List<WebSharedModels.Dtos.Products.ProductBriefDto>
+
+<div class="list-container">
+    <div class="child">
+        @foreach (var product in Model)
+        {
+            <partial name="Components/ProductCard/Default" model="product" />
+        }
+    </div>
+</div>
