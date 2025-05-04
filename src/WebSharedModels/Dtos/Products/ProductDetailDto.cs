@@ -1,4 +1,5 @@
 using SharedKernel.Enums;
+using WebSharedModels.Dtos.Attributes;
 
 namespace WebSharedModels.Dtos.Products;
 
@@ -22,9 +23,6 @@ public class ProductDetailDto
     public int FeaturedPoint { get; set; }
     public List<AttributeDto> Attributes { get; set; } = [];
     public List<VariantDto> Variants { get; set; } = [];
-
-    
-
 }
 
 public class VariantDto
@@ -37,8 +35,6 @@ public class VariantDto
     public int Stock { get; set; }
     public int Sold { get; set; }
     public List<VariantAttributeDto> VariantAttributes { get; set; } = [];
-
-
 }
 
 public class VariantAttributeDto
@@ -47,21 +43,6 @@ public class VariantAttributeDto
     public string Value { get; set; } = null!;
 }
 
-public class AttributeValueDto
-{
-    public float OrderPriority { get; set; }
-    public string Value { get; set; } = null!;
-    public string? ImageUrl { get; set; }
-}
-
-public class AttributeDto
-{
-    public int AttributeId { get; set; }
-    public string Name { get; set; } = null!;
-    public float OrderPriority { get; set; }
-    public bool IsPrimary { get; set; }
-    public List<AttributeValueDto> Values { get; set; } = [];
-}
 
 public class ProductImageDto
 {

@@ -1,0 +1,52 @@
+@model WebSharedModels.Dtos.Orders.OrderItemDto
+
+<div class="cart-item d-flex border-bottom py-3">
+    <div class="cart-item-image me-3">
+        <img src="@Model.ProductImageUrl" alt="@Model.ProductName" class="img-fluid" style="max-width: 100px;" />
+    </div>
+    <div class="cart-item-details flex-grow-1">
+        <h5 class="cart-item-title mb-1">@Model.ProductName</h5>
+        
+        @if (Model.AttributeValues.Any())
+        {
+            <div class="cart-item-attributes small text-muted mb-2">
+                @foreach (var attr in Model.AttributeValues.OrderBy(a => a.OrderPriority))
+                {
+                    <div>
+                        @if (!string.IsNullOrEmpty(attr.Name))
+                        {
+                            <span class="fw-bold">@attr.Name: </span>
+                        }
+                        <span>@attr.Value</span>
+                        @if (!string.IsNullOrEmpty(attr.ImageUrl))
+                        {
+                            <img src="@attr.ImageUrl" alt="@attr.Value" class="ms-1" style="width: 20px; height: 20px;" />
+                        }
+                    </div>
+                }
+            </div>
+        }
+        
+        <div class="cart-item-price mb-1">
+            <span class="fw-bold">@Model.UnitPrice.ToString("C")</span>
+        </div>
+    </div>
+    
+    <div class="cart-item-quantity d-flex align-items-center me-3">
+        <div class="input-group input-group-sm" style="width: 120px;">
+            <button class="btn btn-outline-secondary decrease-quantity" type="button" data-product-id="@Model.ProductId" data-variant-id="@Model.VariantId">-</button>
+            <input type="text" class="form-control text-center quantity-input" value="@Model.Quantity" readonly>
+            <button class="btn btn-outline-secondary increase-quantity" type="button" data-product-id="@Model.ProductId" data-variant-id="@Model.VariantId">+</button>
+        </div>
+    </div>
+    
+    <div class="cart-item-total-price d-flex align-items-center me-3">
+        <span class="fw-bold">@((Model.UnitPrice * Model.Quantity).ToString("C"))</span>
+    </div>
+    
+    <div class="cart-item-remove d-flex align-items-center">
+        <button class="btn btn-sm btn-danger remove-item" data-product-id="@Model.ProductId" data-variant-id="@Model.VariantId">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+</div>

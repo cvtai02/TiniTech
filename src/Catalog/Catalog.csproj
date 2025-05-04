@@ -25,12 +25,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CrossCutting\CrossCutting.csproj" />
     <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\SharedViewModels\SharedViewModels.csproj" />
     <ProjectReference Include="..\WebSharedModels\WebSharedModels.csproj" />
   </ItemGroup>
+
 
 </Project>

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebMVC.Models;
 using WebMVC.Services.Abstractions;
 using WebSharedModels.Dtos.Products;
-using WebSharedModels.ViewModels;
 
 namespace WebMVC.Controllers;
 

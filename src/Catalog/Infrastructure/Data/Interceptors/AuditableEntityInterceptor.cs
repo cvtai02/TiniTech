@@ -1,7 +1,7 @@
-using Application.Common.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using SharedKernel.Interfaces;
 
 namespace Catalog.Infrastructure.Data.Interceptors;
 
@@ -16,7 +16,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
     {
         _user = user;
         _dateTime = dateTime;
-    }   
+    }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
