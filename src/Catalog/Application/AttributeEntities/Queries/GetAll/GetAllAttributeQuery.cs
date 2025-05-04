@@ -25,7 +25,7 @@ public class GetAllAttributeQueryHandler : IRequestHandler<GetAllAttributesQuery
             .AsNoTracking()
             .Select(a => new AttributeDto
             {
-                Id = a.Id,
+                AttributeId = a.Id,
                 Name = a.Name,
             })
             .ToListAsync(cancellationToken);

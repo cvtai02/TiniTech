@@ -17,3 +17,5 @@
 
 -   cache api query data (mvc)
 -   lock order to avoid users duplicate the orders
+
+-   Rename: Cozi

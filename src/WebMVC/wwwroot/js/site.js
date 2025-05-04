@@ -9,8 +9,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const hrefs = window.location.href.split("/");
 
     //remove domain from hrefs
-    const hrefsWithoutDomain = hrefs.slice(3);
-    if (hrefsWithoutDomain.length > 1) {
+    const hrefsWithoutDomain = hrefs.slice(3).join("/");
+    if (hrefsWithoutDomain === "") {
+    } else {
         document.getElementById("header").classList.remove("fixed");
     }
 });

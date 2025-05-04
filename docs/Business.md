@@ -1,35 +1,5 @@
 ## Categories
 
--   Trong nhà
-
-    -   Chuông gió
-    -   Đèn
-    -   Firgure
-    -   Kệ gỗ
-    -   Tinh dầu
-    -   Dán tường
-    -   Dán sàn
-    -   Loa
-    -   Tranh treo tường
-
--   Phụ kiện
-
-    -   Đồng hồ
-    -   Tai nghe
-    -   Kính
-
--   Boss
-
-    -   Thức ăn
-    -   Bàn cào
-    -   Bàn chải
-    -   Cát
-
--   Thức uống
-    -   Cà phê rang xay
-    -   Trà
-    -   Ly
-
 ### Mỗi product tham chiếu tới duy nhất 1 category, mục đích là khi thêm category, không cần phải duyệt lại products cũ để thêm vào category mới, đồng thời cũng giúp việc tìm kiếm dựa trên category trở nên dễ dàng hơn.
 
 ### Categories được chia thành nhiều lớp. Product chỉ được tham chiếu tới category lá.

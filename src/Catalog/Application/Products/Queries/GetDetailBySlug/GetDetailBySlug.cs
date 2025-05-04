@@ -2,6 +2,7 @@ using Catalog.Application.Common.Abstraction;
 using Catalog.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebSharedModels.Dtos.Attributes;
 using WebSharedModels.Dtos.Products;
 
 namespace Catalog.Application.Products.Queries.GetDetailBySlug;
