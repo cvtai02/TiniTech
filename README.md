@@ -5,3 +5,7 @@
 ## Week 2: Product and variant Feature, set up Front store - mvc, refactor validation
 
 -   Link demo: https://youtu.be/CrkN0vht3dM
+
+## Week 3: Develop Customer site
+
+-   Link demo: https://youtu.be/215KqQuN-zU

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SharedKernel.Base;
 
-namespace Purchase.Core.Services.Commands.OrderCommands;
+namespace Purchase.Core.Events;
 
-public class GetProcessingOrders
+public class OrderCreated : BaseEvent
 {
-    
+
 }

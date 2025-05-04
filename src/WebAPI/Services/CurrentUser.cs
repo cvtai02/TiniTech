@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using Application.Common.Abstraction;
+using SharedKernel.Interfaces;
 
 namespace WebAPI.Services;
 

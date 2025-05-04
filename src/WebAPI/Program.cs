@@ -1,9 +1,6 @@
-using System.Text.Json.Serialization;
 using Application;
-using Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Catalog.Infrastructure;
 using WebAPI;
-using WebAPI.Middlewares;
 using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);

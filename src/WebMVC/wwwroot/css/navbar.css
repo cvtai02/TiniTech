@@ -1,7 +1,6 @@
 /* Main navigation container */
 
 #navbar {
-    width: 100vw;
     max-width: 1280px;
     display: flex;
     align-items: center;
@@ -79,4 +78,10 @@
 
 .dropdown-item-link:hover {
     color: var(--color-primary);
+}
+
+@media screen and (max-width: 768px) {
+    #navbar-list {
+        display: none;
+    }
 }

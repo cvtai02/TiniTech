@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Purchase.Core.Entities;
 using WebSharedModels.Dtos.Orders;
 
-namespace Purchase.Core.Extensions;
+namespace Purchase.Core.Mapping;
 
 public static class CartItemExtension
 {
@@ -13,8 +13,8 @@ public static class CartItemExtension
     {
         return new OrderItemDto
         {
-            ProductId = cartItem.StockItem.ProductId,
-            VariantId = cartItem.StockItem.VariantId,
+            ProductId = cartItem.ProductId,
+            VariantId = cartItem.VariantId,
             Quantity = cartItem.Quantity,
             UnitPrice = cartItem.StockItem.Price
         };

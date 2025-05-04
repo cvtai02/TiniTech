@@ -1,5 +1,4 @@
 using Catalog.Application.Common.Exceptions;
-using Catalog.Application.Common.Exceptions.Base;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Models;
@@ -26,7 +25,7 @@ public abstract class ApiController : ControllerBase
         {
             return BadRequest(
                 CreateProblemDetails(
-                    "Validation Error", StatusCodes.Status400BadRequest,
+                    validationException.Errors.Values.First().First(), StatusCodes.Status400BadRequest,
                     validationException,
                     validationException.Errors));
         }

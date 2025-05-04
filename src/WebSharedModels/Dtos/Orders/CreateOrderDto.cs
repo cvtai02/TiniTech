@@ -5,7 +5,7 @@ namespace WebSharedModels.Dtos.Orders;
 
 public class CreateOrderDto
 {
-    public int? CustomerId { get; set; }
+    public string? CustomerId { get; set; }
     public Address BillingAddress { get; set; } = null!;
     public List<CreateOrderItemDto> Items { get; set; } = [];
     public string Notes { get; set; } = "";

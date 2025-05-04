@@ -108,9 +108,9 @@ function addToCart() {
     const cartItem = {
         productId: productId,
         variantId: selectedVariant ? selectedVariant.id : null,
+        name: productName,
         quantity,
         selectedAttributes,
-        name: productName,
         price: selectedVariant ? selectedVariant.price : productPrice,
         imageUrl: mainImageUrl,
         timestamp: new Date().getTime(),

@@ -1,4 +1,4 @@
-namespace Catalog.Application.Common.Exceptions.Base;
+namespace Catalog.Application.Common.Exceptions;
 
 public class AbstractException : Exception
 {

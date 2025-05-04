@@ -27,7 +27,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
         };
         if (!environment.IsProduction())
         {
-            problemDetails.Detail = exception.Message;
+            problemDetails.Detail = exception.Message + "\n" + exception.InnerException?.Message;
         }
 
         await httpContext.Response
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
     {
         return exception switch
         {
-            KeyNotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, exception.Message),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             TimeoutException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
             NotImplementedException => (StatusCodes.Status501NotImplemented, "Not Implemented"),

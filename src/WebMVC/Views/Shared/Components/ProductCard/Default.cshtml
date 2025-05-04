@@ -1,7 +1,7 @@
 @using WebMVC.Extensions
 @model WebSharedModels.Dtos.Products.ProductBriefDto
 
-<div class=" rounded-[0.2rem] flex flex-col bg-white p-4 h-full w-full hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
+<div class=" rounded-[0.2rem] flex flex-col bg-white p-2 md:p-4 h-full w-full hover:cursor-pointer" onclick="window.location.href='/products/@Model.Slug';">
     <div class="relative flex  aspect-square overflow-hidden mb-4 rounded-lg">
         <img class="object-cover w-full h-full transition-transform duration-300 transform hover:scale-105"
              src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "https://vi.m.wikipedia.org/wiki/T%E1%BA%ADp_tin:No_image_available.svg" : Model.ImageUrl)"

@@ -12,7 +12,6 @@ public abstract class DbContextAbstract : DbContext
     public DbSet<UserAddress> UserAddresses { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
     public DbSet<StockItem> StockItems { get; set; }
-
     protected DbContextAbstract(DbContextOptions options) : base(options)
     {
     }

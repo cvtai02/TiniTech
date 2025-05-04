@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Purchase.Core.Abstraction;
 using SharedKernel.Interfaces;
 
-namespace Purchase.Core.Services.Commands.CartCommands;
+namespace Purchase.Core.Services.CartServices;
 
 public class UpdateCartItemQuantityAsync
 {
