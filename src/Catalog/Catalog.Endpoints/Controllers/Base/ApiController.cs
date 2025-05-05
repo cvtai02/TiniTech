@@ -3,6 +3,7 @@ using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Models;
 
 namespace Catalog.EndPoints.Controllers;
 

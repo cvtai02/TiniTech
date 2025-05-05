@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using SharedKernel.Base;
 
-namespace Catalog.Infrastructure.Data.Interceptors;
+namespace Purchase.Infrastructure.Data.Interceptors;
 
 public class DispatchDomainEventsInterceptor : SaveChangesInterceptor
 {

@@ -1,7 +1,6 @@
-using Application;
 using Catalog.Endpoints;
-using Catalog.Infrastructure;
 using Identity.Endpoints;
+using Infrastructure;
 using WebAPI;
 using WebAPI.ServiceCollectionExtensions;
 

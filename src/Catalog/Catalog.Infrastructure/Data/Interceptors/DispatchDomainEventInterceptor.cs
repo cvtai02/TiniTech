@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using SharedKernel.Base;
 
 namespace Catalog.Infrastructure.Data.Interceptors;
 

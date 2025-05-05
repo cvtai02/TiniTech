@@ -4,6 +4,7 @@ using Catalog.Application.Categories.Commands.ActivateCategory;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SharedKernel.Enums;
 using WebSharedModels.Dtos.Common;
 
 namespace Catalog.EndPoints.Controllers;

@@ -12,9 +12,8 @@ using Microsoft.Extensions.Hosting;
 namespace Catalog.Infrastructure;
 public static class DependencyInjection
 {
-    internal static void AddCatalogInfra(this IHostApplicationBuilder builder)
+    public static void AddCatalogInfra(this IHostApplicationBuilder builder)
     {
-
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Catalog.Infrastructure;
+namespace Infrastructure;
 public static class DependencyInjection
 {
     public static void AddInfrastructure(this IServiceCollection services)

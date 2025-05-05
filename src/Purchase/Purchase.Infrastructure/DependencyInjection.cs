@@ -1,4 +1,3 @@
-using Catalog.Infrastructure.Data.Interceptors;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using SharedKernel.Base;
 using SharedKernel.Interfaces;
 
 namespace Catalog.Infrastructure.Data.Interceptors;
