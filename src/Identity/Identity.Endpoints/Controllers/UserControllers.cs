@@ -1,4 +1,3 @@
-using Api.Controllers.Base;
 using Identity.Core.Application.Users.Queries.GetUsers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

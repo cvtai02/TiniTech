@@ -1,9 +1,10 @@
 using Catalog.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Models;
 
-namespace WebAPI.Controllers.Base;
+namespace Catalog.EndPoints.Controllers;
 
 
 [ApiController]
@@ -17,6 +18,7 @@ public abstract class ApiController : ControllerBase
 
     protected IActionResult HandleFailure<T>(Result<T> result)
     {
+        Console.WriteLine($"Handling failure for {typeof(T).Name}");
         if (result.IsSuccess)
         {
             throw new InvalidOperationException("Result is not a failure.");

@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Catalog.Infrastructure;
 public static class DependencyInjection
 {
-    public static void AddInfrastructureServices(this IServiceCollection services)
+    public static void AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();

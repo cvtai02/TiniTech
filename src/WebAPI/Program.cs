@@ -1,4 +1,5 @@
 using Application;
+using Catalog.Endpoints;
 using Catalog.Infrastructure;
 using Identity.Endpoints;
 using WebAPI;
@@ -6,10 +7,12 @@ using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddApplicationServices();
-builder.AddInfrastructureServices();
-builder.AddIdentityModule();
-builder.AddWebServices();
+builder.AddWebServices()
+.AddCatalogModule()
+.AddIdentityModule();
+
+builder.Services.AddInfrastructure();
+
 builder.Services.AddCorsPolicy(builder.Configuration, "CorsPolicy");
 
 var app = builder.Build();

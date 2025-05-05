@@ -7,10 +7,10 @@ using Catalog.Application.Products.Queries.GetProducts;
 using Catalog.Application.Products.Queries.GetRelated;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Controllers.Base;
+using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
 
-namespace WebAPI.Controllers;
+namespace Catalog.EndPoints.Controllers;
 
 [Route("api/products")]
 public class ProductController : ApiController

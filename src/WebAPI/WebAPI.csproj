@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Catalog\Catalog.csproj" />
     <ProjectReference Include="..\Identity\Identity.Endpoints\Identity.Endpoints.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

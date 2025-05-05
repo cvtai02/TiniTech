@@ -9,11 +9,12 @@ using Identity.Infrastructure;
 namespace Identity.Endpoints;
 public static class DependencyInjection
 {
-    public static void AddIdentityModule(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddIdentityModule(this IHostApplicationBuilder builder)
     {
-        builder.Services.ConfigureOptions<JwtOptionConfig>();
-        builder.AddCoreServices();
-        builder.AddInfrastructureServices();
+        builder.AddIdentityCore();
+        builder.AddIdentityInfra();
         builder.Services.AddExceptionHandler<IdentityExceptionHandler>();
+
+        return builder;
     }
 }

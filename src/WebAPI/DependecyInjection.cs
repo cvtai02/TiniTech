@@ -9,7 +9,7 @@ namespace WebAPI;
 
 public static class DependencyInjection
 {
-    public static void AddWebServices(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddWebServices(this IHostApplicationBuilder builder)
     {
 
         builder.Services.AddOpenApi().AddSwaggerGenWithAuth();
@@ -27,5 +27,6 @@ public static class DependencyInjection
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();
 
+        return builder;
     }
 }

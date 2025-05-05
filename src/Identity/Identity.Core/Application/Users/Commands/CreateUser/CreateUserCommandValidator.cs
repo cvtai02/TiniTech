@@ -9,6 +9,7 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator(DbContextAbtract dbContext)
     {
+        Console.WriteLine("CreateUserCommandValidator");
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(50).WithMessage("First name must not exceed 50 characters.");

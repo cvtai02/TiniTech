@@ -3,11 +3,10 @@ using Catalog.Application.Categories.Commands;
 using Catalog.Application.Categories.Commands.ActivateCategory;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel.Enums;
-using WebAPI.Controllers.Base;
+using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
 
-namespace WebAPI.Controllers;
+namespace Catalog.EndPoints.Controllers;
 
 [Route("api/categories")]
 public class CategoryController : ApiController

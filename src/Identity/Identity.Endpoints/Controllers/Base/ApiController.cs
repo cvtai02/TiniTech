@@ -1,10 +1,11 @@
+using CrossCutting.Exceptions;
 using Identity.Core.Application.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel.Models;
 
-namespace Api.Controllers.Base;
+namespace Identity.Endpoints.Controllers;
 
 [ApiController]
 public abstract class ApiController : ControllerBase
@@ -18,6 +19,7 @@ public abstract class ApiController : ControllerBase
     protected IActionResult HandleFailure<T>(Result<T> result)
     {
 
+        Console.WriteLine($"Handling failure for {typeof(T).Name}");
         if (result.Exception is FluentValidationException validationException)
         {
             return BadRequest(

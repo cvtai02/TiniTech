@@ -1,4 +1,5 @@
 using Catalog.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 using FluentValidation;
 using MediatR;
 
@@ -17,6 +18,7 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Validating {typeof(TRequest).Name}");
         if (_validators.Any())
         {
             var context = new ValidationContext<TRequest>(request);

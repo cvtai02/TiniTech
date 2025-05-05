@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SharedKernel\SharedKernel.csproj" />
     <ProjectReference Include="..\..\WebSharedModels\WebSharedModels.csproj" />
+    <ProjectReference Include="..\..\CrossCutting\CrossCutting.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,8 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Controllers.Base;
+using Microsoft.Extensions.Logging;
 
-namespace WebAPI.Controllers;
+namespace Catalog.EndPoints.Controllers;
 
 [Route("api/import-receipts")]
 public class ImportReceiptController : ApiController

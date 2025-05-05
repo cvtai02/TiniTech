@@ -7,8 +7,9 @@ namespace Identity.Core.Application.Auth.Commands.Register;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
-    public RegisterCommandValidator(DbContextAbtract context)
+    public RegisterCommandValidator()
     {
+        Console.WriteLine("RegisterCommandValidator");
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
             .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
@@ -16,7 +17,6 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
         RuleFor(x => x.ConfirmPassword)
             .NotEmpty().WithMessage("Confirm Password is required.")
             .Equal(x => x.Password).WithMessage("Passwords do not match.");
-
     }
 
 }

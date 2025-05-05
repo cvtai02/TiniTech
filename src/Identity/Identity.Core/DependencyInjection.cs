@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 namespace Identity.Core;
 public static class DependencyInjection
 {
-    public static void AddCoreServices(this IHostApplicationBuilder builder)
+    public static void AddIdentityCore(this IHostApplicationBuilder builder)
     {
         // services.AddScoped<CreateUserHandler>();
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

@@ -1,6 +1,6 @@
 using FluentValidation.Results;
 
-namespace Identity.Core.Application.Common.Exceptions;
+namespace CrossCutting.Exceptions;
 
 public class FluentValidationException : Exception
 {

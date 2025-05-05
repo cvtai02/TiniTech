@@ -1,7 +1,7 @@
 using Identity.Core.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data
+namespace Identity.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContextAbtract
     {

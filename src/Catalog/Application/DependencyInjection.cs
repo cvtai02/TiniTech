@@ -9,7 +9,7 @@ namespace Application
 {
     public static class DependencyInjection
     {
-        public static void AddApplicationServices(this IHostApplicationBuilder builder)
+        public static void AddCatalogCore(this IHostApplicationBuilder builder)
         {
             builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

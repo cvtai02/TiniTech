@@ -2,6 +2,7 @@ using System.Data;
 using Catalog.Application.Common.Abstraction;
 using Catalog.Application.Common.Exceptions;
 using Catalog.Domain.Entities;
+using CrossCutting.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

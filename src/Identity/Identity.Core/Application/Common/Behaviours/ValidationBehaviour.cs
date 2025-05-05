@@ -1,5 +1,4 @@
-
-using Identity.Core.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 
 namespace Identity.Core.Application.Common.Behaviours;
 
@@ -15,6 +14,7 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Validating {typeof(TRequest).Name}");
         if (_validators.Any())
         {
             var context = new ValidationContext<TRequest>(request);
@@ -27,6 +27,7 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                 .SelectMany(r => r.Errors)
                 .ToList();
 
+
             if (failures.Any())
             {
                 if (typeof(TResponse).IsGenericType && typeof(TResponse).GetGenericTypeDefinition() == typeof(Result<>))
@@ -36,10 +37,12 @@ public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReque
                     var result = Activator.CreateInstance(resultType, new FluentValidationException(failures));
                     return (TResponse)result!;
                 }
+
+
                 throw new FluentValidationException(failures);
             }
         }
 
-        return await next(cancellationToken);
+        return await next();
     }
 }

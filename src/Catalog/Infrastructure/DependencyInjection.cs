@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 namespace Catalog.Infrastructure;
 public static class DependencyInjection
 {
-    public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
+    internal static void AddCatalogInfra(this IHostApplicationBuilder builder)
     {
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

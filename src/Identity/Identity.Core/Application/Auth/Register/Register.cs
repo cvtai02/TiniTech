@@ -12,6 +12,7 @@ public class RegisterCommand : RegisterForm, IRequest<Result<int>>
         Email = form.Email;
         Phone = form.Phone;
         Password = form.Password;
+        ConfirmPassword = form.ConfirmPassword;
     }
 }
 
@@ -24,8 +25,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<in
         _sender = sender;
         _identityService = identityService;
     }
-
-
 
     public Task<Result<int>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {

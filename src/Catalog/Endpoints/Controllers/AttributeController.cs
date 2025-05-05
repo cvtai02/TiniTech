@@ -3,10 +3,10 @@ using Catalog.Application.AttributeEntities.Commands.DeleteAttribute;
 using Catalog.Application.AttributeEntities.Queries.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WebAPI.Controllers.Base;
+using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
 
-namespace WebAPI.Controllers;
+namespace Catalog.EndPoints.Controllers;
 
 [Route("api/attributes")]
 public class AttributeController : ApiController

@@ -1,4 +1,3 @@
-using Api.Controllers.Base;
 using Identity.Core.Application.Auth.Commands.Register;
 using Identity.Core.Application.Auth.Queries.Login;
 using Identity.Core.Application.Interfaces;
