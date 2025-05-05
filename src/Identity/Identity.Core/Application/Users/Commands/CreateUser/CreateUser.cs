@@ -18,8 +18,8 @@ public class CreateUserCommand : IRequest<Result<int>>
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<int>>
 {
-    private readonly DbContextAbtract _context;
-    public CreateUserCommandHandler(DbContextAbtract context)
+    private readonly DbContextAbstract _context;
+    public CreateUserCommandHandler(DbContextAbstract context)
     {
         _context = context;
     }
@@ -56,6 +56,11 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             Phone = request.Phone,
             Roles = roles,
         };
+
+        if (string.IsNullOrEmpty(user.ImageUrl))
+        {
+            user.ImageUrl = "https://avatar.iran.liara.run/username?username=" + user.Name;
+        }
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync(cancellationToken);

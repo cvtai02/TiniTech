@@ -18,8 +18,8 @@ public class GetUsersQuery : IRequest<List<UserDto>>
 
 public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
 {
-    private readonly DbContextAbtract _context;
-    public GetUsersHandler(DbContextAbtract context)
+    private readonly DbContextAbstract _context;
+    public GetUsersHandler(DbContextAbstract context)
     {
         _context = context;
     }

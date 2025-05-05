@@ -10,7 +10,7 @@ public class User : BaseAuditableEntity
     public string ImageUrl { get; set; } = String.Empty;
     public string Hash { get; set; } = null!;
     public DateTime? Locked { get; set; } = null;
-    public List<Role> Roles { get; set; } = [];
+    public string Role { get; set; } = null!;
     public List<Claim> Claims { get; set; } = [];
     public bool IsActive => Locked == null;
 }

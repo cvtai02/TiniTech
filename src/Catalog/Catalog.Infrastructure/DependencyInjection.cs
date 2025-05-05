@@ -16,9 +16,6 @@ public static class DependencyInjection
     {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
-
         builder.Services.AddDbContext<ApplicationDbContext>((sprovider, options) =>
         {
             options.AddInterceptors(sprovider.GetServices<ISaveChangesInterceptor>());
@@ -27,6 +24,5 @@ public static class DependencyInjection
         builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitializer>();
         builder.Services.AddScoped<IImageService, CloudinaryImageService>();
-        builder.Services.AddSingleton(TimeProvider.System);
     }
 }

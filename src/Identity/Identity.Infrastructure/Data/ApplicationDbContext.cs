@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Data
 {
-    public class ApplicationDbContext : DbContextAbtract
+    public class ApplicationDbContext : DbContextAbstract
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 

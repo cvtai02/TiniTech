@@ -23,17 +23,18 @@ import ProductPage from './pages/Products';
 
 const routes = createRoutesFromElements(
   <>
-    <Route path="/" element={<Layout />}>
-      <Route path="" element={<Home />} />,
-      <Route path="landing" element={<LandingPage />} />,
-      <Route path="products" element={<ProductPage />} />,
-      <Route path="products/:slug" element={<ProductDetailPage />} />,
-      <Route path="categories" element={<CategoriesPage />} />,
-      <Route path="users" element={<UsersPage />} />,
-      <Route path="import" element={<ImportGoodsPage />} />,
-      <Route path="import/new-product" element={<AddProductPage />} />,
-      <Route path="*" element={<NotFoundPage />}></Route>
-      <Route element={<PrivateRoute requiredRole="Admin" />}></Route>
+    <Route element={<PrivateRoute requiredRole="Admin" />}>
+      <Route path="/" element={<Layout />}>
+        <Route path="" element={<Home />} />,
+        <Route path="landing" element={<LandingPage />} />,
+        <Route path="products" element={<ProductPage />} />,
+        <Route path="products/:slug" element={<ProductDetailPage />} />,
+        <Route path="categories" element={<CategoriesPage />} />,
+        <Route path="users" element={<UsersPage />} />,
+        <Route path="import" element={<ImportGoodsPage />} />,
+        <Route path="import/new-product" element={<AddProductPage />} />,
+        <Route path="*" element={<NotFoundPage />}></Route>
+      </Route>
     </Route>
     <Route path="/login" element={<Login></Login>}></Route>
   </>,

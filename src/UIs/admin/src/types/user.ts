@@ -2,7 +2,9 @@ export type User = {
   id: number;
   name: string;
   email: string;
-  role: string;
+  roles: string[];
+  isLocked: boolean;
+  
 };
 
 export type CustomerBilling = {

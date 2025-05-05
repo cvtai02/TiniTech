@@ -29,9 +29,20 @@ public abstract class ApiController : ControllerBase
                     validationException.Errors));
         }
 
-        if (result.IsSuccess)
+        if (result.Exception is EmailExistedException e)
         {
-            throw new InvalidOperationException();
+            return BadRequest(
+                CreateProblemDetails(
+                    e.Message, StatusCodes.Status409Conflict,
+                    e));
+        }
+
+        if (result.Exception is InvalidPasswordException ipe)
+        {
+            return BadRequest(
+                CreateProblemDetails(
+                    "Wrong Password", StatusCodes.Status401Unauthorized,
+                    ipe));
         }
 
         return BadRequest(

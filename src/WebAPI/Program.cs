@@ -6,11 +6,11 @@ using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddWebServices()
-.AddCatalogModule()
-.AddIdentityModule();
-
 builder.Services.AddInfrastructure();
+builder
+.AddIdentityModule()
+.AddCatalogModule()
+.AddWebServices();
 
 builder.Services.AddCorsPolicy(builder.Configuration, "CorsPolicy");
 

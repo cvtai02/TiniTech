@@ -2,6 +2,7 @@ using Identity.Core.Application.Auth.Commands.Register;
 using Identity.Core.Application.Auth.Queries.Login;
 using Identity.Core.Application.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
@@ -26,13 +27,48 @@ public class Auth : ApiController
     {
         var result = await Sender.Send(new LoginQuery(req));
 
+        // set cookie
+        if (result.IsSuccess && result.Value != null)
+        {
+            var token = result.Value.AccessToken;
+            var refreshToken = result.Value.RefreshToken;
+            var accessExpiresTime = result.Value.AccessTokenExpiresTime;
+            var refreshExpiresTime = result.Value.RefreshTokenExpiresTime;
+            Response.Cookies.Append("access_token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = accessExpiresTime,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/",
+            });
+            if (refreshToken != null)
+            {
+                Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = refreshExpiresTime,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Path = "/",
+                });
+            }
+        }
+
         return result.Match(
             r => Ok(new Response
             {
                 Title = "Login Success",
                 Status = "Success",
                 Detail = "Login Success",
-                Data = r,
+                Data = new LoginResponse
+                {
+                    IsAuthenticated = true,
+                    AccessTokenExpiresTime = r.AccessTokenExpiresTime,
+                    RefreshTokenExpiresTime = r.RefreshTokenExpiresTime,
+                    Roles = r.Roles,
+                    Claims = r.Claims,
+                },
                 Errors = null
             }),
             e => HandleFailure<RegisterCommand>(e)

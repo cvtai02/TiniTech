@@ -7,7 +7,7 @@ namespace Identity.Core.Application.Users.Commands.CreateUser;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserCommandValidator(DbContextAbtract dbContext)
+    public CreateUserCommandValidator(DbContextAbstract dbContext)
     {
         Console.WriteLine("CreateUserCommandValidator");
         RuleFor(x => x.Name)

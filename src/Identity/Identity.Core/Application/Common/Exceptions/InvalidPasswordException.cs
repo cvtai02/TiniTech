@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace Identity.Core.Application.Common.Exceptions;
 
-public class EmailExistedException : Exception
+public class InvalidPasswordException : Exception
 {
-    public EmailExistedException(string title) : base(title)
+    public InvalidPasswordException(string message) : base(message)
     {
     }
+
 }
+

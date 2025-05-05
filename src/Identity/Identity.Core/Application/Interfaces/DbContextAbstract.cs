@@ -2,9 +2,9 @@ using Identity.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Core.Application.Interfaces;
-public abstract class DbContextAbtract : DbContext
+public abstract class DbContextAbstract : DbContext
 {
-    protected DbContextAbtract(DbContextOptions options) : base(options)
+    protected DbContextAbstract(DbContextOptions options) : base(options)
     {
     }
     public DbSet<User> Users { get; set; }

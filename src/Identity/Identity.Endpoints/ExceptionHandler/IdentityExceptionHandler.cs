@@ -47,6 +47,7 @@ public class IdentityExceptionHandler(ILogger<IdentityExceptionHandler> logger, 
         return exception switch
         {
             EmailExistedException e => (409, e.Message),
+            InvalidPasswordException e => (401, e.Message),
             _ => (0, "") //signal that we don't want to handle this exception
         };
     }

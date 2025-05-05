@@ -7,6 +7,7 @@ using Identity.Core.Application.Interfaces;
 using Identity.Infrastructure.PasswordHasher;
 using Identity.Infrastructure.Jwt;
 using Identity.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Identity.Infrastructure
 {
@@ -14,9 +15,16 @@ namespace Identity.Infrastructure
     {
         public static void AddIdentityInfra(this IHostApplicationBuilder builder)
         {
-            builder.Services.AddScoped<DbContextAbtract, ApplicationDbContext>();
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+            builder.Services.AddDbContext<ApplicationDbContext>((sprovider, options) =>
+            {
+                options.AddInterceptors(sprovider.GetServices<ISaveChangesInterceptor>());
+                options.UseSqlServer(connectionString);
+            });
+            builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
+            // builder.Services.AddScoped<ApplicationDbContextInitializer>();
 
             builder.Services.ConfigureOptions<JwtOptionConfig>();
             builder.Services.AddTransient<ITokenService, JwtService>();

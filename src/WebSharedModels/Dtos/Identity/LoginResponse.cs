@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 
 namespace WebSharedModels.Dtos.Identity;
 
-public class AuthTokenDto
+public class LoginResponse
 {
     public bool IsAuthenticated { get; set; } = false;
     public DateTime? AccessTokenExpiresTime { get; set; } = null;
-    public string? RefreshToken { get; set; } = string.Empty;
+    public DateTime? RefreshTokenExpiresTime { get; set; } = null;
+    public List<string> Roles { get; set; } = new List<string>();
+    public List<string> Claims { get; set; } = [];
 }

@@ -12,7 +12,6 @@ public class RegisterCommand : RegisterForm, IRequest<Result<int>>
         Email = form.Email;
         Phone = form.Phone;
         Password = form.Password;
-        ConfirmPassword = form.ConfirmPassword;
     }
 }
 
@@ -42,5 +41,4 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<in
         };
         return _sender.Send(user, cancellationToken);
     }
-
 }
