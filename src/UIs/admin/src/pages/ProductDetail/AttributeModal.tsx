@@ -76,7 +76,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
   useEffect(() => {
     if (selectedAttributeId) {
       const selected = existingAttributes.find(
-        (attr) => attr.id == selectedAttributeId,
+        (attr) => attr.attributeId == selectedAttributeId,
       );
       if (selected) {
         setAttributeName(selected.name);
@@ -112,7 +112,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
     );
 
     if (newAttr) {
-      setSelectedAttributeId(newAttr.id);
+      setSelectedAttributeId(newAttr.attributeId);
     }
   };
 
@@ -253,7 +253,7 @@ const AttributeModal: React.FC<AttributeModalProps> = ({
                   >
                     <option value="">Select one</option>
                     {existingAttributes.map((attr, index) => (
-                      <option key={index} value={attr.id}>
+                      <option key={index} value={attr.attributeId}>
                         {attr.name}
                       </option>
                     ))}

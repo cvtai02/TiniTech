@@ -1,5 +1,5 @@
 export interface AttributeDto {
-  id: number;
+  attributeId: number;
   name: string;
 }
 

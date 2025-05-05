@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SharedKernel.Interfaces;
-using WebAPI.Middlewares;
+using WebAPI.ExceptionHandlers;
 using WebAPI.ServiceCollectionExtensions;
 using WebAPI.Services;
 

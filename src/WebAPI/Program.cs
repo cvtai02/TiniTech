@@ -1,13 +1,14 @@
 using Application;
 using Catalog.Infrastructure;
+using Identity.Endpoints;
 using WebAPI;
 using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.AddApplicationServices();
 builder.AddInfrastructureServices();
+builder.AddIdentityModule();
 builder.AddWebServices();
 builder.Services.AddCorsPolicy(builder.Configuration, "CorsPolicy");
 

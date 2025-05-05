@@ -37,7 +37,12 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
         }
 
         // Update product properties
-        product.Name = request.New.Name;
+        if (product.Name != request.New.Name)
+        {
+            // avoid change slug
+            product.Name = request.New.Name;
+        }
+
         product.Sku = request.New.Sku;
         product.Description = request.New.Description ?? string.Empty;
         // product.Status = request.New.Status;     not allow to update status
