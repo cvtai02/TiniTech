@@ -1,35 +1,24 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../contexts/AuthContext';
-import { logout } from '../services/auth';
 
 interface LogoutButtonProps {
+  onLogout: () => void;
+  isLoading: boolean;
   className?: string;
 }
 
-const LogoutButton: React.FC<LogoutButtonProps> = ({ className = '' }) => {
-  const { auth, setAuth } = useAuthContext();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setAuth((prev) => {
-        prev.logout();
-        return prev;
-      });
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
+const LogoutButton: React.FC<LogoutButtonProps> = ({
+  onLogout,
+  isLoading,
+  className = '',
+}) => {
   return (
     <button
-      onClick={handleLogout}
-      className={`py-2 px-4 bg-gray-200 text-gray-800 font-medium rounded-md hover:bg-gray-300 ${className}`}
+      type="button"
+      onClick={onLogout}
+      disabled={isLoading}
+      className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-red-400 ${className}`}
     >
-      Logout
+      {isLoading ? 'Logging out...' : 'Logout'}
     </button>
   );
 };

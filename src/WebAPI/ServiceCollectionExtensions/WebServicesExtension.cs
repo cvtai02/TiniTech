@@ -5,27 +5,25 @@ using WebAPI.ExceptionHandlers;
 using WebAPI.ServiceCollectionExtensions;
 using WebAPI.Services;
 
-namespace WebAPI;
+namespace WebAPI.ServiceCollectionExtensions;
 
-public static class DependencyInjection
+public static class WebServicesExtension
 {
     public static IHostApplicationBuilder AddWebServices(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddScoped<IUser, CurrentUser>();
 
         builder.Services.AddOpenApi().AddSwaggerGenWithAuth();
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddScoped<IUser, CurrentUser>();
+
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>()
             .AddProblemDetails()
+            .AddHttpContextAccessor()
+            .AddJwtCookieAuthentication(builder.Configuration)
             .AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-
-
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer();
 
         return builder;
     }

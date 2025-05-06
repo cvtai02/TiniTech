@@ -13,7 +13,7 @@ public class CreateUserCommand : IRequest<Result<int>>
     public string Hash { get; set; } = "";
     public string Name { get; set; } = null!;
     public string ImageUrl { get; set; } = string.Empty;
-    public List<string> Roles { get; set; } = [];
+    public string Role { get; set; } = null!;
 }
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Result<int>>
@@ -26,25 +26,11 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
     public async Task<Result<int>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
 
-        var roles = await _context.Roles
-            .Where(r => request.Roles.Contains(r.Name))
-            .ToListAsync(cancellationToken);
-
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
         if (existingUser != null)
         {
             return new EmailExistedException($"User with email {request.Email} already exists.");
-        }
-
-        if (roles.Count != request.Roles.Count)
-        {
-            // add role not to list
-            var missingRoles = request.Roles.Except(roles.Select(r => r.Name)).ToList();
-            roles.AddRange(missingRoles.Select(r => new Role
-            {
-                Name = r,
-            }));
         }
 
         var user = new User
@@ -54,7 +40,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Resul
             Name = request.Name,
             ImageUrl = request.ImageUrl,
             Phone = request.Phone,
-            Roles = roles,
+            Role = request.Role,
         };
 
         if (string.IsNullOrEmpty(user.ImageUrl))

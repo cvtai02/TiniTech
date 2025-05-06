@@ -94,6 +94,9 @@ init-monolith:
 	make init-unit-tests
 	make init-solution
 
+run-adminui:
+	cd uis/admin && npm run dev
+
 run-webapi:
 	dotnet run --project WebAPI/WebAPI.csproj 
 run-webapi-nobuild:

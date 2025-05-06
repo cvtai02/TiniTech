@@ -1,24 +1,47 @@
-import { useAuthContext } from '../contexts/AuthContext'; // Import the hook
-import { Outlet } from 'react-router-dom'; // Import Outlet for nested routes
-import Unauthorize from './Unauthorized'; // Import the Unauthorize component
-import { useNavigate } from 'react-router-dom';
+import { ReactNode, useEffect } from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import Unauthorized from './Unauthorized';
 
-const PrivateRoute = (params: { requiredRoles: string[] }) => {
-  const { auth } = useAuthContext(); // Get authentication state from context
+interface PrivateRouteProps {
+  children?: ReactNode;
+  requiredRoles?: string[];
+}
 
-  const navigate = useNavigate(); // Get the navigate function from react-router-dom
+const PrivateRoute = ({ children, requiredRoles }: PrivateRouteProps) => {
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-  // If the user is not authenticated, redirect to the login page
-  if (
-    !auth.isAuthenticated() ||
-    !params.requiredRoles.some((role) => auth.user.roles.includes(role))
-  ) {
-    // return <Unauthorize />;
+  useEffect(() => {
+    console.log('PrivateRoute: isAuthenticated:', isAuthenticated);
+    console.log('PrivateRoute: user:', user);
+  }, [isAuthenticated, user]);
+
+  console.log('isAuthenticated', isAuthenticated);
+
+  // Show loading state if authentication is still being determined
+  if (isLoading) {
+    return <div>Loading...</div>; // You can replace this with a proper loading component
   }
-  navigate('/login', { replace: true }); // Redirect to login page
 
-  // If authenticated, render the child components
-  return <Outlet />;
+  // If not authenticated, redirect to login page with return URL
+  if (!isAuthenticated) {
+    return <Unauthorized />;
+  }
+
+  // If role check is required and user doesn't have the required role
+  if (user && requiredRoles && requiredRoles.length > 0) {
+    const hasRequiredRole = requiredRoles.some(
+      (role) =>
+        user.role === role || (user.claims && user.claims.includes(role)),
+    );
+
+    if (!hasRequiredRole) {
+      return <Unauthorized />;
+    }
+  }
+
+  // If authenticated and has required roles, render the children or the outlet
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default PrivateRoute;

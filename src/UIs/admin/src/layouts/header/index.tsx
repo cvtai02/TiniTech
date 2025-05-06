@@ -10,8 +10,16 @@ import {
   FaCubes,
   FaBoxOpen,
 } from 'react-icons/fa';
+import { useAuth } from '../../contexts/AuthContext';
+import LogoutButton from '../../components/LogoutButton';
 
 const Header: React.FC = () => {
+  const { logout, isLoading } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header className="h-screen bg-transparent sticky top-0 text-black basis-64 flex flex-col border-r border-gray-400 shadow-lg">
       <div className="text-3xl font-bold p-4 border-b border-gray-300 shadow-sm pl-8 flex ">
@@ -133,6 +141,13 @@ const Header: React.FC = () => {
           </li>
         </ul>
       </nav>
+      <div className="p-4 border-t border-gray-300">
+        <LogoutButton
+          onLogout={handleLogout}
+          isLoading={isLoading}
+          className="w-full"
+        />
+      </div>
     </header>
   );
 };

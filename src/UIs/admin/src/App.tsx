@@ -8,12 +8,12 @@ import { toast } from 'react-toastify';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute';
-import { AuthContextProvider } from './contexts/AuthContext';
 import Layout from './layouts';
 import Home from './pages/Dashboard';
 import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
 import CategoriesPage from './pages/Categories';
+import { AuthProvider } from './contexts/AuthContext';
 import UsersPage from './pages/Users';
 import ImportGoodsPage from './pages/Import';
 import AddProductPage from './pages/AddProduct';
@@ -23,7 +23,7 @@ import ProductPage from './pages/Products';
 
 const routes = createRoutesFromElements(
   <>
-    <Route element={<PrivateRoute requiredRole="Admin" />}>
+    <Route element={<PrivateRoute requiredRoles={['Admin']} />}>
       <Route path="/" element={<Layout />}>
         <Route path="" element={<Home />} />,
         <Route path="landing" element={<LandingPage />} />,
@@ -69,9 +69,9 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContextProvider>
+      <AuthProvider>
         <RouterProvider router={router} />
-      </AuthContextProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -37,18 +37,13 @@ namespace Identity.Infrastructure.Jwt
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(JwtRegisteredClaimNames.Email, user.Email),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new("userId", user.Id.ToString()),
-                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new("name", user.Name),
+                new(JwtRegisteredClaimNames.Name, user.Name),
+                new(ClaimTypes.MobilePhone, user.Phone),
                 new("refreshTokenId", ""),
                 // TODO: add refresh token id
             };
 
-            // Add each role as a separate claim
-            foreach (var role in user.Roles)
-            {
-                claims.Add(new System.Security.Claims.Claim(ClaimTypes.Role, role.Name));
-            }
+
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

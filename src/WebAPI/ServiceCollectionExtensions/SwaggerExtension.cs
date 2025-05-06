@@ -9,7 +9,7 @@ namespace WebAPI.ServiceCollectionExtensions;
 
 internal static class SwaggerExtension
 {
-    internal static void AddSwaggerGenWithAuth(this IServiceCollection services)
+    internal static IServiceCollection AddSwaggerGenWithAuth(this IServiceCollection services)
     {
         services.AddSwaggerGen(o =>
         {
@@ -44,6 +44,8 @@ internal static class SwaggerExtension
 
             o.AddSecurityRequirement(securityRequirement);
         });
+
+        return services;
 
     }
 

@@ -1,162 +1,140 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
+import {
   ReactNode,
+  createContext,
+  use,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { User } from '../types/user';
+import { loginForm, LoginResponse } from '../types/auth';
+import {
+  login as loginService,
+  logout as logoutService,
+} from '../services/auth';
 
-// Define user type
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  // Add other user properties as needed
-}
-
-// Define auth context state
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  clearError: () => void;
+  login: (data: loginForm) => Promise<LoginResponse>;
+  logout: () => Promise<void>;
+  error: Error | null;
 }
 
-// Create context with default values
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  token: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
-  login: async () => {},
-  logout: () => {},
-  clearError: () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider props
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Create provider component
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(
-    localStorage.getItem('auth_token'),
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [exp, setExp] = useState<Date | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const queryClient = useQueryClient();
 
-  // Check if user is authenticated on component mount
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        if (token) {
-          // Make API call to validate token and get user data
-          // Replace with your actual API endpoint
-          const response = await fetch('/api/auth/me', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            const userData = await response.json();
-            setUser(userData);
-          } else {
-            // If token is invalid, clear everything
-            localStorage.removeItem('auth_token');
-            setToken(null);
-            setUser(null);
-          }
-        }
-      } catch (err) {
-        setError('Failed to authenticate');
-        localStorage.removeItem('auth_token');
-        setToken(null);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+    if (user) {
+      if (exp) {
+        const currentTime = new Date();
+        const isExpired = exp < currentTime;
+        setIsAuthenticated(!isExpired);
       }
-    };
-
-    checkAuthStatus();
-  }, [token]);
-
-  // Login function
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Replace with your actual login API endpoint
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to login');
-      }
-
-      localStorage.setItem('auth_token', data.token);
-      setToken(data.token);
-      setUser(data.user);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An unknown error occurred',
-      );
-      setUser(null);
-      setToken(null);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setIsAuthenticated(false);
     }
+  }, [user, exp]);
+
+  // Load user from localStorage on initial load
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedTokenExp = localStorage.getItem('exp');
+
+    if (storedUser != null && storedTokenExp != null) {
+      setUser(JSON.parse(storedUser));
+      setExp(new Date(JSON.parse(storedTokenExp)));
+    } else {
+      console.log(
+        'User loaded from localStorage:',
+        JSON.parse(storedUser || 'null'),
+      );
+      console.log(
+        'Token expiration loaded from localStorage:',
+        new Date(JSON.parse(storedTokenExp || 'null')),
+      );
+    }
+  }, []);
+
+  // Login mutation
+  const loginMutation = useMutation({
+    mutationFn: loginService,
+    onSuccess: (data: LoginResponse) => {
+      setExp(data.accessTokenExpiresTime);
+      setUser(data.user);
+      console.log(data.accessTokenExpiresTime);
+      setError(null);
+
+      // Store auth data in localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('exp', JSON.stringify(data.accessTokenExpiresTime));
+
+      // You might want to store tokens here too
+      // localStorage.setItem('accessToken', data.accessToken);
+
+      // Invalidate relevant queries that might depend on auth state
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+    onError: (error: Error) => {
+      setError(error);
+      setUser(null);
+      setExp(null);
+    },
+  });
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: logoutService,
+    onSuccess: () => {
+      setUser(null);
+      // Clear stored auth data
+      localStorage.removeItem('user');
+      localStorage.removeItem('exp');
+
+      // Reset relevant cache
+      queryClient.clear();
+    },
+    onError: (error: Error) => {
+      setError(error);
+    },
+  });
+
+  const handleLogin = async (data: loginForm): Promise<LoginResponse> => {
+    return loginMutation.mutateAsync(data);
   };
 
-  // Logout function
-  const logout = () => {
-    localStorage.removeItem('auth_token');
-    setUser(null);
-    setToken(null);
+  const handleLogout = async (): Promise<void> => {
+    await logoutMutation.mutateAsync();
   };
 
-  // Clear error
-  const clearError = () => {
-    setError(null);
-  };
-
-  // Create the context value object
   const value = {
     user,
-    token,
-    isAuthenticated: !!user,
-    isLoading,
+    isLoading: loginMutation.isPending || logoutMutation.isPending,
+    login: handleLogin,
+    logout: handleLogout,
+    isAuthenticated: isAuthenticated,
     error,
-    login,
-    logout,
-    clearError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use auth context
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
-
-export default AuthContext;

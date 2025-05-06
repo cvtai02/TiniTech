@@ -1,9 +1,9 @@
-import { loginForm } from '../types/auth';
+import { loginForm, LoginResponse } from '../types/auth';
 import { apiFetch } from './api-interceptor';
 
 const API_URL = import.meta.env.VITE_CORE_API_URL || '';
 
-export const login = async (form: loginForm) => {
+export const login = async (form: loginForm): Promise<LoginResponse> => {
   // const { email, password } = form;
   console.log('login', JSON.stringify(form));
   const response = await apiFetch(`${API_URL}/api/auth/login`, {
@@ -15,7 +15,7 @@ export const login = async (form: loginForm) => {
   return body.data;
 };
 
-export const logout = async () => {
+export const logout = async (): Promise<number> => {
   const response = await apiFetch(`${API_URL}/api/auth/logout`, {
     method: 'POST',
   });

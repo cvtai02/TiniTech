@@ -1,11 +1,14 @@
-export type User = {
+export interface User {
   id: number;
   name: string;
   email: string;
-  roles: string[];
-  isLocked: boolean;
-  
-};
+  imageUrl: string;
+  role: string;
+  claims: string[];
+  phone: string;
+  locked: Date | null;
+  createdAt: Date;
+}
 
 export type CustomerBilling = {
   id: string;

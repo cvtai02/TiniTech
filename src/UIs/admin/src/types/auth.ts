@@ -6,7 +6,8 @@ export interface loginForm {
 }
 
 export interface LoginResponse {
-  user: User;
-  expiresIn: number;
-  message?: string;
+  isAuthenticated: boolean;
+  accessTokenExpiresTime: Date | null;
+  refreshTokenExpiresTime: Date | null;
+  user: User | null;
 }

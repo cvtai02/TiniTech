@@ -37,7 +37,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<in
             Phone = request.Phone ?? string.Empty,
             Hash = hash,
             ImageUrl = string.Empty,
-            Roles = [RoleList.User],
+            Role = RoleList.User
         };
         return _sender.Send(user, cancellationToken);
     }

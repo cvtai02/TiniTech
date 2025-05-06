@@ -38,7 +38,7 @@ public class Auth : ApiController
             {
                 HttpOnly = true,
                 Expires = accessExpiresTime,
-                Secure = true,
+                Secure = true, // Set to true in production
                 SameSite = SameSiteMode.Strict,
                 Path = "/",
             });
@@ -49,7 +49,7 @@ public class Auth : ApiController
                     HttpOnly = true,
                     Expires = refreshExpiresTime,
                     Secure = true,
-                    SameSite = SameSiteMode.None,
+                    SameSite = SameSiteMode.Strict,
                     Path = "/",
                 });
             }
@@ -66,8 +66,7 @@ public class Auth : ApiController
                     IsAuthenticated = true,
                     AccessTokenExpiresTime = r.AccessTokenExpiresTime,
                     RefreshTokenExpiresTime = r.RefreshTokenExpiresTime,
-                    Roles = r.Roles,
-                    Claims = r.Claims,
+                    User = r.User,
                 },
                 Errors = null
             }),
@@ -96,38 +95,47 @@ public class Auth : ApiController
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        // get token from cookie or header
-        var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
-        var result1 = 0;
-        var result2 = 0;
-        if (!string.IsNullOrEmpty(token))
-        {
-            result1 = await _tokenService.InvalidateToken(token);
-        }
 
-        token = Request.Cookies["access_token"];
-        if (!string.IsNullOrEmpty(token))
+        var token = Request.Cookies["access_token"];
+        if (string.IsNullOrEmpty(token))
         {
-            result2 = await _tokenService.InvalidateToken(token);
-        }
-
-        if (result1 > 0 || result2 > 0)
-        {
-            return Ok(new Response
+            return BadRequest(new Response
             {
-                Title = "Logout Success",
-                Status = "Success",
-                Detail = "Logout Success",
+                Title = "Logout Failed",
+                Status = "Not Found",
+                Detail = "Token not found",
                 Data = null,
             });
         }
         else
         {
-            return BadRequest(new Response
+            var result = await _tokenService.InvalidateToken(token);
+
+            if (result == 0)
             {
-                Title = "Logout Failed",
-                Status = "Failed",
-                Detail = "Token not found",
+                return BadRequest(new Response
+                {
+                    Title = "Logout Failed",
+                    Status = "Failed",
+                    Detail = "Logout Failed",
+                    Data = null,
+                });
+            }
+
+            Response.Cookies.Delete("access_token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/",
+            });
+
+
+            return Ok(new Response
+            {
+                Title = "Logout Success",
+                Status = "Success",
+                Detail = "Logout Success",
                 Data = null,
             });
         }

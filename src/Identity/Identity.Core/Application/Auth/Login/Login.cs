@@ -10,7 +10,7 @@ using WebSharedModels.Dtos.Identity;
 
 namespace Identity.Core.Application.Auth.Queries.Login;
 
-public class LoginQuery : LoginForm, IRequest<Result<AuthTokenDto>>
+public class LoginQuery : LoginForm, IRequest<Result<LoginDto>>
 {
     public LoginQuery(LoginForm form)
     {
@@ -19,13 +19,13 @@ public class LoginQuery : LoginForm, IRequest<Result<AuthTokenDto>>
     }
 }
 
-public class AuthTokenDto : LoginResponse
+public class LoginDto : LoginResponse
 {
     public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
 }
 
-public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<AuthTokenDto>>
+public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<LoginDto>>
 {
     private readonly ITokenService _tokenService;
     private readonly IPasswordHasher _passwordHasher;
@@ -38,11 +38,10 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<AuthTokenDto
         _tokenService = tokenService;
     }
 
-    public async Task<Result<AuthTokenDto>> Handle(LoginQuery request, CancellationToken cancellationToken)
+    public async Task<Result<LoginDto>> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
 
         var user = await _context.Users
-            .Include(x => x.Roles)
             .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken: cancellationToken);
         if (user == null)
         {
@@ -55,14 +54,23 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<AuthTokenDto
             return new InvalidPasswordException("Invalid password.");
         }
 
-        return new AuthTokenDto
+        return new LoginDto
         {
             IsAuthenticated = true,
             AccessTokenExpiresTime = DateTime.UtcNow.AddMinutes(60),
             RefreshTokenExpiresTime = DateTime.UtcNow.AddDays(7),
             RefreshToken = _tokenService.GenerateRefreshToken(user),
             AccessToken = _tokenService.GenerateAccessToken(user),
-            Roles = [.. user.Roles.Select(x => x.Name)],
+            User = new UserDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                ImageUrl = user.ImageUrl,
+                Locked = user.Locked,
+                Role = user.Role
+            }
         };
 
     }

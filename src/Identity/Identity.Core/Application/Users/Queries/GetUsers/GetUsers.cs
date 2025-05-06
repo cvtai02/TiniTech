@@ -50,7 +50,7 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
             Phone = u.Phone,
             ImageUrl = u.ImageUrl,
             Locked = u.Locked,
-            Roles = u.Roles.Select(r => r.Name).ToList()
+            Role = u.Role
         })];
     }
 }

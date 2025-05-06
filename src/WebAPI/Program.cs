@@ -1,18 +1,32 @@
 using Catalog.Endpoints;
 using Identity.Endpoints;
 using Infrastructure;
-using WebAPI;
 using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure();
-builder
-.AddIdentityModule()
-.AddCatalogModule()
-.AddWebServices();
 
-builder.Services.AddCorsPolicy(builder.Configuration, "CorsPolicy");
+builder
+    .AddIdentityModule()
+    .AddCatalogModule()
+    .AddWebServices();
+
+// Define the CORS policy
+var OriginsPolicy = "_OriginsPolicy";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: OriginsPolicy,
+        policy =>
+        {
+            policy.WithOrigins(allowedOrigins!)
+                  .AllowCredentials()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -24,7 +38,7 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/", () => Results.Redirect("/swagger/index.html", true));
 
 app.UseHttpsRedirection()
-    .UseCors("CorsPolicy")
+    .UseCors(OriginsPolicy)
     .UseAuthentication()
     .UseAuthorization()
     .UseExceptionHandler();

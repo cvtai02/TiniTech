@@ -6,6 +6,7 @@ export async function apiFetch(
   // --- Request Interceptor ---
   const modifiedInit: RequestInit = {
     ...init,
+    credentials: 'include',
     headers: {
       ...init?.headers,
       'Content-Type': 'application/json',
