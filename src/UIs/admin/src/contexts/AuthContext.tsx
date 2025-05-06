@@ -13,6 +13,7 @@ import {
   login as loginService,
   logout as logoutService,
 } from '../services/auth';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
   user: User | null;
@@ -91,6 +92,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setError(error);
       setUser(null);
       setExp(null);
+      toast.error(error.message);
     },
   });
 
@@ -108,6 +110,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     },
     onError: (error: Error) => {
       setError(error);
+      toast.error(error.message);
     },
   });
 

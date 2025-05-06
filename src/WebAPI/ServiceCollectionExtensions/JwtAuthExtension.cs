@@ -11,35 +11,18 @@ using Microsoft.IdentityModel.Tokens;
 namespace WebAPI.ServiceCollectionExtensions;
 internal static class JwtAuthExtension
 {
-    public static IServiceCollection AddJwtCookieAuthentication(this IServiceCollection services, IConfigurationManager configurationManager)
+    public static IServiceCollection AddJwtCookieAuthentication(this IServiceCollection services)
     {
-        var jwtConfig = new JwtOptions();
-        configurationManager.GetSection("JwtOptions").Bind(jwtConfig);
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtConfig.Issuer,
-                ValidAudience = jwtConfig.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
-            };
-
-            // Đọc token từ cookie thay vì header
             options.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
+                    Console.WriteLine("OnMessageReceived");
                     var accessToken = context.Request.Cookies["access_token"];
+                    Console.WriteLine($"accessToken: {accessToken}");
                     if (!string.IsNullOrEmpty(accessToken))
                     {
                         context.Token = accessToken;

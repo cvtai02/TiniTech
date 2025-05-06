@@ -18,20 +18,20 @@ public class ProductService : IProductService
     }
     public async Task<PaginatedList<ProductBriefDto>> GetByQueryAsync(ProductQueryParameters parameters, CancellationToken cancellationToken)
     {
-        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{GetApiQueryString(parameters)}", cancellationToken);
+        var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{GetApiQueryString(parameters)}", cancellationToken);
         return response.Data ?? new PaginatedList<ProductBriefDto>();
     }
 
     public async Task<PaginatedList<ProductBriefDto>> GetBestSellerAsync(CancellationToken cancellationToken)
     {
         var query = $"?Status={ProductStatus.Active}&PageNumber=1&PageSize=5&orderBy=sold&orderDirection=descending";
-        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{query}", cancellationToken);
+        var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{query}", cancellationToken);
         return response.Data ?? new PaginatedList<ProductBriefDto>();
     }
 
     public async Task<ProductDetailDto> GetBySlugAsync(string slug, CancellationToken cancellationToken)
     {
-        var response = await _apiService.GetDataAsync<Response<ProductDetailDto>>($"api/products/{slug}", cancellationToken);
+        var response = await _apiService.GetDataAsync<ProductDetailDto>($"api/products/{slug}", cancellationToken);
         return response.Data ?? new ProductDetailDto();
 
     }
@@ -74,14 +74,14 @@ public class ProductService : IProductService
     public async Task<PaginatedList<ProductBriefDto>> GetFeaturedAsync(CancellationToken cancellationToken)
     {
         var query = $"?Status={ProductStatus.Active}&PageNumber=1&PageSize=5&orderBy=featuredPoint&orderDirection=descending";
-        var response = await _apiService.GetDataAsync<Response<PaginatedList<ProductBriefDto>>>($"api/products{query}", cancellationToken);
+        var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{query}", cancellationToken);
         return response.Data ?? new PaginatedList<ProductBriefDto>();
     }
 
     public async Task<List<ProductBriefDto>> GetRelated(int productId, CancellationToken cancellationToken)
     {
         var query = $"?productId={productId}&Page=1&PageSize=5";
-        var response = await _apiService.GetDataAsync<Response<List<ProductBriefDto>>>($"api/products/related{query}", cancellationToken);
+        var response = await _apiService.GetDataAsync<List<ProductBriefDto>>($"api/products/related{query}", cancellationToken);
         return response.Data ?? [];
     }
 }

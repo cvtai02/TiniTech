@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Base;
+using SharedKernel.Base;
 
-namespace Domain.Entities;
+namespace Rating.Core.Entities;
 
 public class ProductRatingSummary : BaseEntity
 {
@@ -16,6 +12,5 @@ public class ProductRatingSummary : BaseEntity
     public int TotalRating { get; set; }
     public double AverageRating { get; set; } = 0.0;
     public int ProductId { get; set; }
-    public Product? Product { get; set; } = null!;
     public int TotalComment { get; set; } = 0;
 }

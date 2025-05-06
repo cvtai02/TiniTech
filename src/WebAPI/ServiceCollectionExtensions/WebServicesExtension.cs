@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SharedKernel.Interfaces;
+using WebAPI.Configurations;
 using WebAPI.ExceptionHandlers;
 using WebAPI.ServiceCollectionExtensions;
 using WebAPI.Services;
@@ -15,10 +16,12 @@ public static class WebServicesExtension
 
         builder.Services.AddOpenApi().AddSwaggerGenWithAuth();
 
+        builder.Services.ConfigureOptions<JwtValidationConfig>();
+
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>()
             .AddProblemDetails()
             .AddHttpContextAccessor()
-            .AddJwtCookieAuthentication(builder.Configuration)
+            .AddJwtCookieAuthentication()
             .AddControllers()
             .AddJsonOptions(options =>
             {

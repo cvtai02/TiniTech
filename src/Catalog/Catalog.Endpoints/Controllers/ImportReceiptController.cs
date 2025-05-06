@@ -1,10 +1,12 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Catalog.EndPoints.Controllers;
 
 [Route("api/import-receipts")]
+[Authorize(Roles = "Admin")]
 public class ImportReceiptController : ApiController
 
 {

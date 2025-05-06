@@ -38,7 +38,7 @@ namespace Identity.Infrastructure.Jwt
                 new(JwtRegisteredClaimNames.Email, user.Email),
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Name, user.Name),
-                new(ClaimTypes.MobilePhone, user.Phone),
+                new(ClaimTypes.Role, user.Role),
                 new("refreshTokenId", ""),
                 // TODO: add refresh token id
             };

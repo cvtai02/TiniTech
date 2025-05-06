@@ -83,7 +83,7 @@ public class Auth : ApiController
             id => Created($"/{nameof(User)}/{id}", new Response
             {
                 Title = "User Created",
-                Status = "Created",
+                Status = "Success",
                 Detail = "User Created Successfully",
                 Data = new { id },
                 Errors = null
@@ -102,7 +102,7 @@ public class Auth : ApiController
             return BadRequest(new Response
             {
                 Title = "Logout Failed",
-                Status = "Not Found",
+                Status = "Failed",
                 Detail = "Token not found",
                 Data = null,
             });

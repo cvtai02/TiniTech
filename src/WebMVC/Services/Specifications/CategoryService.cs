@@ -17,7 +17,7 @@ public class CategoryService : ICategoryService
     public async Task<List<CategoryDto>> GetActiveCategoriesAsync(CancellationToken cancellationToken)
     {
 
-        var response = await _apiService.GetDataAsync<Response<List<CategoryDto>>>("api/categories?status=active", cancellationToken);
+        var response = await _apiService.GetDataAsync<List<CategoryDto>>("api/categories?status=active", cancellationToken);
 
         return response.Data ?? new List<CategoryDto>();
     }

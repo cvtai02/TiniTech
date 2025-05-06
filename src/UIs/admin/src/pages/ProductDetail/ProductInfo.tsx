@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   ProductAttributeDto,
   ProductAttributeValueDto,
@@ -202,6 +202,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
     setProductClone((prev) => ({
       ...prev,
       attributes: [...prev.attributes, attribute],
+      variants: [],
     }));
 
     if (attribute.values.length > 0) {
@@ -262,6 +263,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
       attributes: prev.attributes.filter(
         (attr) => attr.attributeId !== attributeId,
       ),
+      variants: [],
     }));
 
     if (selectedAttributes[attributeId]) {

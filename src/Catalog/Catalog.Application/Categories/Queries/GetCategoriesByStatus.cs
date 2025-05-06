@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebSharedModels.Dtos.Categories;
 
-namespace Application.Categories.Queries;
+namespace Catalog.Application.Categories.Queries;
 
 public class GetCategoriesByStatusQuery : IRequest<Result<List<CategoryDto>>>
 {

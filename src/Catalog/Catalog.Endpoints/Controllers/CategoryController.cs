@@ -1,7 +1,8 @@
-using Application.Categories.Queries;
 using Catalog.Application.Categories.Commands;
 using Catalog.Application.Categories.Commands.ActivateCategory;
+using Catalog.Application.Categories.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SharedKernel.Enums;
@@ -20,6 +21,7 @@ public class CategoryController : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateCategoryCommand cmd)
     {
         var result = await Sender.Send(cmd);
@@ -38,6 +40,7 @@ public class CategoryController : ApiController
     }
 
     [HttpPut]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update([FromBody] UpdateCategoryCommand cmd)
     {
         var result = await Sender.Send(cmd);
@@ -57,6 +60,7 @@ public class CategoryController : ApiController
 
     public record PatchCategoryStatus(int Id, CategoryStatus Status);
     [HttpPatch("status")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Del([FromBody] PatchCategoryStatus body)
     {
         Console.WriteLine(body.Status);

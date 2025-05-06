@@ -6,6 +6,7 @@ using Catalog.Application.Products.Queries.GetDetailBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
 using Catalog.Application.Products.Queries.GetRelated;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
@@ -23,6 +24,7 @@ public class ProductController : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromForm] CreateProductCommand cmd)
     {
         Console.WriteLine("CreateProductCommand: " + cmd.ToString());
@@ -42,6 +44,7 @@ public class ProductController : ApiController
     }
 
     [HttpPut]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update([FromBody] UpdateProductInfoCommand cmd)
     {
         var result = await Sender.Send(cmd);
@@ -60,6 +63,7 @@ public class ProductController : ApiController
     }
 
     [HttpPatch("images")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateImages([FromForm] UpdateProductImagesCommand cmd)
     {
         var result = await Sender.Send(cmd);
@@ -78,6 +82,7 @@ public class ProductController : ApiController
     }
 
     [HttpPatch("status")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateStatus([FromBody] UpdateProductStatusCommand body)
     {
 

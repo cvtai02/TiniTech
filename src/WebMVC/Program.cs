@@ -9,10 +9,12 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add<GlobalExceptionFilter>();
 });
 
-builder.Services.AddRazorPages();
-builder.Services.AddAuthorization();
-
 builder.AddDataServices();
+builder.Services.AddRazorPages();
+
+builder.Services
+    .AddHttpContextAccessor()
+    .AddAuthorization();
 
 var app = builder.Build();
 

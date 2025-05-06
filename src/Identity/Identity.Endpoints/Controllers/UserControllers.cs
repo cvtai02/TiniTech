@@ -1,5 +1,6 @@
 using Identity.Core.Application.Users.Queries.GetUsers;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebSharedModels.Dtos.Common;
 
@@ -12,7 +13,8 @@ public class UserControllers : ApiController
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers([FromQuery] GetUsersQuery query)
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
     {
         var result = await Sender.Send(query);
 

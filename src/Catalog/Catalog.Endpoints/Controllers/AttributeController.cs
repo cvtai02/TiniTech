@@ -2,6 +2,7 @@ using Catalog.Application.AttributeEntities.Commands.CreatAttribute;
 using Catalog.Application.AttributeEntities.Commands.DeleteAttribute;
 using Catalog.Application.AttributeEntities.Queries.GetAll;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebSharedModels.Dtos.Common;
@@ -19,6 +20,7 @@ public class AttributeController : ApiController
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateAttributeCommand cmd)
     {
         var result = await Sender.Send(cmd);
@@ -37,6 +39,7 @@ public class AttributeController : ApiController
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Del(int id)
     {
         var result = await Sender.Send(new DeleteAttributeCommand { Id = id });

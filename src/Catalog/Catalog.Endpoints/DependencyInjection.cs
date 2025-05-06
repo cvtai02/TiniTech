@@ -1,8 +1,8 @@
-using Application;
 using Catalog.Endpoints.ExceptionHandler;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Catalog.Infrastructure;
+using Catalog.Application;
 
 namespace Catalog.Endpoints;
 public static class DependencyInjection

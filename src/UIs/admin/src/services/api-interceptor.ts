@@ -19,12 +19,21 @@ export async function apiFetch(
     // --- Response Interceptor ---
     if (response.status >= 400) {
       if (response.status === 401) {
-        // console.warn('Unauthorized! Redirecting to login...');
+        throw new Error('Unauthorized!');
+      } else if (response.status === 403) {
+        throw new Error(
+          'Forbidden! You do not have permission to access this resource.',
+        );
       }
 
       // Thêm xử lý an toàn khi parse JSON
       let errorBody;
-      errorBody = await response.json();
+      try {
+        errorBody = await response.json();
+      } catch (e) {
+        console.error('Error parsing JSON:', e);
+        throw new Error('An error occurred while processing your request.');
+      }
       throw new Error(`${errorBody.title}`);
     }
     return response;

@@ -1,16 +1,15 @@
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Purchase.Core.Abstraction;
-using Purchase.Infrastructure.Data;
+using Rating.Core.Interfaces;
+using Rating.Infrastructure.Data;
 
-namespace Purchase.Infrastructure;
-
+namespace Rating.Infrastructure;
 public static class DependencyInjection
 {
-    public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
+    public static void AddRatingInfra(this IHostApplicationBuilder builder)
     {
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

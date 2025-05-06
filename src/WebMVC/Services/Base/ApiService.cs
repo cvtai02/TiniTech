@@ -4,53 +4,90 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WebMVC.Exceptions;
+using WebSharedModels.Dtos.Common;
 
 namespace WebMVC.Services.Base;
 
 public class ApiService
 {
     private readonly HttpClient _httpClient;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ApiService(HttpClient httpClient)
+    public ApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
     {
         _httpClient = httpClient;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<T> GetDataAsync<T>(string endpoint, CancellationToken cancellationToken = default)
+    public async Task<Response<T>> GetDataAsync<T>(string endpoint, CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint, cancellationToken);
-        Console.WriteLine($"Request URL: {endpoint}");
-        Console.WriteLine($"Response Status Code: {response.StatusCode}");
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.GetAsync(endpoint, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw new ApiReachFailedException("Internal Server Error", ex);
+        }
+
+        var result = await ValidateResponseAsync<T>(response);
+        return result;
+    }
+
+    public async Task<Response<TResponse>> PostDataAsync<TRequest, TResponse>(string endpoint, TRequest data, CancellationToken cancellationToken = default)
+    {
+        //get cookies from the request and set them in the httpClient
+        var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
+        if (cookies != null)
+        {
+            foreach (var cookie in cookies)
+            {
+                _httpClient.DefaultRequestHeaders.Add("Cookie", $"{cookie.Key}={cookie.Value}");
+            }
+        }
+        HttpResponseMessage response;
+
+        try
+        {
+            response = await _httpClient.PostAsJsonAsync(endpoint, data, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw new ApiReachFailedException("Internal Server Error", ex);
+        }
+
+        var result = await ValidateResponseAsync<TResponse>(response);
+        return result;
+    }
+
+    /// <summary>
+    /// deserialize and return data.    
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="response"></param>
+    /// <returns></returns>
+    /// <exception cref="DeserializeException"></exception>
+    /// <exception cref="ApiError"></exception>
+    private static async Task<Response<T>> ValidateResponseAsync<T>(HttpResponseMessage response)
+    {
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var responseDto = JsonSerializer.Deserialize<Response<T>>(jsonString, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+        }) ?? throw new DeserializeException("Failed to deserialize response body.", new Exception(jsonString));
+
         if (response.IsSuccessStatusCode)
         {
-            var jsonString = await response.Content.ReadAsStringAsync(cancellationToken);
-            return JsonSerializer.Deserialize<T>(jsonString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-            }) ?? throw new Exception("Failed to deserialize response body.");
+            return responseDto;
         }
         else
         {
-            throw new Exception($"API call failed: {response.StatusCode}");
+            throw new ApiError(responseDto.Title, new Exception(responseDto.Detail));
         }
-    }
 
-    public async Task<TResponse> PostDataAsync<TRequest, TResponse>(string endpoint, TRequest data, CancellationToken cancellationToken = default)
-    {
-        HttpResponseMessage response = await _httpClient.PostAsJsonAsync(endpoint, data, cancellationToken);
-        if (response.IsSuccessStatusCode)
-        {
-            var jsonString = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<TResponse>(jsonString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) ?? throw new Exception("Failed to deserialize response body.");
-        }
-        else
-        {
-            throw new Exception($"API call failed: {response.StatusCode}");
-        }
     }
 
     public string BaseUrl
