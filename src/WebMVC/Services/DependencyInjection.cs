@@ -11,6 +11,8 @@ public static class DependencyInjection
     {
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IProductService, ProductService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IRatingService, RatingService>();
         builder.Services.AddHttpClient<ApiService>(client =>
         {
             client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? throw new ArgumentNullException("BaseUrl"));

@@ -6,6 +6,7 @@ using CrossCutting.Exceptions;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel.Exceptions;
 
 namespace Catalog.Application.Products.Commands.ActivateProductCommand;
 

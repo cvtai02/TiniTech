@@ -1,8 +1,8 @@
 using Catalog.Application.Common.Exceptions;
-using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Exceptions;
 using SharedKernel.Models;
 
 namespace Catalog.EndPoints.Controllers;

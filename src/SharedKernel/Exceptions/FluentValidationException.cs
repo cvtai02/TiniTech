@@ -1,6 +1,6 @@
 using FluentValidation.Results;
 
-namespace CrossCutting.Exceptions;
+namespace SharedKernel.Exceptions;
 
 public class FluentValidationException : Exception
 {

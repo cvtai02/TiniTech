@@ -1,4 +1,5 @@
 using CrossCutting.Exceptions;
+using SharedKernel.Exceptions;
 
 namespace Identity.Core.Application.Common.Behaviours;
 

@@ -15,7 +15,8 @@
 
             <div class="mt-8">
                 <div class="mt-6">
-                    <form action="#" method="POST" class="space-y-6">
+                    <div id="error-message" class="mb-4 text-red-500 text-sm hidden"></div>
+                    <form id="loginForm" class="space-y-6">
                         <div>
                             <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
                             <div class="mt-2">
@@ -26,7 +27,7 @@
                         <div>
                             <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
                             <div class="mt-2">
-                                <input id="password" name="password" type="password" autocomplete="current-password" required class="block  ps-3  w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                                <input id="password" name="password" type="password" autocomplete="current-password" required class="block ps-3 w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                             </div>
                         </div>
 
@@ -38,13 +39,15 @@
 
                         <div>
                             <button 
-                            
+                            id="loginButton"
                             type="submit" 
                             class="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold 
                             leading-6 text-white bg-black
                             transition duration-300 hover: ring-1 ring-black">Sign in</button>
                         </div>
                     </form>
+
+                    
                 </div>
 
                 <div class="mt-6">
@@ -70,3 +73,65 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const errorMessageElement = document.getElementById('error-message');
+            const loginButton = document.getElementById('loginButton');
+            
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Clear previous error messages
+                errorMessageElement.classList.add('hidden');
+                errorMessageElement.textContent = '';
+                
+                // Disable button during request
+                loginButton.disabled = true;
+                loginButton.textContent = 'Signing in...';
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await apiFetch('/api/account/login', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    });
+
+                    console.log(email, password);
+
+                    const data = await response.json();
+                    
+                    if (data.data && data.data.isAuthenticated) {
+                        // Store user data in localStorage
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                        localStorage.setItem('exp', data.data.accessTokenExpiresTime);
+                        
+                        // Redirect to home page after successful login
+                        window.location.href = '/';
+                    } else {
+                        showError('Authentication failed. Please try again.');
+                    }
+                } catch (error) {
+                    showError(error.message || 'An error occurred. Please try again later.');
+                    console.error('Login error:', error);
+                } finally {
+                    // Re-enable button
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Sign in';
+                }
+            });
+            
+            function showError(message) {
+                errorMessageElement.textContent = message;
+                errorMessageElement.classList.remove('hidden');
+            }
+        });
+    </script>
+}

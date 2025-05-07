@@ -9,3 +9,8 @@
 ## Week 3: Develop Customer site
 
 -   Link demo: https://youtu.be/215KqQuN-zU
+
+## References:
+
+-   https://github.com/dogsteven/RookieShop
+-   https://github.com/phongnguyend/Practical.CleanArchitecture/tree/master/src/ModularMonolith

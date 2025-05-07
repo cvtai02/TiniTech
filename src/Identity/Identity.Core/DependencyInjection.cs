@@ -8,7 +8,6 @@ public static class DependencyInjection
 {
     public static void AddIdentityCore(this IHostApplicationBuilder builder)
     {
-        // services.AddScoped<CreateUserHandler>();
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         builder.Services.AddMediatR(cfg =>

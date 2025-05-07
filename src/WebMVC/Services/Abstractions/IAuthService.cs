@@ -10,6 +10,6 @@ namespace WebMVC.Services.Abstractions;
 public interface IAuthService
 {
     Task<Response<int>> Register(RegisterForm data, CancellationToken cancellationToken);
-    Task<Response<bool>> Logout(CancellationToken cancellationToken);
+    Task<Response<bool?>> Logout(CancellationToken cancellationToken);
     Task<Response<LoginResponse>> Login(LoginForm data, CancellationToken cancellationToken);
 }

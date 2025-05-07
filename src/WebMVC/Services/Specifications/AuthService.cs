@@ -38,9 +38,9 @@ public class AuthService : IAuthService
     //     return response.Data ?? false;
     // }
 
-    public async Task<Response<bool>> Logout(CancellationToken cancellationToken)
+    public async Task<Response<bool?>> Logout(CancellationToken cancellationToken)
     {
-        var response = await _apiService.PostDataAsync<int, bool>("api/auth/logout", 0, cancellationToken);
+        var response = await _apiService.PostDataAsync<int, bool?>("api/auth/logout", 0, cancellationToken);
         return response;
     }
 }

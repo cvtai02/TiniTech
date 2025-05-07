@@ -2,6 +2,7 @@ using Catalog.Application.Common.Exceptions;
 using CrossCutting.Exceptions;
 using FluentValidation;
 using MediatR;
+using SharedKernel.Exceptions;
 
 namespace Catalog.Application.Common.Behaviours;
 

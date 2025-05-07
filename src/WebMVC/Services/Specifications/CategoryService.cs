@@ -1,3 +1,4 @@
+using WebMVC.Exceptions;
 using WebMVC.Services.Abstractions;
 using WebMVC.Services.Base;
 using WebSharedModels.Dtos.Categories;
@@ -19,7 +20,7 @@ public class CategoryService : ICategoryService
 
         var response = await _apiService.GetDataAsync<List<CategoryDto>>("api/categories?status=active", cancellationToken);
 
-        return response.Data ?? new List<CategoryDto>();
+        return response.Data ?? throw new ApiError("Failed to get categories", new Exception(response.Detail));
     }
 
 }

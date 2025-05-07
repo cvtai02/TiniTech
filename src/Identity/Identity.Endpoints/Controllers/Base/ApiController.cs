@@ -3,6 +3,7 @@ using Identity.Core.Application.Common.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SharedKernel.Exceptions;
 using SharedKernel.Models;
 
 namespace Identity.Endpoints.Controllers;
@@ -24,7 +25,7 @@ public abstract class ApiController : ControllerBase
         {
             return BadRequest(
                 CreateProblemDetails(
-                    "Validation Error", StatusCodes.Status400BadRequest,
+                    validationException.Errors.Values.First().First(), StatusCodes.Status400BadRequest,
                     validationException,
                     validationException.Errors));
         }
@@ -33,21 +34,27 @@ public abstract class ApiController : ControllerBase
         {
             return BadRequest(
                 CreateProblemDetails(
-                    e.Message, StatusCodes.Status409Conflict,
-                    e));
+                   "Email existed", StatusCodes.Status409Conflict));
         }
 
         if (result.Exception is InvalidPasswordException ipe)
         {
             return BadRequest(
                 CreateProblemDetails(
-                    "Wrong Password", StatusCodes.Status401Unauthorized,
-                    ipe));
+                    "Wrong Password", StatusCodes.Status400BadRequest));
+        }
+
+        if (result.Exception is NotFoundException nfe)
+        {
+            return BadRequest(
+                CreateProblemDetails(
+                    nfe.Message, StatusCodes.Status400BadRequest,
+                    nfe));
         }
 
         return BadRequest(
             CreateProblemDetails(
-                "Bad Request",
+                "unexpected error",
                 StatusCodes.Status400BadRequest,
                 result.Exception));
     }
@@ -55,13 +62,12 @@ public abstract class ApiController : ControllerBase
     private static ProblemDetails CreateProblemDetails(
             string title,
             int status,
-            Exception error,
+            Exception? error = null,
             IDictionary<string, string[]>? errors = null) =>
             new()
             {
                 Title = title,
-                // Type = error.Code,
-                Detail = error.Message,
+                Detail = error?.Message,
                 Status = status,
                 Extensions = { { nameof(errors), errors } }
             };

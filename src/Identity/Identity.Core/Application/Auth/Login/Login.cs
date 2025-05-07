@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CrossCutting.Exceptions;
 using Identity.Core.Application.Common.Exceptions;
 using Identity.Core.Application.Interfaces;
 using MediatR;
@@ -45,7 +46,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<LoginDto>>
             .FirstOrDefaultAsync(x => x.Email == request.Email, cancellationToken: cancellationToken);
         if (user == null)
         {
-            return new KeyNotFoundException("User not found.");
+            return new NotFoundException("User not found.");
         }
         var isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.Hash);
         Console.WriteLine($"isValidPassword: {isValidPassword}");
@@ -60,10 +61,11 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<LoginDto>>
             AccessTokenExpiresTime = DateTime.UtcNow.AddMinutes(60),
             RefreshTokenExpiresTime = DateTime.UtcNow.AddDays(7),
             RefreshToken = _tokenService.GenerateRefreshToken(user),
+            //TODO: get refresh token id to pass to access token
             AccessToken = _tokenService.GenerateAccessToken(user),
             User = new UserDto
             {
-                Id = user.Id,
+                Id = user.Id.ToString(),
                 Name = user.Name,
                 Email = user.Email,
                 Phone = user.Phone,

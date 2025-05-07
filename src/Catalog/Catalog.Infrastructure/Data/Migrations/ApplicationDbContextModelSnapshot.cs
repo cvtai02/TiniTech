@@ -22,7 +22,7 @@ namespace Infrastructure.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.AttributeEntity", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.AttributeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,49 +39,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("AttributeEntities");
                 });
 
-            modelBuilder.Entity("Domain.Entities.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_CartItem_UserId");
-
-                    b.ToTable("CartItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Category", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -137,7 +95,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ImportReceipt", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ImportReceipt", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -178,7 +136,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ImportReceipts");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ImportReceiptItem", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ImportReceiptItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -189,21 +147,16 @@ namespace Infrastructure.Data.Migrations
                     b.Property<int>("ImportReceiptId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("UnitCost")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -212,90 +165,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ImportReceiptItems");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Discount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ItemsPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OrderNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("ShippingPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("Domain.Entities.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("VariantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -355,7 +225,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductAttribute", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -384,7 +254,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ProductAttributes");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductAttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductAttributeValue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -412,7 +282,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ProductAttributeValues");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductImage", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -437,7 +307,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ProductImages");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductMetric", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductMetric", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -481,64 +351,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("ProductMetrics");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Shipping", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShippingProviderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TrackingCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShippingProviderId");
-
-                    b.ToTable("Shippings");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UserAddress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserAddresses");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Variant", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Variant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -579,7 +392,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("Variants");
                 });
 
-            modelBuilder.Entity("Domain.Entities.VariantAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.VariantAttribute", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -606,7 +419,7 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("VariantAttributes");
                 });
 
-            modelBuilder.Entity("Domain.Entities.VariantMetric", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.VariantMetric", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -631,34 +444,9 @@ namespace Infrastructure.Data.Migrations
                     b.ToTable("VariantMetrics");
                 });
 
-            modelBuilder.Entity("Domain.ValueObjects.ShippingProvider", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Category", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TrackingUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ShippingProviders");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Category", b =>
-                {
-                    b.HasOne("Domain.Entities.Category", "Parent")
+                    b.HasOne("Catalog.Domain.Entities.Category", "Parent")
                         .WithMany("Subcategories")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -666,9 +454,9 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ImportReceiptItem", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ImportReceiptItem", b =>
                 {
-                    b.HasOne("Domain.Entities.ImportReceipt", "InventoryReceipt")
+                    b.HasOne("Catalog.Domain.Entities.ImportReceipt", "InventoryReceipt")
                         .WithMany("Items")
                         .HasForeignKey("ImportReceiptId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -677,67 +465,9 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("InventoryReceipt");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Order", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
                 {
-                    b.OwnsOne("Domain.ValueObjects.Address", "BillingAddress", b1 =>
-                        {
-                            b1.Property<int>("OrderId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("DetailAddress")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("PhoneNumber")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Province")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ReceiverName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Ward")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("OrderId");
-
-                            b1.ToTable("Orders");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderId");
-                        });
-
-                    b.Navigation("BillingAddress")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.OrderItem", b =>
-                {
-                    b.HasOne("Domain.Entities.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Product", b =>
-                {
-                    b.HasOne("Domain.Entities.Category", "Category")
+                    b.HasOne("Catalog.Domain.Entities.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -746,15 +476,15 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductAttribute", b =>
                 {
-                    b.HasOne("Domain.Entities.AttributeEntity", "Attribute")
+                    b.HasOne("Catalog.Domain.Entities.AttributeEntity", "Attribute")
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Product", "Product")
+                    b.HasOne("Catalog.Domain.Entities.Product", "Product")
                         .WithMany("Attributes")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -765,9 +495,9 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductAttributeValue", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductAttributeValue", b =>
                 {
-                    b.HasOne("Domain.Entities.ProductAttribute", "ProductAttribute")
+                    b.HasOne("Catalog.Domain.Entities.ProductAttribute", "ProductAttribute")
                         .WithMany("ProductAttributeValues")
                         .HasForeignKey("ProductAttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -776,9 +506,9 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("ProductAttribute");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductImage", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductImage", b =>
                 {
-                    b.HasOne("Domain.Entities.Product", "Product")
+                    b.HasOne("Catalog.Domain.Entities.Product", "Product")
                         .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -787,166 +517,20 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductMetric", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductMetric", b =>
                 {
-                    b.HasOne("Domain.Entities.Product", "Product")
+                    b.HasOne("Catalog.Domain.Entities.Product", "Product")
                         .WithOne("Metric")
-                        .HasForeignKey("Domain.Entities.ProductMetric", "ProductId")
+                        .HasForeignKey("Catalog.Domain.Entities.ProductMetric", "ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Shipping", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Variant", b =>
                 {
-                    b.HasOne("Domain.ValueObjects.ShippingProvider", "ShippingProvider")
-                        .WithMany()
-                        .HasForeignKey("ShippingProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("Domain.ValueObjects.Address", "From", b1 =>
-                        {
-                            b1.Property<int>("ShippingId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("DetailAddress")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("PhoneNumber")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Province")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ReceiverName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Ward")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("ShippingId");
-
-                            b1.ToTable("Shippings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShippingId");
-                        });
-
-                    b.OwnsOne("Domain.ValueObjects.Address", "To", b1 =>
-                        {
-                            b1.Property<int>("ShippingId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("DetailAddress")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("PhoneNumber")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Province")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ReceiverName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Ward")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("ShippingId");
-
-                            b1.ToTable("Shippings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShippingId");
-                        });
-
-                    b.Navigation("From")
-                        .IsRequired();
-
-                    b.Navigation("ShippingProvider");
-
-                    b.Navigation("To")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.UserAddress", b =>
-                {
-                    b.OwnsOne("Domain.ValueObjects.Address", "Address", b1 =>
-                        {
-                            b1.Property<int>("UserAddressId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("DetailAddress")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("PhoneNumber")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Province")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ReceiverName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Ward")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("UserAddressId");
-
-                            b1.ToTable("UserAddresses");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserAddressId");
-                        });
-
-                    b.Navigation("Address")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Domain.Entities.Variant", b =>
-                {
-                    b.HasOne("Domain.Entities.Product", "Product")
+                    b.HasOne("Catalog.Domain.Entities.Product", "Product")
                         .WithMany("Variants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -955,15 +539,15 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Domain.Entities.VariantAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.VariantAttribute", b =>
                 {
-                    b.HasOne("Domain.Entities.AttributeEntity", "Attribute")
+                    b.HasOne("Catalog.Domain.Entities.AttributeEntity", "Attribute")
                         .WithMany()
                         .HasForeignKey("AttributeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Variant", "Variant")
+                    b.HasOne("Catalog.Domain.Entities.Variant", "Variant")
                         .WithMany("VariantAttributes")
                         .HasForeignKey("VariantId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -974,35 +558,30 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Variant");
                 });
 
-            modelBuilder.Entity("Domain.Entities.VariantMetric", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.VariantMetric", b =>
                 {
-                    b.HasOne("Domain.Entities.Variant", "Variant")
+                    b.HasOne("Catalog.Domain.Entities.Variant", "Variant")
                         .WithOne("Metric")
-                        .HasForeignKey("Domain.Entities.VariantMetric", "VariantId")
+                        .HasForeignKey("Catalog.Domain.Entities.VariantMetric", "VariantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Variant");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Category", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
 
                     b.Navigation("Subcategories");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ImportReceipt", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ImportReceipt", b =>
                 {
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Order", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Product", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Attributes");
 
@@ -1014,12 +593,12 @@ namespace Infrastructure.Data.Migrations
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.ProductAttribute", b =>
                 {
                     b.Navigation("ProductAttributeValues");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Variant", b =>
+            modelBuilder.Entity("Catalog.Domain.Entities.Variant", b =>
                 {
                     b.Navigation("Metric")
                         .IsRequired();

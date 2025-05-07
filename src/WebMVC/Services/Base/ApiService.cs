@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 using WebMVC.Exceptions;
 using WebSharedModels.Dtos.Common;
 
@@ -58,7 +59,37 @@ public class ApiService
             throw new ApiReachFailedException("Internal Server Error", ex);
         }
 
+
         var result = await ValidateResponseAsync<TResponse>(response);
+
+        //set cookies from the response to the httpClient
+        if (response.Headers.TryGetValues("Set-Cookie", out var rsCookies))
+        {
+            foreach (var rawCookie in rsCookies)
+            {
+                // Optional: parse cookie name and value for better control
+                var cookieParts = SetCookieHeaderValue.ParseList(new List<string> { rawCookie });
+                foreach (var cookie in cookieParts)
+                {
+                    if (cookie.Name.Value == null || cookie.Value.Value == null)
+                    {
+                        continue;
+                    }
+                    _httpContextAccessor.HttpContext?.Response.Cookies.Append(
+                        cookie.Name.Value,
+                        cookie.Value.Value,
+                        new CookieOptions
+                        {
+                            Path = "/",
+                            HttpOnly = cookie.HttpOnly,
+                            Secure = cookie.Secure,
+                            Expires = cookie.Expires?.UtcDateTime
+                        }
+                    );
+                }
+            }
+        }
+
         return result;
     }
 
@@ -73,20 +104,64 @@ public class ApiService
     private static async Task<Response<T>> ValidateResponseAsync<T>(HttpResponseMessage response)
     {
         var jsonString = await response.Content.ReadAsStringAsync();
-        var responseDto = JsonSerializer.Deserialize<Response<T>>(jsonString, new JsonSerializerOptions
+        Response<T>? responseDto;
+        try
         {
-            PropertyNameCaseInsensitive = true,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        }) ?? throw new DeserializeException("Failed to deserialize response body.", new Exception(jsonString));
 
-        if (response.IsSuccessStatusCode)
-        {
-            return responseDto;
+            responseDto = JsonSerializer.Deserialize<Response<T>>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            });
         }
-        else
+        catch
         {
-            throw new ApiError(responseDto.Title, new Exception(responseDto.Detail));
+            // BaseResponse? baseResponse = null;
+            // try
+            // {
+            //     baseResponse = JsonSerializer.Deserialize<BaseResponse>(jsonString, new JsonSerializerOptions
+            //     {
+            //         PropertyNameCaseInsensitive = true,
+            //         Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
+            //     });
+            // }
+            // catch (Exception)
+            // {
+            throw new DeserializeException("Failed to deserialize response body.", new Exception(jsonString));
+            // }
+            // if (baseResponse == null)
+            // {
+            //     throw new DeserializeException("No body data is return.", new Exception(jsonString));
+            // }
+
+            // responseDto = new Response<T>
+            // {
+            //     Title = baseResponse.Title,
+            //     Detail = baseResponse.Detail,
+            //     Errors = baseResponse.Errors,
+            //     Status = baseResponse.Status,
+            //     Data = default
+            // };
         }
+
+        if (responseDto == null)
+        {
+            throw new DeserializeException("No body data is return.", new Exception(jsonString));
+        }
+
+        // if (response.IsSuccessStatusCode)
+        // {
+        Console.WriteLine(responseDto.Status);
+        Console.WriteLine(responseDto.Detail);
+        Console.WriteLine(responseDto.Title);
+        return responseDto;
+
+        // }
+        // else
+        // {
+        //     throw new ApiError(responseDto.Title, new Exception(responseDto.Detail));
+        // }
 
     }
 
@@ -94,5 +169,16 @@ public class ApiService
     {
         get => _httpClient.BaseAddress?.ToString() ?? string.Empty;
         set => _httpClient.BaseAddress = new Uri(value);
+    }
+
+    private static Response<T> MapToNoneNullResponse<T>(Response<T?> response)
+    {
+        return new Response<T>
+        {
+            Title = response.Title,
+            Detail = response.Detail,
+            Status = response.Status,
+            Data = response.Data != null ? response.Data : default
+        };
     }
 }

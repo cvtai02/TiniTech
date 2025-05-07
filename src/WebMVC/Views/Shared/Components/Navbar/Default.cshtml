@@ -67,18 +67,34 @@
                         clip-rule="evenodd" />
             </svg>
         </div>
-        <div class="account-icon hover:cursor-pointer ">
-            <svg width="20"
-                    height="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    onclick="window.location.href='/account'"
-                    class="hover:cursor-pointer">
-                <path fill-rule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clip-rule="evenodd" />
-            </svg>
+        <div class="account-icon relative group">
+            <div id="account-icon" class="cursor-pointer">
+                <svg width="20"
+                     height="20"
+                     xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 20 20"
+                     fill="currentColor">
+                    <path fill-rule="evenodd"
+                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                          clip-rule="evenodd" />
+                </svg>
+            </div>
+            <!-- Dropdown for non-authenticated users -->
+            <div id="auth-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-10">
+                <a href="/account/login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Login</a>
+                <a href="/account/register" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Register</a>
+            </div>
+            
+            <!-- Dropdown for authenticated users -->
+            <div id="user-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-10">
+                <div class="px-4 py-3 border-b">
+                    <div id="user-name" class="text-sm font-medium text-gray-900 truncate"></div>
+                    <div id="user-email" class="text-sm text-gray-500 truncate"></div>
+                </div>
+                <a href="/account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                <a href="/account/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+            </div>
         </div>
         <div onclick="window.location.href='/cart'" 
             class="hover:text-primary relative cart-icon w-9 h-9 flex flex-col justify-center items-center cursor-pointer">

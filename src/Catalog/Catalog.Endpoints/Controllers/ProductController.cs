@@ -34,10 +34,9 @@ public class ProductController : ApiController
             r => CreatedAtAction(nameof(GetBySlug), new { slug = r }, new Response
             {
                 Title = "Product Created",
-                Status = "Success",
+                Status = 200,
                 Detail = "Product Created Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<CreateProductCommand>(e)
         );
@@ -53,10 +52,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Product Updated",
-                Status = "Success",
+                Status = 200,
                 Detail = "Product Updated Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<UpdateProductInfoCommand>(e)
         );
@@ -72,10 +70,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Product Images Updated",
-                Status = "Success",
+                Status = 200,
                 Detail = "Product Images Updated Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<UpdateProductImagesCommand>(e)
         );
@@ -92,10 +89,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Product Status Updated",
-                Status = "Success",
+                Status = 200,
                 Detail = "Product status changed to " + body.Status.ToString(),
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<UpdateProductStatusCommand>(e)
         );
@@ -111,10 +107,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Ok",
-                Status = "Success",
+                Status = 200,
                 Detail = "Product Retrieved Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<GetProductDetailBySlug>(e)
         );
@@ -129,10 +124,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Ok",
-                Status = "Success",
+                Status = 200,
                 Detail = "Related Products Retrieved Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<GetProductRelatedQuery>(e)
         );
@@ -147,10 +141,9 @@ public class ProductController : ApiController
             r => Ok(new Response
             {
                 Title = "Ok",
-                Status = "Success",
+                Status = 200,
                 Detail = "Search Products Retrieved Successfully",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<GetProductsQuery>(e)
         );

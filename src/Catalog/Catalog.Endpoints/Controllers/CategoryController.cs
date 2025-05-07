@@ -30,10 +30,9 @@ public class CategoryController : ApiController
             r => CreatedAtAction(nameof(Get), new Response
             {
                 Title = "Category Created",
-                Status = "Success",
+                Status = 200,
                 Detail = "Category Created",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<CreateCategoryCommand>(e)
         );
@@ -49,10 +48,9 @@ public class CategoryController : ApiController
             r => Ok(new Response
             {
                 Title = "Category Updated",
-                Status = "Success",
+                Status = 200,
                 Detail = "Category Updated",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<UpdateCategoryCommand>(e)
         );
@@ -72,10 +70,9 @@ public class CategoryController : ApiController
                 r => Ok(new Response
                 {
                     Title = "Category Deleted",
-                    Status = "Success",
+                    Status = 200,
                     Detail = "Category Status Changed to Deleted",
                     Data = r,
-                    Errors = null
                 }),
                 e => HandleFailure<SoftDeleteCategoryCommand>(e)
             );
@@ -88,10 +85,9 @@ public class CategoryController : ApiController
                 r => Ok(new Response
                 {
                     Title = "Category Restored",
-                    Status = "Success",
+                    Status = 200,
                     Detail = "Category Status Changed to Active",
                     Data = r,
-                    Errors = null
                 }),
                 e => HandleFailure<ActivateCategoryCommand>(e)
             );
@@ -99,10 +95,9 @@ public class CategoryController : ApiController
         else return BadRequest(new Response
         {
             Title = "Bad Request",
-            Status = "Error",
+            Status = 200,
             Detail = "Invalid Category Status",
             Data = null,
-            Errors = new[] { "Invalid Category Status" }
         });
     }
 
@@ -115,10 +110,9 @@ public class CategoryController : ApiController
             r => Ok(new Response
             {
                 Title = "Ok",
-                Status = "Success",
+                Status = 200,
                 Detail = "Categories Retrieved",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<GetCategoriesByStatusQuery>(e)
         );

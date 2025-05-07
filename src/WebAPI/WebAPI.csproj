@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Catalog\Catalog.Endpoints\Catalog.Endpoints.csproj" />
     <ProjectReference Include="..\Identity\Identity.Endpoints\Identity.Endpoints.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Rating\Rating.csproj" />
   </ItemGroup>
 
 </Project>

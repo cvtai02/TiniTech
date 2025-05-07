@@ -59,7 +59,7 @@ public class Auth : ApiController
             r => Ok(new Response
             {
                 Title = "Login Success",
-                Status = "Success",
+                Status = 200,
                 Detail = "Login Success",
                 Data = new LoginResponse
                 {
@@ -67,10 +67,9 @@ public class Auth : ApiController
                     AccessTokenExpiresTime = r.AccessTokenExpiresTime,
                     RefreshTokenExpiresTime = r.RefreshTokenExpiresTime,
                     User = r.User,
-                },
-                Errors = null
+                }
             }),
-            e => HandleFailure<RegisterCommand>(e)
+            e => HandleFailure<LoginQuery>(e)
         );
 
     }
@@ -83,10 +82,9 @@ public class Auth : ApiController
             id => Created($"/{nameof(User)}/{id}", new Response
             {
                 Title = "User Created",
-                Status = "Success",
+                Status = 201,
                 Detail = "User Created Successfully",
-                Data = new { id },
-                Errors = null
+                Data = id,
             }),
             e => HandleFailure<RegisterCommand>(e)
         );
@@ -102,7 +100,7 @@ public class Auth : ApiController
             return BadRequest(new Response
             {
                 Title = "Logout Failed",
-                Status = "Failed",
+                Status = 404,
                 Detail = "Token not found",
                 Data = null,
             });
@@ -116,9 +114,9 @@ public class Auth : ApiController
                 return BadRequest(new Response
                 {
                     Title = "Logout Failed",
-                    Status = "Failed",
+                    Status = 400,
                     Detail = "Logout Failed",
-                    Data = null,
+                    Data = false,
                 });
             }
 
@@ -134,9 +132,9 @@ public class Auth : ApiController
             return Ok(new Response
             {
                 Title = "Logout Success",
-                Status = "Success",
+                Status = 200,
                 Detail = "Logout Success",
-                Data = null,
+                Data = true,
             });
         }
     }

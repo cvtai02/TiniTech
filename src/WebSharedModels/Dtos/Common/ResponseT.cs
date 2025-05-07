@@ -2,9 +2,8 @@ namespace WebSharedModels.Dtos.Common;
 
 public class Response<T>
 {
-    public string Title { get; set; } = "Success";
-    public string Status { get; set; } = "200 OK";
-    public string Detail { get; set; } = "Request was successful.";
-    public T? Data { get; set; }
-    public object[]? Errors { get; set; } = null;
+    public string Title { get; set; } = "";
+    public int Status { get; set; }
+    public string Detail { get; set; } = "";
+    public T? Data { get; set; } = default; // default(T) provides the default value for type T
 }

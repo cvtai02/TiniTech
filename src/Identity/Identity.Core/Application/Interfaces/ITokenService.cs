@@ -4,7 +4,7 @@ namespace Identity.Core.Application.Interfaces;
 
 public interface ITokenService
 {
-    string GenerateAccessToken(User user);
+    string GenerateAccessToken(User user, string refreshTokenId = "");
     string GenerateRefreshToken(User user);
     string RefreshToken(string refreshToken);
     Task<int> InvalidateToken(string accessToken, string? refreshToken = null);

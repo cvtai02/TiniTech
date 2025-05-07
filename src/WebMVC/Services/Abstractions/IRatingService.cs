@@ -9,6 +9,6 @@ namespace WebMVC.Services.Abstractions;
 
 public interface IRatingService
 {
+    Task<ProductRatingDto> GetByProduct(int productId, int page, int pageSize);
     Task<int> SubmitRatingAsync(SubmitRatingRequest ratingDto);
-    Task<ProductRatingDto> GetByProduct(int productId, int pageIndex, int pageSize);
 }

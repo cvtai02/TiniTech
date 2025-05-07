@@ -10,7 +10,7 @@ namespace Rating.Endpoints;
 
 public static class DependencyInjection
 {
-    public static IHostApplicationBuilder AddCatalogModule(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddRatingModule(this IHostApplicationBuilder builder)
     {
         builder.AddRatingCore();
         builder.AddRatingInfra();

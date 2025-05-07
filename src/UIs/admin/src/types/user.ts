@@ -10,12 +10,10 @@ export interface User {
   createdAt: Date;
 }
 
-export type CustomerBilling = {
-  id: string;
-  name: string;
-  phone: string;
-  address: string;
-  city: string;
-  district: string;
-  ward: string;
-};
+
+export interface GetUsersQuery {
+  page: number ;
+  pageSize: number;
+  search: string | null;
+  isActive: boolean | null;
+}

@@ -5,33 +5,27 @@ using WebSharedModels.Dtos.Inventory;
 
 namespace Catalog.Application.Inventory.Commands;
 
-public class CreateImportReceiptCommand : IRequest<Result<string>>
+public class CreateImportReceiptCommand : ImportReceiptDto, IRequest<Result<string>>
 {
-    public string Code { get; set; } = string.Empty;
-    public DateTime ReceiptDate { get; set; }
-    public string SupplierId { get; set; } = string.Empty;
-    public string? Note { get; set; } = null;
-    public List<ImportReceiptItemDto> Items { get; set; } = [];
-
     public ImportReceipt ToEntity()
     {
         return new ImportReceipt
         {
             Code = Code,
             ReceiptDate = ReceiptDate,
-            Supplier = SupplierId,
+            Supplier = Supplier,
             Note = Note,
             Items = [.. Items.Select(i => new ImportReceiptItem
             {
-                ProductId = i.ProductId,
-                VariantId = i.VariantId,
+                Sku = i.Sku,
                 Quantity = i.Quantity,
                 UnitCost = i.UnitCost,
-                Note = i.Note
             })]
         };
     }
 }
+
+
 
 
 

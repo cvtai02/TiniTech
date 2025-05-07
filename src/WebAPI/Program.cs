@@ -1,15 +1,17 @@
 using Catalog.Endpoints;
 using Identity.Endpoints;
 using Infrastructure;
+using Rating.Endpoints;
+using SharedKernel;
 using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure();
-
 builder
     .AddIdentityModule()
     .AddCatalogModule()
+    .AddRatingModule()
     .AddWebServices();
 
 // Define the CORS policy

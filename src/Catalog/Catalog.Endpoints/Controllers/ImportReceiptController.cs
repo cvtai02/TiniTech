@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using WebSharedModels.Dtos.Inventory;
 
 namespace Catalog.EndPoints.Controllers;
 
@@ -21,12 +22,12 @@ public class ImportReceiptController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetImportReceipts()
     {
-        var receipts = await Sender.Send(new Catalog.Application.Inventory.Queries.GetListQuery());
+        var receipts = await Sender.Send(new Application.Inventory.Queries.GetListQuery());
         return Ok(receipts);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateImportReceipt([FromBody] Catalog.Application.Inventory.Commands.CreateImportReceiptCommand command)
+    public async Task<IActionResult> CreateImportReceipt([FromBody] ImportReceiptDto command)
     {
         var result = await Sender.Send(command);
         return CreatedAtAction(nameof(GetImportReceipts), new { code = result }, result);

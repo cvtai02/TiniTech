@@ -6,37 +6,36 @@ using WebSharedModels.Dtos.Common;
 
 namespace Identity.Endpoints.Controllers;
 
+[Route("api/users")]
 public class UserControllers : ApiController
 {
     public UserControllers(ISender sender) : base(sender)
     {
     }
 
-    [HttpGet("users")]
+    [HttpGet()]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUsers([FromQuery] GetUsersQuery query)
     {
         var result = await Sender.Send(query);
 
-        if (result.Count == 0)
+        if (result.TotalCount == 0)
         {
             return NotFound(new Response
             {
                 Title = "No Users Found",
-                Status = "Not Found",
+                Status = 404,
                 Detail = "No Users Found",
                 Data = null,
-                Errors = null
             });
         }
 
         return Ok(new Response
         {
             Title = "Users Found",
-            Status = "Success",
+            Status = 200,
             Detail = "Users Found",
             Data = result,
-            Errors = null
         });
     }
 

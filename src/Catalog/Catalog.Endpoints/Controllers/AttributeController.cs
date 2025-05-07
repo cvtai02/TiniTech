@@ -29,10 +29,9 @@ public class AttributeController : ApiController
             r => CreatedAtAction(nameof(Get), new Response
             {
                 Title = "Attribute Created",
-                Status = "Success",
+                Status = 201,
                 Detail = "Attribute Created",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<CreateAttributeCommand>(e)
         );
@@ -48,10 +47,9 @@ public class AttributeController : ApiController
             r => Ok(new Response
             {
                 Title = "Attribute Deleted",
-                Status = "Success",
+                Status = 200,
                 Detail = "Attribute Deleted",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<DeleteAttributeCommand>(e)
         );
@@ -66,10 +64,9 @@ public class AttributeController : ApiController
             r => Ok(new Response
             {
                 Title = "Ok",
-                Status = "Success",
+                Status = 200,
                 Detail = "Attributes Retrieved",
                 Data = r,
-                Errors = null
             }),
             e => HandleFailure<GetAllAttributesQuery>(e)
         );

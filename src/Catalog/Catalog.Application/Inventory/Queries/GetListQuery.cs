@@ -22,6 +22,7 @@ public class GetListQueryHandler : IRequestHandler<GetListQuery, Result<List<Imp
     public async Task<Result<List<ImportReceiptDto>>> Handle(GetListQuery request, CancellationToken cancellationToken)
     {
         var receipts = await _context.ImportReceipts
+            .Include(receipt => receipt.Items)
             .Select(receipt => receipt.ToReceiptDto())
             .ToListAsync(cancellationToken);
 
@@ -41,11 +42,9 @@ public static class ImportReceiptDtoExtensions
             Note = receipt.Note,
             Items = [.. receipt.Items.Select(item => new ImportReceiptItemDto
             {
-                ProductId = item.ProductId,
-                VariantId = item.VariantId,
+                Sku = item.Sku,
                 Quantity = item.Quantity,
                 UnitCost = item.UnitCost,
-                Note = item.Note
             })]
         };
     }

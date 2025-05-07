@@ -4,11 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Identity.Core.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel.Extensions;
 using WebSharedModels.Dtos.Identity;
 
 namespace Identity.Core.Application.Users.Queries.GetUsers;
 
-public class GetUsersQuery : IRequest<List<UserDto>>
+public class GetUsersQuery : IRequest<PaginatedList<UserDto>>
 {
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
@@ -16,14 +17,14 @@ public class GetUsersQuery : IRequest<List<UserDto>>
     public bool? IsActive { get; set; } = null;
 }
 
-public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
+public class GetUsersHandler : IRequestHandler<GetUsersQuery, PaginatedList<UserDto>>
 {
     private readonly DbContextAbstract _context;
     public GetUsersHandler(DbContextAbstract context)
     {
         _context = context;
     }
-    public async Task<List<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         var query = _context.Users.AsQueryable();
 
@@ -37,20 +38,18 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
             query = query.Where(u => u.IsActive == request.IsActive.Value);
         }
 
-        var users = await query
-            .Skip((request.Page - 1) * request.PageSize)
-            .Take(request.PageSize)
-            .ToListAsync(cancellationToken);
+        var toDtoQuery = query.Select(
+            u => new UserDto
+            {
+                Id = u.Id.ToString(),
+                Name = u.Name,
+                Email = u.Email,
+                Phone = u.Phone,
+                ImageUrl = u.ImageUrl,
+                Locked = u.Locked,
+                Role = u.Role
+            });
 
-        return [.. users.Select(u => new UserDto
-        {
-            Id = u.Id,
-            Name = u.Name,
-            Email = u.Email,
-            Phone = u.Phone,
-            ImageUrl = u.ImageUrl,
-            Locked = u.Locked,
-            Role = u.Role
-        })];
+        return await toDtoQuery.ToPaginatedListAsync(request.Page, request.PageSize, cancellationToken);
     }
 }

@@ -32,7 +32,7 @@ public class RatingController : Controller
                 {
                     Title = "Error",
                     Data = null,
-                    Status = "Failed",
+                    Status = 400,
                     Detail = "No ratings found."
                 });
         }
@@ -40,7 +40,7 @@ public class RatingController : Controller
         {
             Title = "Success",
             Data = result,
-            Status = "Success",
+            Status = 200,
             Detail = "Ratings retrieved successfully."
         });
     }
@@ -56,7 +56,7 @@ public class RatingController : Controller
                 {
                     Title = "Error",
                     Data = result,
-                    Status = "Failed",
+                    Status = 201,
                     Detail = "Failed to submit rating."
                 });
         }
@@ -64,7 +64,7 @@ public class RatingController : Controller
         {
             Title = "Success",
             Data = result,
-            Status = "Success",
+            Status = 200,
             Detail = "Rating submitted successfully."
         });
     }

@@ -9,11 +9,17 @@ import {
 } from 'react-icons/fa';
 import ProductSearch from '../../components/products/ProductSearching';
 import { ProductBriefDto } from '../../types/product';
+import {
+  createImportReceipt,
+  saveImportReceiptDraft,
+} from '../../services/import';
+import { toast } from 'react-toastify';
 
 // Define proper interfaces
 interface ProductVariant {
   id: number;
   name: string;
+  sku: string;
 }
 
 interface Product extends ProductBriefDto {
@@ -26,6 +32,7 @@ interface ImportItem {
   productName: string;
   variantId: number;
   variantName: string;
+  sku: string;
   quantity: number;
   unitCost: number;
 }
@@ -44,6 +51,7 @@ const ImportProductPage: React.FC = () => {
   const [quantity, setQuantity] = useState<string>('1');
   const [unitCost, setUnitCost] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Get product variants based on selected product
   const getVariantsForSelectedProduct = () => {
@@ -80,7 +88,7 @@ const ImportProductPage: React.FC = () => {
       !quantity ||
       !unitCost
     ) {
-      alert('Please fill in all fields');
+      toast.error('Please fill in all fields');
       return;
     }
 
@@ -97,6 +105,7 @@ const ImportProductPage: React.FC = () => {
       productName: selectedProduct.name,
       variantId: selectedVariant.id,
       variantName: selectedVariant.name,
+      sku: selectedVariant.sku,
       quantity: parseInt(quantity),
       unitCost: parseFloat(unitCost),
     };
@@ -119,6 +128,68 @@ const ImportProductPage: React.FC = () => {
   // Format number to currency
   const formatCurrency = (value: number) => {
     return value.toFixed(2);
+  };
+
+  // Prepare data for API submission
+  const prepareImportData = () => {
+    if (importItems.length === 0) {
+      toast.error('Please add at least one product to import');
+      return null;
+    }
+
+    const items = importItems.map((item) => ({
+      sku: item.sku,
+      quantity: item.quantity,
+      unitCost: item.unitCost,
+    }));
+
+    return [
+      {
+        Code: importNumber,
+        receiptDate: importDate,
+        items,
+      },
+    ];
+  };
+
+  // Handle submit
+  const handleSubmit = async () => {
+    const importData = prepareImportData();
+    if (!importData) return;
+
+    setIsSubmitting(true);
+    try {
+      const success = await createImportReceipt(importData);
+      if (success) {
+        setImportItems([]);
+        // Optionally reset other fields or redirect
+      }
+    } catch (error) {
+      console.error('Error submitting import:', error);
+      toast.error('Failed to submit import');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle save as draft
+  const handleSaveAsDraft = async () => {
+    const importData = prepareImportData();
+    if (!importData) return;
+
+    setIsSubmitting(true);
+    try {
+      const success = await saveImportReceiptDraft(importData);
+      if (success) {
+        // Maybe don't clear the form when saving as draft
+        toast.success('Draft saved successfully');
+      }
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast.error('Failed to save draft');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const { totalQuantity, totalCost } = calculateTotals();
@@ -319,7 +390,12 @@ const ImportProductPage: React.FC = () => {
                 >
                   Variant
                 </th>
-
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  SKU
+                </th>
                 <th
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -358,7 +434,9 @@ const ImportProductPage: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {item.variantName}
                   </td>
-
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {item.sku}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {item.quantity}
                   </td>
@@ -403,16 +481,18 @@ const ImportProductPage: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex justify-between mt-8">
           <button
-            onClick={() => alert('Import saved as draft!')}
-            className="flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            onClick={handleSaveAsDraft}
+            disabled={isSubmitting || importItems.length === 0}
+            className="flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaSave className="mr-2" />
             Save as Draft
           </button>
 
           <button
-            onClick={() => alert('Import submitted successfully!')}
-            className="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            onClick={handleSubmit}
+            disabled={isSubmitting || importItems.length === 0}
+            className="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaPaperPlane className="mr-2" />
             Submit Import
