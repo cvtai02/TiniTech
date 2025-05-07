@@ -52,7 +52,6 @@ public class CreateImportReceiptCommandHandler : IRequestHandler<CreateImportRec
         var importReceipt = request.ToEntity();
         _context.ImportReceipts.Add(importReceipt);
 
-
         await _context.SaveChangesAsync(cancellationToken);
 
         return importReceipt.Code;

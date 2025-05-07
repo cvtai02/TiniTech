@@ -9,9 +9,6 @@ public class ImportReceiptConfiguration : IEntityTypeConfiguration<ImportReceipt
     public void Configure(EntityTypeBuilder<ImportReceipt> builder)
     {
         builder.HasKey(e => e.Id);
-
-        builder.Property(e => e.TotalCost)
-            .HasPrecision(18, 2);
     }
 }
 
