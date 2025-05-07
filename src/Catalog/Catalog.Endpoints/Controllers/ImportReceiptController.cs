@@ -1,3 +1,4 @@
+using Catalog.Application.Inventory.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,9 +28,9 @@ public class ImportReceiptController : ApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateImportReceipt([FromBody] ImportReceiptDto command)
+    public async Task<IActionResult> CreateImportReceipt([FromBody] ImportReceiptDto req)
     {
-        var result = await Sender.Send(command);
+        var result = await Sender.Send(new CreateImportReceiptCommand(req) );
         return CreatedAtAction(nameof(GetImportReceipts), new { code = result }, result);
     }
 

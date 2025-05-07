@@ -1,506 +1,372 @@
-// ImportProductPage.tsx
-import React, { useState } from 'react';
-import {
-  FaSave,
-  FaPaperPlane,
-  FaPlus,
-  FaTrash,
-  FaSearch,
-} from 'react-icons/fa';
-import ProductSearch from '../../components/products/ProductSearching';
-import { ProductBriefDto } from '../../types/product';
-import {
-  createImportReceipt,
-  saveImportReceiptDraft,
-} from '../../services/import';
+import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { FaPlus, FaTrash, FaSearch } from 'react-icons/fa';
+import { createImportReceipt, searchBySku } from '../../services/inventory';
+import { CreateImportItemDto, SkuItem } from '../../types/inventory';
 
-// Define proper interfaces
-interface ProductVariant {
-  id: number;
-  name: string;
-  sku: string;
-}
+const ImportPage = () => {
+  const [code, setCode] = useState('');
+  const [receiptDate, setReceiptDate] = useState(
+    new Date().toISOString().split('T')[0],
+  );
+  const [items, setItems] = useState<
+    (CreateImportItemDto & { name?: string; image?: string })[]
+  >([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SkuItem[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<SkuItem | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [unitCost, setUnitCost] = useState(0);
 
-interface Product extends ProductBriefDto {
-  variants: ProductVariant[];
-}
+  const createImportMutation = useMutation({
+    mutationFn: createImportReceipt,
+    onSuccess: () => {
+      toast.success('Import receipt created successfully');
+      resetForm();
+    },
+    onError: (error) => {
+      toast.error(`Error creating import receipt: ${error}`);
+    },
+  });
 
-interface ImportItem {
-  id: number;
-  productId: string;
-  productName: string;
-  variantId: number;
-  variantName: string;
-  sku: string;
-  quantity: number;
-  unitCost: number;
-}
-
-const ImportProductPage: React.FC = () => {
-  // Empty products array using proper types
-  const products: Product[] = [];
-
-  // State variables
-  const [importNumber, setImportNumber] = useState<string>('IMP-2025-0042');
-  const [importDate, setImportDate] = useState<string>('2025-04-25');
-  const [importItems, setImportItems] = useState<ImportItem[]>([]); // Empty initial items
-  const [selectedProductId, setSelectedProductId] = useState<string | ''>('');
-  const [selectedProductName, setSelectedProductName] = useState<string>('');
-  const [selectedVariantId, setSelectedVariantId] = useState<number | ''>('');
-  const [quantity, setQuantity] = useState<string>('1');
-  const [unitCost, setUnitCost] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Get product variants based on selected product
-  const getVariantsForSelectedProduct = () => {
-    if (selectedProductId === '') return [];
-    const product = products.find((p) => p.id === selectedProductId);
-    return product ? product.variants : [];
+  const resetForm = () => {
+    setCode('');
+    setReceiptDate(new Date().toISOString().split('T')[0]);
+    setItems([]);
+    setSearchQuery('');
+    setSearchResults([]);
+    setSelectedProduct(null);
+    setQuantity(1);
+    setUnitCost(0);
   };
 
-  // Handle product selection from the modal
-  const handleProductSelect = (product: ProductBriefDto) => {
-    setSelectedProductId(product.id);
-    setSelectedProductName(product.name);
-    setIsModalOpen(false);
+  const handleSearch = async () => {
+    if (searchQuery.trim() === '') return;
+
+    try {
+      const results = await searchBySku(searchQuery);
+      console.log('Search results:', results);
+      setSearchResults(results);
+      if (results.length === 0) {
+        toast.info('No products found with this SKU');
+      }
+    } catch (error) {
+      toast.error('Error searching for products');
+      console.error(error);
+    }
   };
 
-  // Calculate totals
-  const calculateTotals = () => {
-    const totalQuantity = importItems.reduce(
-      (sum, item) => sum + item.quantity,
-      0,
-    );
-    const totalCost = importItems.reduce(
-      (sum, item) => sum + item.quantity * item.unitCost,
-      0,
-    );
-    return { totalQuantity, totalCost };
+  const handleSelectProduct = (product: SkuItem) => {
+    setSelectedProduct(product);
+    setSearchResults([]);
   };
 
-  // Add a new product to the import list
-  const handleAddProduct = () => {
-    if (
-      selectedProductId === '' ||
-      selectedVariantId === '' ||
-      !quantity ||
-      !unitCost
-    ) {
-      toast.error('Please fill in all fields');
+  const handleAddItem = () => {
+    if (!selectedProduct) {
+      toast.error('Please select a product');
       return;
     }
 
-    const selectedProduct = products.find((p) => p.id === selectedProductId);
-    const selectedVariant = selectedProduct?.variants.find(
-      (v) => v.id === selectedVariantId,
-    );
-
-    if (!selectedProduct || !selectedVariant) return;
-
-    const newItem: ImportItem = {
-      id: Math.max(0, ...importItems.map((item) => item.id)) + 1,
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      variantId: selectedVariant.id,
-      variantName: selectedVariant.name,
-      sku: selectedVariant.sku,
-      quantity: parseInt(quantity),
-      unitCost: parseFloat(unitCost),
-    };
-
-    setImportItems([...importItems, newItem]);
-
-    // Reset form
-    setSelectedProductId('');
-    setSelectedProductName('');
-    setSelectedVariantId('');
-    setQuantity('1');
-    setUnitCost('');
-  };
-
-  // Remove an item from the import list
-  const handleRemoveItem = (id: number) => {
-    setImportItems(importItems.filter((item) => item.id !== id));
-  };
-
-  // Format number to currency
-  const formatCurrency = (value: number) => {
-    return value.toFixed(2);
-  };
-
-  // Prepare data for API submission
-  const prepareImportData = () => {
-    if (importItems.length === 0) {
-      toast.error('Please add at least one product to import');
-      return null;
+    if (quantity <= 0) {
+      toast.error('Quantity must be greater than 0');
+      return;
     }
 
-    const items = importItems.map((item) => ({
-      sku: item.sku,
-      quantity: item.quantity,
-      unitCost: item.unitCost,
-    }));
+    if (unitCost <= 0) {
+      toast.error('Unit cost must be greater than 0');
+      return;
+    }
 
-    return [
+    setItems([
+      ...items,
       {
-        Code: importNumber,
-        receiptDate: importDate,
-        items,
+        sku: selectedProduct.sku,
+        quantity,
+        unitCost,
+        name: selectedProduct.name,
+        image: selectedProduct.imageUrl,
       },
-    ];
+    ]);
+
+    // Reset values
+    setSelectedProduct(null);
+    setSearchQuery('');
+    setQuantity(1);
+    setUnitCost(0);
   };
 
-  // Handle submit
-  const handleSubmit = async () => {
-    const importData = prepareImportData();
-    if (!importData) return;
+  const handleRemoveItem = (index: number) => {
+    setItems(items.filter((_, i) => i !== index));
+  };
 
-    setIsSubmitting(true);
-    try {
-      const success = await createImportReceipt(importData);
-      if (success) {
-        setImportItems([]);
-        // Optionally reset other fields or redirect
-      }
-    } catch (error) {
-      console.error('Error submitting import:', error);
-      toast.error('Failed to submit import');
-    } finally {
-      setIsSubmitting(false);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!code) {
+      toast.error('Please enter a receipt code');
+      return;
     }
-  };
 
-  // Handle save as draft
-  const handleSaveAsDraft = async () => {
-    const importData = prepareImportData();
-    if (!importData) return;
-
-    setIsSubmitting(true);
-    try {
-      const success = await saveImportReceiptDraft(importData);
-      if (success) {
-        // Maybe don't clear the form when saving as draft
-        toast.success('Draft saved successfully');
-      }
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      toast.error('Failed to save draft');
-    } finally {
-      setIsSubmitting(false);
+    if (items.length === 0) {
+      toast.error('Please add at least one item');
+      return;
     }
+
+    const importReceipt = {
+      Code: code,
+      receiptDate: new Date(receiptDate),
+      items: items.map(({ sku, quantity, unitCost }) => ({
+        sku,
+        quantity,
+        unitCost,
+      })),
+    };
+    createImportMutation.mutate(importReceipt);
   };
 
-  const { totalQuantity, totalCost } = calculateTotals();
+  const calculateTotal = () => {
+    return items.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
+  };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
-      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Goods Receipt Note
-        </h1>
-        {/* Form Header */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div>
-            <label
-              htmlFor="import-number"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Number:
-            </label>
-            <input
-              type="text"
-              id="import-number"
-              value={importNumber}
-              onChange={(e) => setImportNumber(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Create Import Receipt</h1>
 
-          <div>
-            <label
-              htmlFor="import-date"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Date:
-            </label>
-            <input
-              type="date"
-              id="import-date"
-              value={importDate}
-              onChange={(e) => setImportDate(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              required
-            />
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Receipt Code</h2>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Enter receipt code"
+                    required
+                  />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold mb-2">Receipt Date</h2>
+                  <input
+                    type="date"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={receiptDate}
+                    onChange={(e) => setReceiptDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-        {/* Product Form */}
-        <div className="bg-gray-50 p-6 rounded-md mb-8">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
-            Add Product
-          </h3>
+              <h2 className="text-xl font-bold mb-4">Add Products</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div>
-              <label
-                htmlFor="product"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Product:
-              </label>
-              <div className="flex">
-                {!selectedProductId && (
+              <div className="mb-6">
+                <div className="flex gap-2 mb-4">
+                  <div className="flex-grow relative">
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search by SKU"
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      <FaSearch />
+                    </span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onClick={handleSearch}
                   >
-                    <FaSearch className="mr-2" />
-                    Search Products
+                    Search
                   </button>
+                </div>
+
+                {searchResults.length > 0 && (
+                  <div className="mb-4 border rounded-lg p-2 max-h-40 overflow-y-auto">
+                    {searchResults.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleSelectProduct(product)}
+                      >
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                        <div>
+                          <p className="font-medium">{product.identityName}</p>
+                          <p className="text-sm text-gray-600">
+                            SKU: {product.sku}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
 
-                {selectedProductName && (
-                  <span className="ml-2 text-gray-700">
-                    {selectedProductName}
-                  </span>
+                {selectedProduct && (
+                  <div className="mb-4 p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={selectedProduct.imageUrl}
+                        alt={selectedProduct.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-grow">
+                        <h3 className="text-lg font-semibold">
+                          {selectedProduct.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          SKU: {selectedProduct.sku}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <p className="text-sm mb-1">Quantity</p>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          min="1"
+                          value={quantity}
+                          onChange={(e) =>
+                            setQuantity(parseInt(e.target.value) || 0)
+                          }
+                        />
+                      </div>
+                      <div>
+                        <p className="text-sm mb-1">Unit Cost</p>
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          min="0"
+                          step="0.01"
+                          value={unitCost}
+                          onChange={(e) =>
+                            setUnitCost(parseFloat(e.target.value) || 0)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end mt-4">
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        onClick={handleAddItem}
+                      >
+                        <FaPlus /> Add Item
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="variant"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Variant:
-              </label>
-              <select
-                id="variant"
-                value={selectedVariantId}
-                onChange={(e) =>
-                  setSelectedVariantId(
-                    e.target.value ? parseInt(e.target.value) : '',
-                  )
-                }
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                disabled={selectedProductId === ''}
-                required
-              >
-                <option value="">-- Select Variant --</option>
-                {getVariantsForSelectedProduct().map((variant) => (
-                  <option key={variant.id} value={variant.id}>
-                    {variant.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {items.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="p-2">Product</th>
+                        <th className="p-2">SKU</th>
+                        <th className="p-2">Quantity</th>
+                        <th className="p-2">Unit Cost</th>
+                        <th className="p-2">Total</th>
+                        <th className="p-2">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.map((item, index) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-2">
+                            <div className="flex items-center gap-2">
+                              {item.image && (
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-8 h-8 object-cover rounded"
+                                />
+                              )}
+                              <span>{item.name || item.sku}</span>
+                            </div>
+                          </td>
+                          <td className="p-2">{item.sku}</td>
+                          <td className="p-2">{item.quantity}</td>
+                          <td className="p-2">${item.unitCost.toFixed(2)}</td>
+                          <td className="p-2">
+                            ${(item.quantity * item.unitCost).toFixed(2)}
+                          </td>
+                          <td className="p-2">
+                            <button
+                              type="button"
+                              className="p-1 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                              onClick={() => handleRemoveItem(index)}
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
-            <div>
-              <label
-                htmlFor="quantity"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Quantity:
-              </label>
-              <input
-                type="number"
-                id="quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                min="1"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="unit-cost"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Unit Cost ($):
-              </label>
-              <input
-                type="number"
-                id="unit-cost"
-                value={unitCost}
-                onChange={(e) => setUnitCost(e.target.value)}
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleAddProduct}
-            className="mt-4 flex items-center bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          >
-            <FaPlus className="mr-2" />
-            Add Product
-          </button>
-        </div>
-
-        {/* Product Search Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
-            <div className="bg-gray-900 p-6 rounded-lg shadow-xl w-3/4 max-w-4xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-white">
-                  Search Product
-                </h3>
+              <div className="mt-6 flex justify-end gap-4">
                 <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  type="button"
+                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  onClick={resetForm}
+                  disabled={createImportMutation.isPending}
                 >
-                  ×
+                  Reset
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  disabled={
+                    createImportMutation.isPending || items.length === 0
+                  }
+                >
+                  {createImportMutation.isPending
+                    ? 'Submitting...'
+                    : 'Create Import Receipt'}
                 </button>
               </div>
-              <ProductSearch onProductSelect={handleProductSelect} />
-            </div>
+            </form>
           </div>
-        )}
-
-        {/* Products Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  #
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Product
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Variant
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  SKU
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Quantity
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Unit Cost ($)
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Total Cost ($)
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {importItems.map((item, index) => (
-                <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {item.productName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.variantName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.sku}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.quantity}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatCurrency(item.unitCost)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatCurrency(item.quantity * item.unitCost)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {/* Total Row */}
-              <tr className="bg-gray-50 font-semibold">
-                <td
-                  colSpan={4}
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                >
-                  Total
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {totalQuantity}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatCurrency(totalCost)}
-                </td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-between mt-8">
-          <button
-            onClick={handleSaveAsDraft}
-            disabled={isSubmitting || importItems.length === 0}
-            className="flex items-center bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaSave className="mr-2" />
-            Save as Draft
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || importItems.length === 0}
-            className="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaPaperPlane className="mr-2" />
-            Submit Import
-          </button>
+        <div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4">Summary</h2>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <p>Total Items:</p>
+                <p>{items.length}</p>
+              </div>
+              <div className="flex justify-between">
+                <p>Total Quantity:</p>
+                <p>{items.reduce((sum, item) => sum + item.quantity, 0)}</p>
+              </div>
+              <div className="flex justify-between font-medium text-lg">
+                <p>Total Cost:</p>
+                <p>${calculateTotal().toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ImportProductPage;
+export default ImportPage;

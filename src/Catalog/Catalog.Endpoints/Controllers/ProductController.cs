@@ -2,6 +2,7 @@ using Catalog.Application.Products.Commands.ActivateProductCommand;
 using Catalog.Application.Products.Commands.CreateProductCommand;
 using Catalog.Application.Products.Commands.UpdateProductImages;
 using Catalog.Application.Products.Commands.UpdateProductInfo;
+using Catalog.Application.Products.Queries.GetBySku;
 using Catalog.Application.Products.Queries.GetDetailBySlug;
 using Catalog.Application.Products.Queries.GetProducts;
 using Catalog.Application.Products.Queries.GetRelated;
@@ -136,6 +137,23 @@ public class ProductController : ApiController
     public async Task<IActionResult> Search([FromQuery] GetProductsQuery query)
     {
         var result = await Sender.Send(query);
+
+        return result.Match(
+            r => Ok(new Response
+            {
+                Title = "Ok",
+                Status = 200,
+                Detail = "Search Products Retrieved Successfully",
+                Data = r,
+            }),
+            e => HandleFailure<GetProductsQuery>(e)
+        );
+    }
+
+    [HttpGet("sku-search")]
+    public async Task<IActionResult> SearchBySku([FromQuery] string q)
+    {
+        var result = await Sender.Send(new GetListBySkuQuery() { Sku = q});
 
         return result.Match(
             r => Ok(new Response

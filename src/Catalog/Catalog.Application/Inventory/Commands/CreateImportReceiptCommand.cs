@@ -7,6 +7,14 @@ namespace Catalog.Application.Inventory.Commands;
 
 public class CreateImportReceiptCommand : ImportReceiptDto, IRequest<Result<string>>
 {
+    public CreateImportReceiptCommand(ImportReceiptDto dto)
+    {
+        Code = dto.Code;
+        ReceiptDate = dto.ReceiptDate;
+        Supplier = dto.Supplier;
+        Note = dto.Note;
+        Items = dto.Items;
+    }
     public ImportReceipt ToEntity()
     {
         return new ImportReceipt
@@ -42,7 +50,9 @@ public class CreateImportReceiptCommandHandler : IRequestHandler<CreateImportRec
     public async Task<Result<string>> Handle(CreateImportReceiptCommand request, CancellationToken cancellationToken)
     {
         var importReceipt = request.ToEntity();
-        await _context.ImportReceipts.AddAsync(importReceipt, cancellationToken);
+        _context.ImportReceipts.Add(importReceipt);
+
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return importReceipt.Code;

@@ -17,5 +17,4 @@ public class ImportReceiptItemDto
     public string Sku { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal UnitCost { get; set; }
-    public string? Note { get; set; } = null;
 }
