@@ -1,7 +1,7 @@
 using System.Reflection;
-using Identity.Core.Application.Common.Behaviours;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SharedKernel.MediatRBehaviors;
 
 namespace Identity.Core;
 public static class DependencyInjection

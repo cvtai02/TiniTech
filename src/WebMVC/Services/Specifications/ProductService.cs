@@ -1,3 +1,5 @@
+using CrossCutting.Exceptions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using SharedKernel.Enums;
 using SharedKernel.Models;
 using WebMVC.Exceptions;
@@ -20,20 +22,20 @@ public class ProductService : IProductService
     public async Task<PaginatedList<ProductBriefDto>> GetByQueryAsync(ProductQueryParameters parameters, CancellationToken cancellationToken)
     {
         var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{GetApiQueryString(parameters)}", cancellationToken);
-        return response.Data ?? throw new ApiError("Failed to get products", new Exception(response.Detail));
+        return response.Data ?? throw new NotFoundException("Products not found", new Exception(response.Detail));
     }
 
     public async Task<PaginatedList<ProductBriefDto>> GetBestSellerAsync(CancellationToken cancellationToken)
     {
         var query = $"?Status={ProductStatus.Active}&PageNumber=1&PageSize=5&orderBy=sold&orderDirection=descending";
         var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{query}", cancellationToken);
-        return response.Data ?? throw new ApiError("Failed to get bestseller", new Exception(response.Detail));
+        return response.Data ?? throw new NotFoundException("Failed to get best selling products", new Exception(response.Detail));
     }
 
     public async Task<ProductDetailDto> GetBySlugAsync(string slug, CancellationToken cancellationToken)
     {
         var response = await _apiService.GetDataAsync<ProductDetailDto>($"api/products/{slug}", cancellationToken);
-        return response.Data ?? throw new ApiError("Failed to get product detail", new Exception(response.Detail));
+        return response.Data ?? throw new NotFoundException("Product not found", new Exception(response.Detail));
 
     }
 
@@ -76,13 +78,13 @@ public class ProductService : IProductService
     {
         var query = $"?Status={ProductStatus.Active}&PageNumber=1&PageSize=5&orderBy=featuredPoint&orderDirection=descending";
         var response = await _apiService.GetDataAsync<PaginatedList<ProductBriefDto>>($"api/products{query}", cancellationToken);
-        return response.Data ?? throw new ApiError("Failed to get featured products", new Exception(response.Detail));
+        return response.Data ?? throw new NotFoundException("Failed to get featured products", new Exception(response.Detail));
     }
 
     public async Task<List<ProductBriefDto>> GetRelated(int productId, CancellationToken cancellationToken)
     {
         var query = $"?productId={productId}&Page=1&PageSize=5";
         var response = await _apiService.GetDataAsync<List<ProductBriefDto>>($"api/products/related{query}", cancellationToken);
-        return response.Data ?? throw new ApiError("Failed to get ralated products", new Exception(response.Detail));
+        return response.Data ?? throw new NotFoundException("Failed to get related products", new Exception(response.Detail));
     }
 }

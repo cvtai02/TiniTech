@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using CrossCutting.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -30,6 +31,8 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
             problemDetails.Detail = exception.Message + "\n" + exception.InnerException?.Message;
         }
 
+        httpContext.Response.StatusCode = statusCode;
+
         await httpContext.Response
             .WriteAsJsonAsync(problemDetails, cancellationToken);
         return IsLastStopInPipeline;
@@ -39,10 +42,10 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
     {
         return exception switch
         {
-            KeyNotFoundException => (StatusCodes.Status404NotFound, exception.Message),
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            NotFoundException => (StatusCodes.Status404NotFound, exception.Message),
             TimeoutException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
             NotImplementedException => (StatusCodes.Status501NotImplemented, "Not Implemented"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             DbUpdateException when exception.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601) =>
             (StatusCodes.Status409Conflict, "Unique Constraint Violation"),
 

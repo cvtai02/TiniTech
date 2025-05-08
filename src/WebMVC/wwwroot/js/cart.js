@@ -66,7 +66,7 @@ $(document).ready(function () {
         if (promoCode) {
             // TODO: Implement promo code application
             console.log(`Applying promo code: ${promoCode}`);
-            alert("Promo code functionality will be implemented soon.");
+            toast("Promo code functionality will be implemented soon.");
         }
     });
 });

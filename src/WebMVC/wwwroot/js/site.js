@@ -106,7 +106,7 @@ async function logout() {
                 localStorage.removeItem("user");
                 localStorage.removeItem("exp");
                 console.log("Logout successful");
-                window.location.href = "/";
+                // window.location.href = "/";
             } else {
                 // Handle error response
                 console.error("Logout failed:", response.statusText);
@@ -115,7 +115,7 @@ async function logout() {
         })
         .catch((error) => {
             console.error("Error during logout:", error);
-            alert("An error occurred during logout. Please try again.");
+            toast("An error occurred during logout. Please try again.");
         });
 }
 
@@ -165,3 +165,26 @@ async function apiFetch(input, init) {
         }
     }
 }
+
+function toast(message) {
+    const toastContainer = document.getElementById("toastContainer");
+    const toastElement = document.createElement("div");
+    toastElement.className =
+        "fixed bottom-4 right-4 bg-gray-800 text-white p-4 rounded shadow-lg transition-transform transform translate-y-full";
+    toastElement.innerText = message;
+
+    toastContainer.appendChild(toastElement);
+
+    setTimeout(() => {
+        toastElement.style.transform = "translateY(0)";
+    }, 100);
+
+    setTimeout(() => {
+        toastElement.style.transform = "translateY(100%)";
+        setTimeout(() => {
+            toastContainer.removeChild(toastElement);
+        }, 300);
+    }, 3000);
+}
+
+

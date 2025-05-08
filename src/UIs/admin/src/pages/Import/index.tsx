@@ -11,7 +11,10 @@ const ImportPage = () => {
     new Date().toISOString().split('T')[0],
   );
   const [items, setItems] = useState<
-    (CreateImportItemDto & { name?: string; image?: string })[]
+    (CreateImportItemDto & {
+      name?: string;
+      image?: string;
+    })[]
   >([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SkuItem[]>([]);
@@ -81,6 +84,8 @@ const ImportPage = () => {
     setItems([
       ...items,
       {
+        productId: selectedProduct.productId,
+        variantId: selectedProduct.variantId,
         sku: selectedProduct.sku,
         quantity,
         unitCost,
@@ -116,7 +121,9 @@ const ImportPage = () => {
     const importReceipt = {
       Code: code,
       receiptDate: new Date(receiptDate),
-      items: items.map(({ sku, quantity, unitCost }) => ({
+      items: items.map(({ productId, variantId, sku, quantity, unitCost }) => ({
+        productId,
+        variantId,
         sku,
         quantity,
         unitCost,
@@ -191,7 +198,10 @@ const ImportPage = () => {
                   <div className="mb-4 border rounded-lg p-2 max-h-40 overflow-y-auto">
                     {searchResults.map((product) => (
                       <div
-                        key={product.id}
+                        key={
+                          product.productId.toString() +
+                          product.variantId.toString()
+                        }
                         className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleSelectProduct(product)}
                       >

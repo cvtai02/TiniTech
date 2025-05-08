@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CrossCutting.Exceptions;
 using CrossCutting.Extensions;
 using SharedKernel.Models;
 using WebMVC.Exceptions;
@@ -21,15 +22,15 @@ public class RatingService : IRatingService
         _apiService = apiService;
     }
 
-    public async Task<ProductRatingDto> GetByProduct(int productId, int page, int pageSize)
+    public async Task<ProductRatingDto> GetByProduct(ProductRatingQuery query)
     {
-        var ratings = await _apiService.GetDataAsync<ProductRatingDto>($"ratings?productId={productId}&page={page}&pageSize={pageSize}");
-        return ratings.Data ?? throw new ApiError("Failed to get ratings", new Exception(ratings.Detail));
+        var ratings = await _apiService.GetDataAsync<ProductRatingDto>($"ratings?productId={query.ProductId}&page={query.Page}&pageSize={query.PageSize}");
+        return ratings.Data ?? throw new NotFoundException("Ratings not found", new Exception(ratings.Detail));
     }
 
     public async Task<int> SubmitRatingAsync(SubmitRatingRequest ratingDto)
     {
         var response = await _apiService.PostDataAsync<SubmitRatingRequest, int>("ratings", ratingDto);
-        return response.Data == 0 ? throw new ApiError("Failed to submit rating", new Exception(response.Detail)) : response.Data;
+        return response.Data;
     }
 }

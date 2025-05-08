@@ -1,5 +1,6 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +27,7 @@ public class SoftDeleteCategoryCommandHandler : IRequestHandler<SoftDeleteCatego
 
         if (category == null)
         {
-            return new KeyNotFoundException($"Category {request.Id} not found.");
+            return new NotFoundException($"Category {request.Id} not found.");
         }
 
         // Check if category has subcategories

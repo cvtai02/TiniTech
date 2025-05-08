@@ -1,10 +1,10 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Domain.Entities;
+using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebSharedModels.Dtos.Attributes;
 using WebSharedModels.Dtos.Products;
-
 namespace Catalog.Application.Products.Queries.GetDetailBySlug;
 
 public class GetProductDetailBySlug : IRequest<Result<ProductDetailDto>>
@@ -24,6 +24,7 @@ public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailByS
     public async Task<Result<ProductDetailDto>> Handle(GetProductDetailBySlug request, CancellationToken cancellationToken)
     {
         var product = await _context.Products
+            .AsSplitQuery()
             .Include(p => p.Metric)
             .Include(p => p.Images)
             .Include(p => p.Variants.Where(v => v.IsDeleted == false))
@@ -32,12 +33,11 @@ public class GetProductDetailBySlugHandler : IRequestHandler<GetProductDetailByS
                 .ThenInclude(v => v.Metric)
             .Include(p => p.Attributes)
                 .ThenInclude(a => a.Attribute)
-
             .Include(p => p.Attributes)
                 .ThenInclude(a => a.ProductAttributeValues)
             .FirstOrDefaultAsync(p => p.Slug == request.Slug, cancellationToken);
 
-        if (product == null) return new KeyNotFoundException($"Product with slug {request.Slug} not found.");
+        if (product == null) return new NotFoundException($"Product with slug {request.Slug} not found.");
 
         var productDetail = product.ToDetailDto();
 

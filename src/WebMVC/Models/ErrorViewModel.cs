@@ -2,7 +2,14 @@ namespace WebMVC.Models;
 
 public class ErrorViewModel
 {
-    public string? RequestId { get; set; }
-    public string? ErrorMessage { get; set; } = "An error occurred while processing your request.";
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    public int StatusCode { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string Detail { get; set; } = string.Empty;
+
+    public ErrorViewModel(int statusCode, string message, string detail = "")
+    {
+        StatusCode = statusCode;
+        Message = message;
+        Detail = detail;
+    }
 }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Contracts.RatingIntegrationEvents;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Rating.Core.Entities;
 using Rating.Core.Interfaces;
@@ -14,11 +16,13 @@ public class SubmitRating
 {
     private readonly DbContextAbstract _dbContext;
     private readonly IUser _user;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public SubmitRating(DbContextAbstract dbContext, IUser user)
+    public SubmitRating(DbContextAbstract dbContext, IUser user, IPublishEndpoint publishEndpoint)
     {
-        _user = user;
+        _publishEndpoint = publishEndpoint;
         _dbContext = dbContext;
+        _user = user;
     }
 
     public async Task<int> Handle(SubmitRatingRequest s)
@@ -80,8 +84,19 @@ public class SubmitRating
         productRattingSummary.AverageRating = (productRattingSummary.OneStar + productRattingSummary.TwoStar * 2 + productRattingSummary.ThreeStar * 3 + productRattingSummary.FourStar * 4 + productRattingSummary.FiveStar * 5) / (double)productRattingSummary.TotalRating;
 
         _dbContext.UserRatings.Add(userRating);
-
+        // Add outbox
         await _dbContext.SaveChangesAsync();
+        
+        await _publishEndpoint.Publish(new RatingSubmitted
+        {
+            RatingId = userRating.Id,
+            UserId = userRating.UserId,
+            ProductId = userRating.ProductId,
+            Rating = userRating.Rating,
+            Comment = userRating.Comment,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
 
         return userRating.Id;
     }

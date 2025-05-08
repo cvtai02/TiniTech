@@ -7,7 +7,7 @@ using WebSharedModels.Dtos.Rating;
 
 namespace Rating.Endpoints.Controllers;
 
-[Route("rating")]
+[Route("ratings")]
 public class RatingController : Controller
 {
     private readonly ILogger<RatingController> _logger;
@@ -22,7 +22,7 @@ public class RatingController : Controller
     }
 
     [HttpGet()]
-    public async Task<IActionResult> GetProductRatingAsync([FromQuery] GetProductRatingQuery q)
+    public async Task<IActionResult> GetProductRatingAsync([FromQuery] ProductRatingQuery q)
     {
         var result = await _getProductRating.Handle(q);
         if (result == null)

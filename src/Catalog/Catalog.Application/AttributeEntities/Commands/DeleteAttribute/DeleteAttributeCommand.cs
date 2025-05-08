@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Catalog.Application.Common.Abstraction;
 using Catalog.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 
 namespace Catalog.Application.AttributeEntities.Commands.DeleteAttribute;
 
@@ -25,7 +26,7 @@ public class DeleteAttributeCommandHandler : IRequestHandler<DeleteAttributeComm
 
         if (attribute == null)
         {
-            return new KeyNotFoundException($"Attribute with ID {request.Id} not found.");
+            return new NotFoundException($"Attribute with ID {request.Id} not found.");
         }
 
         // Check if attribute is used by any product attributes

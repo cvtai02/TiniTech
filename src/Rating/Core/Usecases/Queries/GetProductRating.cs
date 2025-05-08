@@ -19,16 +19,51 @@ public class GetProductRating
         _dbContext = dbContext;
     }
 
-    public async Task<ProductRatingDto> Handle(GetProductRatingQuery request)
+    public async Task<ProductRatingDto> Handle(ProductRatingQuery request)
     {
-        var ratingsTask = _dbContext.UserRatings
+        // Concurent error
+
+        //var ratingsTask = _dbContext.UserRatings
+        //    .Where(r => r.ProductId == request.ProductId)
+        //    .OrderByDescending(r => r.Created)
+        //    .Skip((request.Page - 1) * request.PageSize)
+        //    .Take(request.PageSize)
+        //    .ToListAsync();
+
+        //var ratingSummaryTask = _dbContext.ProductRatingSummaries
+        //    .Where(r => r.ProductId == request.ProductId)
+        //    .Select(r => new RatingSummaryDto
+        //    {
+        //        OneStar = r.OneStar,
+        //        TwoStar = r.TwoStar,
+        //        ThreeStar = r.ThreeStar,
+        //        FourStar = r.FourStar,
+        //        FiveStar = r.FiveStar,
+        //        TotalRating = r.TotalRating,
+        //        AverageRating = r.AverageRating,
+        //        ProductId = r.ProductId
+        //    })
+        //    .FirstOrDefaultAsync();
+
+        //await Task.WhenAll(ratingsTask, ratingSummaryTask);
+
+        //// Access results safely
+        //var ratings = await ratingsTask;
+        //var ratingSummary = await ratingSummaryTask;
+
+        var ratings = await _dbContext.UserRatings
             .Where(r => r.ProductId == request.ProductId)
             .OrderByDescending(r => r.Created)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync();
 
-        var ratingSummaryTask = _dbContext.ProductRatingSummaries
+        if (ratings == null)
+        {
+            throw new NotFoundException("Product user ratings not found.");
+        }
+
+        var ratingSummary = await _dbContext.ProductRatingSummaries
             .Where(r => r.ProductId == request.ProductId)
             .Select(r => new RatingSummaryDto
             {
@@ -43,14 +78,9 @@ public class GetProductRating
             })
             .FirstOrDefaultAsync();
 
-        // Run both in parallel
-        await Task.WhenAll(ratingsTask, ratingSummaryTask);
-        var ratings = ratingsTask.Result;
-        var ratingSummary = ratingSummaryTask.Result;
-
-        if (ratings == null || ratingSummary == null)
+        if (ratingSummary == null)
         {
-            throw new NotFoundException("Product rating not found.");
+            throw new NotFoundException("Product rating summary not found.");
         }
 
         var userRatings = ratings.Select(r => new UserRatingDto

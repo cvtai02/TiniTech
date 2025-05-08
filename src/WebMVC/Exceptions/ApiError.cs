@@ -8,12 +8,11 @@ namespace WebMVC.Exceptions;
 
 public class ApiError : Exception
 {
-    public ApiError(string message) : base(message)
+    public Response Response { get; set; } = new Response();
+    public ApiError(Response res)
     {
+        Response = res;
     }
 
-    public ApiError(string message, Exception innerException) : base(message, innerException)
-    {
-    }
 
 }

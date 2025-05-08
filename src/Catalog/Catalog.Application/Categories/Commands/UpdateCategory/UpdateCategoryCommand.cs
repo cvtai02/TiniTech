@@ -1,4 +1,5 @@
 using Catalog.Application.Common.Abstraction;
+using CrossCutting.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Categories.Commands;
@@ -26,7 +27,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
 
         if (entity == null)
         {
-            return new KeyNotFoundException($"Category with ID {request.Id} not found.");
+            return new NotFoundException($"Category with ID {request.Id} not found.");
         }
         // Update slug if name has changed
         if (entity.Name != request.Name)

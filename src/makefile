@@ -94,46 +94,30 @@ init-monolith:
 	make init-unit-tests
 	make init-solution
 
-run-adminui:
-	cd uis/admin && npm run dev
-
-run-webapi:
+run-api:
 	dotnet run --project WebAPI/WebAPI.csproj 
-run-webapi-nobuild:
+run-admin:
+	cd uis/admin && npm run dev
+run-api-nobuild:
 	dotnet run --project WebAPI/WebAPI.csproj --no-build
-run-webmvc:
+run-mvc:
 	dotnet run --project WebMVC/WebMVC.csproj
-watch-webmvc:
+watch-mvc:
 	dotnet watch run --project WebMVC/WebMVC.csproj 
 run-unit-tests:
 	dotnet test --project UnitTests/UnitTests.csproj --no-build --verbosity normal --filter "Category=Unit"
 
 
 name = $(shell basename $(shell pwd))
-
-migration-add:
-	dotnet ef migrations add $(name) --project Infrastructure -o Data/Migrations --startup-project WebAPI
-
-migration-update:
-	dotnet ef database update --project Infrastructure --startup-project WebAPI
 	
-migration-addup:
-	dotnet ef migrations add $(name) --project Infrastructure -o Data/Migrations --startup-project WebAPI
-	dotnet ef database update --project Infrastructure --startup-project WebAPI
-migration-catalog-addup:
+migration-catalog:
 	dotnet ef migrations add $(name) --project Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj -o Data/Migrations --context Catalog.Infrastructure.Data.ApplicationDbContext  --startup-project WebAPI
 	dotnet ef database update --project Catalog/Catalog.Infrastructure/Catalog.Infrastructure.csproj --context Catalog.Infrastructure.Data.ApplicationDbContext --startup-project WebAPI
 	
-migration-identity-addup:
+migration-identity:
 	dotnet ef migrations add $(name) --project Identity/Identity.Infrastructure/Identity.Infrastructure.csproj -o Data/Migrations --context Identity.Infrastructure.Data.ApplicationDbContext  --startup-project WebAPI
 	dotnet ef database update --project Identity/Identity.Infrastructure/Identity.Infrastructure.csproj --context Identity.Infrastructure.Data.ApplicationDbContext --startup-project WebAPI
 
-migration-rating-addup:
+migration-rating:
 	dotnet ef migrations add $(name) --project Rating/Rating.csproj -o Data/Migrations --context Rating.Infrastructure.Data.ApplicationDbContext  --startup-project WebAPI
 	dotnet ef database update --project Rating/Rating.csproj --context Rating.Infrastructure.Data.ApplicationDbContext --startup-project WebAPI
-
-migration-reset:
-	dotnet ef database update 0 --project Infrastructure --startup-project WebAPI
-
-migration-remove:
-	dotnet ef migrations remove --project Infrastructure --startup-project WebAPI

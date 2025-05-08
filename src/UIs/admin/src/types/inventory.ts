@@ -5,19 +5,16 @@ export type createImportReceiptDto = {
 };
 
 export type CreateImportItemDto = {
+  productId: number;
+  variantId: number;
   sku: string;
   quantity: number;
   unitCost: number;
 };
 
-export enum ProductStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  OUT_OF_STOCK = 'OUT_OF_STOCK',
-}
-
 export interface SkuItem {
-  id: string;
+  productId: number;
+  variantId: number;
   sku: string;
   name: string;
   identityName: string;

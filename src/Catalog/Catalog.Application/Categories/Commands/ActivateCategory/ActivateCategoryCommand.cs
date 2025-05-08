@@ -1,5 +1,6 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Application.Common.Exceptions;
+using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,7 @@ public class ActivateCategoryCommandHandler : IRequestHandler<ActivateCategoryCo
 
         if (category == null)
         {
-            return new KeyNotFoundException($"Category {request.Id} not found.");
+            return new NotFoundException($"Category {request.Id} not found.");
         }
 
         if (category.Status == CategoryStatus.Active)

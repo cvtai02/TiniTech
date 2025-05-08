@@ -10,7 +10,6 @@ using WebSharedModels.Dtos.Rating;
 
 namespace WebMVC.Controllers;
 
-[Route("rating")]
 public class RatingController : Controller
 {
     private readonly ILogger<RatingController> _logger;
@@ -22,10 +21,17 @@ public class RatingController : Controller
         _ratingService = ratingService;
     }
 
-    [HttpPost()]
-    public async Task<IActionResult> SubmitRatingAsync(SubmitRatingRequest model)
+    [HttpPost("/api/ratings")]
+    public async Task<IActionResult> SubmitRatingAsync([FromBody]SubmitRatingRequest model)
     {
         var r = await _ratingService.SubmitRatingAsync(model);
+        return Ok(r);
+    }
+
+    [HttpGet("/api/ratings")]
+    public async Task<IActionResult> GetRating([FromQuery] ProductRatingQuery model)
+    {
+        var r = await _ratingService.GetByProduct(model);
         return Ok(r);
     }
 }

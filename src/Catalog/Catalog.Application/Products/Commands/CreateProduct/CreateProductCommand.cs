@@ -30,7 +30,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
     public CreateProductCommandHandler(DbContextAbstract context, IImageService imageService)
     {
         _context = context;
-        _imageService = imageService;
+        _imageService = imageService; 
     }
 
     public async Task<Result<string>> Handle(CreateProductCommand request, CancellationToken cancellationToken)

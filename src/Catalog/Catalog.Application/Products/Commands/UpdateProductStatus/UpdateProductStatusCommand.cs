@@ -65,7 +65,7 @@ public class UpdateProductStatusCommandHandler : IRequestHandler<UpdateProductSt
 
             if (product == null)
             {
-                return new KeyNotFoundException($"Product {request.Id} not found.");
+                return new NotFoundException($"Product {request.Id} not found.");
             }
 
             var validationResult = _activateValidator.Validate(product);

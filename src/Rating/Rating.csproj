@@ -15,6 +15,7 @@
         <!-- domain -->
     <ProjectReference Include="..\SharedKernel\SharedKernel.csproj" />
     <ProjectReference Include="..\CrossCutting\CrossCutting.csproj" />
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\WebSharedModels\WebSharedModels.csproj" />
     </ItemGroup>
 

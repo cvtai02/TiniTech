@@ -3,6 +3,7 @@ using Catalog.Infrastructure.CloudinaryService;
 using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Data.Interceptors;
 using Infrastructure.Data;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -19,10 +20,14 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sprovider, options) =>
         {
             options.AddInterceptors(sprovider.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString,
+            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+
         });
         builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitializer>();
         builder.Services.AddScoped<IImageService, CloudinaryImageService>();
+
+        
     }
 }

@@ -6,10 +6,6 @@
     -   ctrl+z feature on edit product detail
     -   fix the input of variant sku, price in edit product page (done)
 
--   feat:
-
-    -   View deleted variant
-
 -   background jobs
 
     -   delete redundance imgage
@@ -19,3 +15,8 @@
 -   lock order to avoid users duplicate the orders
 
 -   Rename: Cozi
+
+-   refactor: move import-recipts to inventory module
+
+-   use split query for productdetail
+

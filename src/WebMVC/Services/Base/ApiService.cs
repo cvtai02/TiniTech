@@ -23,6 +23,7 @@ public class ApiService
 
     public async Task<Response<T>> GetDataAsync<T>(string endpoint, CancellationToken cancellationToken = default)
     {
+        Console.WriteLine($"Getting data from {endpoint}");
         HttpResponseMessage response;
         try
         {
@@ -56,7 +57,7 @@ public class ApiService
         }
         catch (Exception ex)
         {
-            throw new ApiReachFailedException("Internal Server Error", ex);
+            throw new ApiReachFailedException("Can not connect to api server", ex);
         }
 
 
@@ -105,6 +106,11 @@ public class ApiService
     {
         var jsonString = await response.Content.ReadAsStringAsync();
         Response<T>? responseDto;
+        if (jsonString == null)
+        {
+            throw new DeserializeException("No body data is return.", new Exception(jsonString));
+        }
+
         try
         {
 
@@ -117,52 +123,26 @@ public class ApiService
         }
         catch
         {
-            // BaseResponse? baseResponse = null;
-            // try
-            // {
-            //     baseResponse = JsonSerializer.Deserialize<BaseResponse>(jsonString, new JsonSerializerOptions
-            //     {
-            //         PropertyNameCaseInsensitive = true,
-            //         Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
-            //     });
-            // }
-            // catch (Exception)
-            // {
+            Console.WriteLine("response body: " + jsonString);
             throw new DeserializeException("Failed to deserialize response body.", new Exception(jsonString));
-            // }
-            // if (baseResponse == null)
-            // {
-            //     throw new DeserializeException("No body data is return.", new Exception(jsonString));
-            // }
-
-            // responseDto = new Response<T>
-            // {
-            //     Title = baseResponse.Title,
-            //     Detail = baseResponse.Detail,
-            //     Errors = baseResponse.Errors,
-            //     Status = baseResponse.Status,
-            //     Data = default
-            // };
         }
 
-        if (responseDto == null)
+
+        if (response.IsSuccessStatusCode)
         {
-            throw new DeserializeException("No body data is return.", new Exception(jsonString));
+#pragma warning disable CS8603 // Possible null reference return.
+            return responseDto;
+#pragma warning restore CS8603 // Possible null reference return.
         }
-
-        // if (response.IsSuccessStatusCode)
-        // {
-        Console.WriteLine(responseDto.Status);
-        Console.WriteLine(responseDto.Detail);
-        Console.WriteLine(responseDto.Title);
-        return responseDto;
-
-        // }
-        // else
-        // {
-        //     throw new ApiError(responseDto.Title, new Exception(responseDto.Detail));
-        // }
-
+        else
+        {
+            throw new ApiError(new Response()
+            {
+                Status = (int)response.StatusCode,
+                Title = responseDto?.Title ?? "Unknown error",
+                Detail = responseDto?.Detail ?? "Unknown error",
+            });
+        }
     }
 
     public string BaseUrl
@@ -171,14 +151,4 @@ public class ApiService
         set => _httpClient.BaseAddress = new Uri(value);
     }
 
-    private static Response<T> MapToNoneNullResponse<T>(Response<T?> response)
-    {
-        return new Response<T>
-        {
-            Title = response.Title,
-            Detail = response.Detail,
-            Status = response.Status,
-            Data = response.Data != null ? response.Data : default
-        };
-    }
 }

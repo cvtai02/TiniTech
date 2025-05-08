@@ -7,7 +7,8 @@ namespace WebSharedModels.Dtos.Inventory;
 
 public class SkuItem
 {
-    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public int VariantId { get; set; }
     public string Sku { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;

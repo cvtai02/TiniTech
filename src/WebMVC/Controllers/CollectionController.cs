@@ -28,33 +28,25 @@ public class CollectionController : Controller
     [HttpGet("{slug}")]
     public async Task<IActionResult> Details(string slug, [FromQuery] ProductQueryParameters parameters)
     {
-        try
+        if (slug == "whatever")
         {
-            if (slug == "whatever")
-            {
-            }
-            else
-            {
-                parameters.CategorySlug = slug;
-            }
-            var categories = await _categoryService.GetActiveCategoriesAsync(HttpContext.RequestAborted);
-            var products = await _productService.GetByQueryAsync(parameters, HttpContext.RequestAborted);
-
-            Console.WriteLine($"Query Parameters: {parameters}");
-            Console.WriteLine($"total products: {products.TotalCount}");
-
-            return View(new CollectionViewModel
-            {
-                Categories = categories,
-                Products = products,
-                QueryParameters = parameters
-            });
         }
-        catch (Exception ex)
+        else
         {
-            _logger.LogError(ex, "Error retrieving category details for slug: {Slug}", slug);
-            return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            parameters.CategorySlug = slug;
         }
+        var categories = await _categoryService.GetActiveCategoriesAsync(HttpContext.RequestAborted);
+        var products = await _productService.GetByQueryAsync(parameters, HttpContext.RequestAborted);
+
+        Console.WriteLine($"Query Parameters: {parameters}");
+        Console.WriteLine($"total products: {products.TotalCount}");
+
+        return View(new CollectionViewModel
+        {
+            Categories = categories,
+            Products = products,
+            QueryParameters = parameters
+        });
     }
 
 }

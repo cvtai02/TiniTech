@@ -1,5 +1,6 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Domain.Entities;
+using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebSharedModels.Dtos.Products;
@@ -33,7 +34,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
 
         if (product == null)
         {
-            return new KeyNotFoundException($"Product {request.New.Id} not found.");
+            return new NotFoundException($"Product {request.New.Id} not found.");
         }
 
         // Update product properties

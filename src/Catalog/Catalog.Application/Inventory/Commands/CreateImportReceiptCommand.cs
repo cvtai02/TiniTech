@@ -1,6 +1,8 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Domain.Entities;
+using CrossCutting.Exceptions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using WebSharedModels.Dtos.Inventory;
 
 namespace Catalog.Application.Inventory.Commands;
@@ -31,6 +33,7 @@ public class CreateImportReceiptCommand : ImportReceiptDto, IRequest<Result<stri
             })]
         };
     }
+
 }
 
 
@@ -51,6 +54,28 @@ public class CreateImportReceiptCommandHandler : IRequestHandler<CreateImportRec
     {
         var importReceipt = request.ToEntity();
         _context.ImportReceipts.Add(importReceipt);
+
+        foreach (var item in request.Items)
+        {
+            if (item.VariantId != 0)
+            {
+                var variant = await _context.Variants.Include(x => x.Metric).FirstOrDefaultAsync(x => x.Id == item.VariantId, cancellationToken);
+                if (variant == null)
+                {
+                    return new NotFoundException($"Variant with ID {item.VariantId} not found.");
+                }
+                variant.Metric.Stock += item.Quantity;
+            }
+            else
+            {
+                var product = await _context.Products.Include(x => x.Metric).FirstOrDefaultAsync(x => x.Id == item.ProductId, cancellationToken);
+                if (product == null)
+                {
+                    return new NotFoundException($"Product with SKU {item.Sku} not found.");
+                }
+                product.Metric.Stock += item.Quantity;
+            }
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 

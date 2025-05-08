@@ -114,7 +114,7 @@
                         localStorage.setItem('exp', data.data.accessTokenExpiresTime);
                         
                         // Redirect to home page after successful login
-                        window.location.href = '/';
+                       window.history.back();
                     } else {
                         showError('Authentication failed. Please try again.');
                     }

@@ -102,6 +102,7 @@ public class CategoryController : ApiController
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client, NoStore = false)]
     public async Task<IActionResult> Get([FromQuery] GetCategoriesByStatusQuery query)
     {
         var result = await Sender.Send(query);

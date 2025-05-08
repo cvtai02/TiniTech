@@ -1,3 +1,4 @@
+using CrossCutting.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -22,11 +23,12 @@ public class GlobalExceptionFilter : IExceptionFilter
             {
                 context.Result = new JsonResult(new
                 {
-                    title = e.Message,
-                    detail = context.Exception.Message
+                    title = e.Response.Title,
+                    detail = e.Response.Detail,
+                    status = e.Response.Status
                 })
                 {
-                    StatusCode = StatusCodes.Status500InternalServerError
+                    StatusCode = e.Response.Status
                 };
             }
             else
@@ -43,16 +45,24 @@ public class GlobalExceptionFilter : IExceptionFilter
         }
         else // For MVC controllers
         {
+            ErrorViewModel v = context.Exception switch
+            {
+                ApiError ex => new(ex.Response.Status, ex.Response.Title, ex.Response.Detail),
+                NotFoundException => new(StatusCodes.Status404NotFound, "Not Found"),
+                ValidationException => new(StatusCodes.Status400BadRequest, context.Exception.Message),
+                ApiReachFailedException => new(StatusCodes.Status503ServiceUnavailable, "Something went wrong"),
+                DeserializeException => new(StatusCodes.Status503ServiceUnavailable, "Something went wrong", context.Exception.Message),
+                _ => new(StatusCodes.Status500InternalServerError, "Internal Server Error")
+            };
+
+
             context.Result = new ViewResult
             {
                 ViewName = "Error",
                 ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState)
                 {
-                    Model = new ErrorViewModel
-                    {
-                        RequestId = context.HttpContext.TraceIdentifier,
-                        ErrorMessage = context.Exception.Message
-                    }
+
+                    Model = v,
                 }
             };
         }
