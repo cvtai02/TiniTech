@@ -22,7 +22,9 @@ public static class DependencyInjection
 
         builder.Services.AddMassTransit(bus =>
         {
-            bus.AddConsumer<RatingSubmittedConsumer>();
+            bus.AddConsumer<RatingCreatedConsumer>();
+            bus.AddConsumer<RatingUpdatedConsumer>();
+            bus.AddConsumer<OrderCreatedConsumer>();
         });
     }
 }

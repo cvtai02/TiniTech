@@ -43,9 +43,12 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
         return exception switch
         {
             NotFoundException => (StatusCodes.Status404NotFound, exception.Message),
-            TimeoutException => (StatusCodes.Status408RequestTimeout, "Request Timeout"),
-            NotImplementedException => (StatusCodes.Status501NotImplemented, "Not Implemented"),
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            ValidationException => (StatusCodes.Status400BadRequest, exception.Message),
+            UnauthorizedAccessException => (StatusCodes.Status403Forbidden, $"Forbidden: {exception.Message}"),
+            InvalidOperationException e => (StatusCodes.Status400BadRequest, e.Message),
+            ArgumentOutOfRangeException e => (StatusCodes.Status400BadRequest, $"{e.ParamName} is out of range"),
+            ArgumentNullException e => (StatusCodes.Status400BadRequest, $"{e.ParamName} cannot be null"),
+            ArgumentException e => (StatusCodes.Status400BadRequest, $"{e.ParamName}:  {exception.Message}"),
             DbUpdateException when exception.InnerException is SqlException sqlEx && (sqlEx.Number == 2627 || sqlEx.Number == 2601) =>
             (StatusCodes.Status409Conflict, "Unique Constraint Violation"),
 

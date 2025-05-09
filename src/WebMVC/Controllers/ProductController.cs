@@ -29,4 +29,5 @@ public class ProductController : Controller
             RelatedProducts = relatedProducts,
         });
     }
+
 }

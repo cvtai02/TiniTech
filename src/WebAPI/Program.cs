@@ -1,18 +1,20 @@
 using Catalog.Endpoints;
 using Identity.Endpoints;
 using Infrastructure;
+using Purchase.Endpoints;
 using Rating.Endpoints;
 using SharedKernel;
 using WebAPI.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddInfrastructure();
 builder
     .AddIdentityModule()
     .AddCatalogModule()
     .AddRatingModule()
+    .AddPurchaseModule()
     .AddWebServices();
+builder.AddInfrastructure();       //move this after Modules because of Masstransit injection 
 
 // Define the CORS policy
 var OriginsPolicy = "_OriginsPolicy";

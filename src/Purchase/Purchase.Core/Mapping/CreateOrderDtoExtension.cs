@@ -10,7 +10,6 @@ public static class CreateOrderDtoExtension
     {
         return new Order
         {
-            UserId = orderDto.CustomerId,
             BillingAddress = orderDto.BillingAddress,
             Notes = orderDto.Notes,
             ItemsPrice = orderDto.ItemsPrice,

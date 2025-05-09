@@ -1,9 +1,10 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Purchase.Core.Services.OrderServices;
 using Purchase.Core.Services.OrderServices.CreateOrder;
 using Purchase.Core.Services.OrderServices.Dtos;
 using SharedKernel.Enums;
+using WebSharedModels.Dtos.Common;
 using WebSharedModels.Dtos.Orders;
 
 namespace Purchase.Endpoints;
@@ -46,8 +47,8 @@ public class OrderController : ControllerBase
         return Ok(order);
     }
 
-    [HttpPatch("cancell/{orderId}")]
-    public IActionResult CancellOrder(int orderId)
+    [HttpPatch("cancel/{orderId}")]
+    public IActionResult CancelOrder(int orderId)
     {
         var order = _updateOrderStatus.Handle(orderId, OrderStatus.Cancelled);
         return Ok(order);
@@ -57,7 +58,13 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto orderDto)
     {
         var orderId = await _createOrder.Handle(orderDto);
-        return CreatedAtAction(nameof(GetdProcessingOrders), new { id = orderId }, orderId);
+        return CreatedAtAction(nameof(GetdProcessingOrders), new { id = orderId }, new Response<int>
+        {
+            Title = "Success",
+            Data = orderId,
+            Status = 201,
+            Detail = "Order created successfully."
+        });
     }
 
 }

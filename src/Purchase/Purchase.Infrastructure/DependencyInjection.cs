@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Purchase.Core.Abstraction;
 using Purchase.Infrastructure.Data;
+using Purchase.Infrastructure.ShippingInfras;
 
 namespace Purchase.Infrastructure;
 
@@ -21,5 +22,7 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString);
         });
         builder.Services.AddScoped<DbContextAbstract>(provider => provider.GetRequiredService<ApplicationDbContext>());
+
+        builder.Services.AddScoped<IShippingFeeCalculator, ShippingFeeCalculator>();
     }
 }

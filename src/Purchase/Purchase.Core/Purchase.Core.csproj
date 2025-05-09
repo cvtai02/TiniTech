@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\CrossCutting\CrossCutting.csproj" />
     <ProjectReference Include="..\..\SharedKernel\SharedKernel.csproj" />
     <ProjectReference Include="..\..\WebSharedModels\WebSharedModels.csproj" />
+    <ProjectReference Include="..\..\Contracts\Contracts.csproj" />
   </ItemGroup>
 
 </Project>

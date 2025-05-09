@@ -55,6 +55,12 @@ function scrollToThumbnail(index) {
 function showAddressModal() {
     document.getElementById("addressModal").classList.remove("hidden");
     document.getElementById("addressModal").classList.add("flex");
+    console.log("isAuthenticated", isAuthenticated());
+    if (isAuthenticated()) {
+        document
+            .getElementById("addressModel-authNavigation")
+            .classList.add("hidden");
+    }
     document.body.style.overflow = "hidden";
 }
 
@@ -426,8 +432,10 @@ function updateSelectedVariant() {
         const maxStock = selectedVariant
             ? selectedVariant.stock
             : productData.stock;
-        if (parseInt(quantityInput.value) > maxStock) {
-            quantityInput.value = maxStock;
+        if (maxStock === 0) {
+            quantityInput.value = 0;
+        } else {
+            quantityInput.value = 1;
         }
     }
 }
@@ -437,28 +445,93 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const addressForm = document.getElementById("addressForm");
     if (addressForm) {
-        addressForm.addEventListener("submit", function (e) {
+        addressForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            const formData = {
-                receiverName: document.getElementById("receiverName").value,
-                phoneNumber: document.getElementById("phoneNumber").value,
-                city: document.getElementById("city").value,
-                district: document.getElementById("district").value,
-                ward: document.getElementById("ward").value,
-                detailAddress: document.getElementById("detailAddress").value,
-            };
+            try {
+                const quantity =
+                    parseInt(document.getElementById("quantityInput").value) ||
+                    0;
 
-            addToCart();
+                // Create the order item
+                const orderItem = {
+                    productId: parseInt(productId),
+                    variantId: selectedVariant ? selectedVariant.id : null,
+                    quantity: quantity,
+                    unitPrice: selectedVariant
+                        ? selectedVariant.price
+                        : productPrice,
+                };
 
-            console.log("Proceeding to checkout with address:", formData);
+                // Create the address object matching our backend model
+                const address = {
+                    owner: document.getElementById("receiverName").value,
+                    phoneNumber: document.getElementById("phoneNumber").value,
+                    email: document.getElementById("email").value,
+                    province: document.getElementById("city").value,
+                    district: document.getElementById("district").value,
+                    ward: document.getElementById("ward").value,
+                    detailAddress:
+                        document.getElementById("detailAddress").value,
+                };
 
-            const queryParams = new URLSearchParams({
-                receiverName: formData.receiverName,
-                phoneNumber: formData.phoneNumber,
-            }).toString();
+                // Calculate the total price
+                const totalPrice = orderItem.unitPrice * quantity;
 
-            window.location.href = "/checkout?" + queryParams;
+                // Create the complete order object
+                const orderData = {
+                    billingAddress: address,
+                    items: [orderItem],
+                    totalPrice: totalPrice,
+                };
+
+                // Show loading state
+                const submitButton = addressForm.querySelector(
+                    'button[type="submit"]'
+                );
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Processing...";
+
+                // Send the order to the API
+                const response = await apiFetch("/api/checkout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(orderData),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Close the modal
+                    closeAddressModal();
+
+                    // Show success message
+                    toast("Order placed successfully!");
+
+                    // Redirect to order confirmation or order detail page
+                    // setTimeout(() => {
+                    //     window.location.href = `/orders/${result.orderId}`;
+                    // }, 1500);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.title || "Failed to place order");
+                }
+            } catch (error) {
+                console.error("Error placing order:", error);
+                toast(
+                    error.message || "Failed to place order. Please try again."
+                );
+            } finally {
+                // Reset button state
+                const submitButton = addressForm.querySelector(
+                    'button[type="submit"]'
+                );
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
         });
     }
 

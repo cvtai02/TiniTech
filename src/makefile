@@ -121,3 +121,7 @@ migration-identity:
 migration-rating:
 	dotnet ef migrations add $(name) --project Rating/Rating.csproj -o Data/Migrations --context Rating.Infrastructure.Data.ApplicationDbContext  --startup-project WebAPI
 	dotnet ef database update --project Rating/Rating.csproj --context Rating.Infrastructure.Data.ApplicationDbContext --startup-project WebAPI
+
+migration-purchase:
+	dotnet ef migrations add $(name) --project Purchase/Purchase.Infrastructure/Purchase.Infrastructure.csproj -o Data/Migrations --context Purchase.Infrastructure.Data.ApplicationDbContext  --startup-project WebAPI
+	dotnet ef database update --project Purchase/Purchase.Infrastructure/Purchase.Infrastructure.csproj --context Purchase.Infrastructure.Data.ApplicationDbContext --startup-project WebAPI

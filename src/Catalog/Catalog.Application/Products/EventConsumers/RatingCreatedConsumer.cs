@@ -6,16 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Application.Products.EventConsumers;
 
-public class RatingSubmittedConsumer : IConsumer<RatingSubmitted>
+public class RatingCreatedConsumer : IConsumer<RatingCreated>
 {
     private readonly DbContextAbstract _context;
-    public RatingSubmittedConsumer(DbContextAbstract context)
+    public RatingCreatedConsumer(DbContextAbstract context)
     {
         _context = context;
     }
-    public async Task Consume(ConsumeContext<RatingSubmitted> context)
+    public async Task Consume(ConsumeContext<RatingCreated> context)
     {
-        var productMetric = await _context.ProductMetrics.FirstOrDefaultAsync(x => x.Id == context.Message.ProductId, context.CancellationToken);
+        var productMetric = await _context.ProductMetrics.FirstOrDefaultAsync(x => x.ProductId == context.Message.ProductId, context.CancellationToken);
         if (productMetric == null)
         {
             _context.ProductMetrics.Add(new Domain.Entities.ProductMetric

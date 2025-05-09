@@ -106,6 +106,7 @@ async function logout() {
                 localStorage.removeItem("user");
                 localStorage.removeItem("exp");
                 console.log("Logout successful");
+                window.location.reload();
                 // window.location.href = "/";
             } else {
                 // Handle error response
@@ -136,11 +137,7 @@ async function apiFetch(input, init) {
         // --- Response Interceptor ---
         if (response.status >= 400) {
             if (response.status === 401) {
-                throw new Error("Unauthorized!");
-            } else if (response.status === 403) {
-                throw new Error(
-                    "Forbidden! You do not have permission to access this resource."
-                );
+                throw new Error("Unauthorized! Please log in.");
             }
 
             // Thêm xử lý an toàn khi parse JSON
@@ -186,5 +183,3 @@ function toast(message) {
         }, 300);
     }, 3000);
 }
-
-

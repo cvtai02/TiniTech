@@ -1,6 +1,8 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Domain.Entities;
+using Contracts.Inventory;
 using CrossCutting.Exceptions;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebSharedModels.Dtos.Inventory;
@@ -44,9 +46,11 @@ public class CreateImportReceiptCommand : ImportReceiptDto, IRequest<Result<stri
 public class CreateImportReceiptCommandHandler : IRequestHandler<CreateImportReceiptCommand, Result<string>>
 {
     private readonly DbContextAbstract _context;
+    private readonly IPublishEndpoint _publisher;
 
-    public CreateImportReceiptCommandHandler(DbContextAbstract context)
+    public CreateImportReceiptCommandHandler(DbContextAbstract context, IPublishEndpoint publisher)
     {
+        _publisher = publisher;
         _context = context;
     }
 
@@ -78,6 +82,31 @@ public class CreateImportReceiptCommandHandler : IRequestHandler<CreateImportRec
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+        foreach (var item in request.Items)
+        {
+            if (item.VariantId != 0)
+            {
+                await _publisher.Publish(new ProductImported()
+                {
+                    Sku = item.Sku,
+                    VariantId = item.VariantId,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitCost = item.UnitCost,
+                }, cancellationToken);
+            }
+            else
+            {
+                await _publisher.Publish(new ProductImported()
+                {
+                    Sku = item.Sku,
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitCost = item.UnitCost,
+                }, cancellationToken);
+            }
+        }
+
 
         return importReceipt.Code;
     }

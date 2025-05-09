@@ -12,7 +12,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(e => e.ItemsPrice)
             .HasPrecision(18, 2);
-        builder.Property(e => e.ShippingPrice)
+        builder.Property(e => e.ShippingFee)
             .HasPrecision(18, 2);
 
         builder.Property(e => e.TotalCost)

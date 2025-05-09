@@ -20,3 +20,5 @@
 
 -   use split query for productdetail
 
+-   mvc
+    handler login page when already login

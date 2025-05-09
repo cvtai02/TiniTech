@@ -2,17 +2,18 @@ using Infrastructure.Data.Interceptors;
 using MassTransit;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 public static class DependencyInjection
 {
-    public static void AddInfrastructure(this IServiceCollection services)
+    public static void AddInfrastructure(this IHostApplicationBuilder builder)
     {
-        services.AddSingleton(TimeProvider.System);
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        builder.Services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
 
-        services.AddMassTransit(bus =>
+        builder.Services.AddMassTransit(bus =>
         {
             bus.UsingRabbitMq((context, cfg) =>
             {

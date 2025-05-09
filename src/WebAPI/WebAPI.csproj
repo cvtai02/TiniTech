@@ -21,6 +21,7 @@
     <ProjectReference Include="..\Identity\Identity.Endpoints\Identity.Endpoints.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Rating\Rating.csproj" />
+    <ProjectReference Include="..\Purchase\Purchase.Endpoints\Purchase.Endpoints.csproj" />
   </ItemGroup>
 
 </Project>

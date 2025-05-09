@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
+using Contracts.Purchase.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Purchase.Core.ContractsImp;
 using Purchase.Core.Services.CartServices;
 using Purchase.Core.Services.CartServices.CreateOrder;
 using Purchase.Core.Services.OrderServices;
@@ -20,6 +22,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<GetOrders>();
         builder.Services.AddScoped<UpdateOrderStatus>();
         builder.Services.AddScoped<GetUserOrders>();
+        builder.Services.AddScoped<UpdateOrderStatus>();
+
+        builder.Services.AddScoped<ICheckUserProductPurchase, CheckUserProductPurchase>();
 
         builder.Services.AddSingleton<ConcurrentQueue<OrderQueueItem>>();
 

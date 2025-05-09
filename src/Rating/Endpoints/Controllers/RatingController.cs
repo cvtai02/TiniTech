@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Rating.Core.Usecases.Queries;
@@ -46,6 +47,7 @@ public class RatingController : Controller
     }
 
     [HttpPost()]
+    [Authorize]
     public async Task<IActionResult> SubmitRatingAsync([FromBody] SubmitRatingRequest r)
     {
         var result = await _submitRating.Handle(r);

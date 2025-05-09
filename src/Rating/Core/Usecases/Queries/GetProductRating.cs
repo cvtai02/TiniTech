@@ -53,7 +53,7 @@ public class GetProductRating
 
         var ratings = await _dbContext.UserRatings
             .Where(r => r.ProductId == request.ProductId)
-            .OrderByDescending(r => r.Created)
+            .OrderByDescending(r => r.LastModified)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync();

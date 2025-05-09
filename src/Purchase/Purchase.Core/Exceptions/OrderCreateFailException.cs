@@ -9,7 +9,6 @@ public class OrderCreateFailException : Exception
 {
     public OrderCreateFailException(string message) : base(message) { }
 
-
     public OrderCreateFailException(string message, Exception inner) : base(message, inner) { }
 
 }

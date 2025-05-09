@@ -1,12 +1,14 @@
 using System.Collections.Concurrent;
+using Contracts.Purchase.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Purchase.Core.Abstraction;
 using Purchase.Core.Entities;
 using Purchase.Core.Exceptions;
 using Purchase.Core.Mapping;
-using Purchase.Core.Services.OrderServices.CreateOrder;
 using SharedKernel.Enums;
+using SharedKernel.Interfaces;
 using WebSharedModels.Dtos.Orders;
 
 namespace Purchase.Core.Services.OrderServices.CreateOrder;
@@ -15,26 +17,31 @@ public class CreateOrder
 {
     private readonly ConcurrentQueue<OrderQueueItem> _orderQueue;
     private readonly IShippingFeeCalculator _shippingFeeCalculator;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUser _user;
+    private readonly IPublishEndpoint _publisher;
 
-    public CreateOrder(ConcurrentQueue<OrderQueueItem> orderQueue, IShippingFeeCalculator shippingFeeCalculator, IHttpContextAccessor httpContextAccessor)
+    public CreateOrder(
+        ConcurrentQueue<OrderQueueItem> orderQueue,
+        IShippingFeeCalculator shippingFeeCalculator,
+        IUser user,
+        IPublishEndpoint publisher)
     {
         _orderQueue = orderQueue;
         _shippingFeeCalculator = shippingFeeCalculator;
-        _httpContextAccessor = httpContextAccessor;
+        _user = user;
+        _publisher = publisher;
     }
-
     public async Task<int> Handle(CreateOrderDto orderDto)
     {
         var order = orderDto.ToOrder();
         order.Status = OrderStatus.Preparing;
+        order.UserId = _user.Id;
 
         var shippingFee = await _shippingFeeCalculator.CalculateShippingCostAsync(orderDto);
         order.ShippingFee = shippingFee;
 
         var shipping = orderDto.ToShipping();
         order.Shipping = shipping;
-        order.Shipping.ShippingFee = shippingFee;
 
         var tcs = new TaskCompletionSource<int>();
 
@@ -45,6 +52,18 @@ public class CreateOrder
             {
                 try
                 {
+                    _publisher.Publish(new OrderCreated
+                    {
+                        OrderId = orderId,
+                        UserId = order.UserId,
+                        Items = [.. order.OrderItems.Select(i => new Contracts.Purchase.OrderItem
+                        {
+                            ProductId = i.ProductId,
+                            VariantId = i.VariantId,
+                            Quantity = i.Quantity,
+                            Price = i.UnitPrice,
+                        })],
+                    });
                     tcs.TrySetResult(orderId);
                 }
                 catch (Exception ex)
