@@ -44,11 +44,15 @@ public abstract class ApiController : ControllerBase
 
         }
 
-        return BadRequest(
-            CreateProblemDetails(
-                "Something went wrong",
+        return new ObjectResult("Internal Server Error")
+        {
+            StatusCode = 500,
+            Value = CreateProblemDetails(
+                "Internal Server Error",
                 StatusCodes.Status500InternalServerError,
-                result.Exception));
+                result.Exception)
+        };
+
     }
 
     private static ProblemDetails CreateProblemDetails(

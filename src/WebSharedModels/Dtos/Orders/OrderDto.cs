@@ -12,6 +12,6 @@ public class OrderDto
     public string ShippingAddress { get; set; } = null!;
     public string BillingAddress { get; set; } = null!;
     public decimal TotalAmount { get; set; }
-    public DateTime OrderDate { get; set; }
+    public DateTimeOffset OrderDate { get; set; }
     public List<OrderItemDto> Items { get; set; } = [];
 }

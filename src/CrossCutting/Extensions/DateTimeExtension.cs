@@ -5,14 +5,9 @@ using System.Threading.Tasks;
 
 namespace CrossCutting.Extensions;
 
-public static class DateTimeExtension
+public static class DateTimeOffsetExtension
 {
-    /// <summary>
-    /// Formats the DateTime to "yymmddhhmmss" format
-    /// </summary>
-    /// <param name="dateTime">The DateTime to format</param>
-    /// <returns>The formatted string in "yymmddhhmmss" format</returns>
-    public static string ToYymmddhhmmss(this DateTime dateTime)
+    public static string ToYymmddhhmmss(this DateTimeOffset dateTime)
     {
         return dateTime.ToString("yyMMddHHmmss");
     }

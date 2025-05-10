@@ -403,23 +403,24 @@ function updateSelectedVariant() {
 
     if (selectedVariant) {
         if (priceElement)
-            priceElement.textContent = "$" + selectedVariant.price;
+            priceElement.textContent = formatVND(selectedVariant.price);
         if (skuElement) skuElement.textContent = selectedVariant.sku;
         if (stockElement) {
-            stockElement.textContent = selectedVariant.stock + " left";
+            stockElement.textContent = "còn " + selectedVariant.stock;
             stockElement.className =
                 "font-medium " +
                 (selectedVariant.stock > 0 ? "text-green-700" : "text-red-700");
         }
         if (soldElement) {
-            soldElement.textContent = selectedVariant.sold + " sold";
+            soldElement.textContent = "đã bán " + selectedVariant.sold;
         }
     } else {
-        if (priceElement) priceElement.textContent = "$" + productData.price;
+        if (priceElement)
+            priceElement.textContent = formatVND(productData.price);
         if (skuElement)
             skuElement.textContent = "This combination has no variant";
         if (stockElement) {
-            stockElement.textContent = productData.stock + " left";
+            stockElement.textContent = "còn " + productData.stock;
             stockElement.className =
                 "font-medium " +
                 (productData.stock > 0 ? "text-green-700" : "text-red-700");

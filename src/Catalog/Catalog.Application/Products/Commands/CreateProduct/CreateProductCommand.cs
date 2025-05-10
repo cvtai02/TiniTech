@@ -1,8 +1,10 @@
 using Catalog.Application.Common.Abstraction;
 using Catalog.Application.Common.Exceptions;
 using Catalog.Domain.Entities;
+using CrossCutting.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Application.Products.Commands.CreateProductCommand;
 
@@ -17,7 +19,7 @@ public class CreateProductCommand : IRequest<Result<string>>
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; } = string.Empty;
     public string Sku { get; set; } = null!;
-    public decimal? Price { get; set; } = 0m;
+    public decimal Price { get; set; } = 0.00m;
     public int CategoryId { get; set; }
     public List<IFormFile>? Images { get; set; } = [];
 }
@@ -30,7 +32,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
     public CreateProductCommandHandler(DbContextAbstract context, IImageService imageService)
     {
         _context = context;
-        _imageService = imageService; 
+        _imageService = imageService;
     }
 
     public async Task<Result<string>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -45,9 +47,17 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             CategoryId = request.CategoryId,
             Metric = new ProductMetric
             {
-                LowestPrice = request.Price ?? 0m,
+                LowestPrice = request.Price,
             },
         };
+
+        var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == request.CategoryId);
+
+        if (category == null)
+            return new NotFoundException("Category not found");
+
+        if (category.ParentId == null)
+            return new ArgumentException("CategoryId must be Id of Leaf category");
 
 
         var uploadTasks = request.Images?.Select(async (image, index) =>

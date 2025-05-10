@@ -33,26 +33,9 @@ public class Auth : ApiController
             var token = result.Value.AccessToken;
             var refreshToken = result.Value.RefreshToken;
             var accessExpiresTime = result.Value.AccessTokenExpiresTime;
+            var accessToken = result.Value.AccessToken;
+            var refreshTokenId = result.Value.RefreshToken;
             var refreshExpiresTime = result.Value.RefreshTokenExpiresTime;
-            Response.Cookies.Append("access_token", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = accessExpiresTime,
-                Secure = true, // Set to true in production
-                SameSite = SameSiteMode.Strict,
-                Path = "/",
-            });
-            if (refreshToken != null)
-            {
-                Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Expires = refreshExpiresTime,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Path = "/",
-                });
-            }
         }
 
         return result.Match(
@@ -67,6 +50,8 @@ public class Auth : ApiController
                     AccessTokenExpiresTime = r.AccessTokenExpiresTime,
                     RefreshTokenExpiresTime = r.RefreshTokenExpiresTime,
                     User = r.User,
+                    AccessToken = r.AccessToken,
+                    RefreshToken = r.RefreshToken,
                 }
             }),
             e => HandleFailure<LoginQuery>(e)
@@ -94,7 +79,7 @@ public class Auth : ApiController
     public async Task<IActionResult> Logout()
     {
 
-        var token = Request.Cookies["access_token"];
+        var token = Request.Headers.Authorization.ToString().Replace("Bearer ", "");
         if (string.IsNullOrEmpty(token))
         {
             return BadRequest(new Response
@@ -119,14 +104,6 @@ public class Auth : ApiController
                     Data = false,
                 });
             }
-
-            Response.Cookies.Delete("access_token", new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Path = "/",
-            });
 
 
             return Ok(new Response

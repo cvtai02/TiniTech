@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Data.Migrations
+namespace Catalog.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -122,8 +122,8 @@ namespace Infrastructure.Data.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ReceiptDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("ReceiptDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Supplier")
                         .HasColumnType("nvarchar(max)");

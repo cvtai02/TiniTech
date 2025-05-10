@@ -16,4 +16,6 @@ public class ProductBriefDto
     public int RatingCount { get; set; }
     public int Stock { get; set; }
     public int Sold { get; set; }
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset LastModified { get; set; }
 }

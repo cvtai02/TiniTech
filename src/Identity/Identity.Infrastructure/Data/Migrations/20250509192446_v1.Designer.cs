@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Identity.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250505164347_v2")]
-    partial class v2
+    [Migration("20250509192446_v1")]
+    partial class v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,6 +93,12 @@ namespace Identity.Infrastructure.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<TimeSpan>("AccessTokenLifetime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("RefreshTokenLifetime")
+                        .HasColumnType("time");
+
                     b.HasKey("Name");
 
                     b.ToTable("Roles");
@@ -130,8 +136,8 @@ namespace Identity.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Locked")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("Locked")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()

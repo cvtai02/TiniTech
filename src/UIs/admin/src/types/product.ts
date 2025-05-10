@@ -76,11 +76,13 @@ export interface ProductBriefDto {
   ratingCount: number;
   stock: number;
   sold: number;
+  created: Date;
+  lastModified: Date;
 }
 
 export class GetProductsQueryParams {
   page: number = 1;
-  pageSize: number = 8;
+  pageSize: number = 10;
   search?: string | null;
   categorySlug?: string | null;
   status: string[] = ['active', 'draft'];
@@ -112,5 +114,3 @@ export class GetProductsQueryParams {
     return params.toString();
   }
 }
-
-

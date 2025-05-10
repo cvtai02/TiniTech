@@ -90,6 +90,12 @@ namespace Identity.Infrastructure.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<TimeSpan>("AccessTokenLifetime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("RefreshTokenLifetime")
+                        .HasColumnType("time");
+
                     b.HasKey("Name");
 
                     b.ToTable("Roles");
@@ -127,8 +133,8 @@ namespace Identity.Infrastructure.Data.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Locked")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("Locked")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()

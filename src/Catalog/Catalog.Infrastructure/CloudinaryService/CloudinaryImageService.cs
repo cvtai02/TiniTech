@@ -43,14 +43,14 @@ public class CloudinaryImageService : IImageService
         string uniqueFileName;
         if (string.IsNullOrEmpty(fileName))
         {
-            uniqueFileName = $"{DateTime.UtcNow.Ticks}_{Guid.NewGuid()}";
+            uniqueFileName = $"{DateTimeOffset.UtcNow.Ticks}_{Guid.NewGuid()}";
         }
         else
         {
             // Append a timestamp to user-provided filename to ensure uniqueness
             string fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(fileName);
             string extension = System.IO.Path.GetExtension(fileName);
-            uniqueFileName = $"{fileNameWithoutExtension}_{DateTime.UtcNow.Ticks}{extension}";
+            uniqueFileName = $"{fileNameWithoutExtension}_{DateTimeOffset.UtcNow.Ticks}{extension}";
         }
 
         // Prepare upload parameters

@@ -10,6 +10,7 @@ export async function apiFetch(
     headers: {
       ...init?.headers,
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('accessToken') || '')}`,
     },
   };
 
@@ -56,6 +57,7 @@ export async function postForm(
     ...init,
     headers: {
       ...init?.headers,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('accessToken') || '')}`,
     },
   };
 

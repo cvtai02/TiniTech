@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Rating.Data.Migrations
+namespace Rating.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class v1 : Migration
@@ -23,7 +23,6 @@ namespace Rating.Data.Migrations
                     FourStar = table.Column<int>(type: "int", nullable: false),
                     FiveStar = table.Column<int>(type: "int", nullable: false),
                     TotalRating = table.Column<int>(type: "int", nullable: false),
-                    AverageRating = table.Column<double>(type: "float", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     TotalComment = table.Column<int>(type: "int", nullable: false)
                 },

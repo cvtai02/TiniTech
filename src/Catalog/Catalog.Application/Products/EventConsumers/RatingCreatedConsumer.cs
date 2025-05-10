@@ -22,13 +22,15 @@ public class RatingCreatedConsumer : IConsumer<RatingCreated>
             {
                 Id = context.Message.ProductId,
                 RatingAvg = context.Message.Rating,
-                RatingCount = 1
+                RatingCount = 1,
+                FeaturedPoint = 1
             });
         }
         else
         {
             productMetric.RatingAvg = (productMetric.RatingAvg * productMetric.RatingCount + context.Message.Rating) / (productMetric.RatingCount + 1);
             productMetric.RatingCount += 1;
+            productMetric.FeaturedPoint += 1;
         }
 
         await _context.SaveChangesAsync(context.CancellationToken);

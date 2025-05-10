@@ -91,8 +91,8 @@ public class GetProductRating
             Avatar = r.Avatar,
             Rating = r.Rating,
             Comment = r.Comment,
-            CreatedAt = r.Created.DateTime,
-            UpdatedAt = r.LastModified.DateTime
+            CreatedAt = r.Created,
+            UpdatedAt = r.LastModified
         }).ToList();
 
         return new ProductRatingDto

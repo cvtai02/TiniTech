@@ -19,7 +19,7 @@ public class Product : BaseAuditableEntity
             {
                 _name = char.ToUpper(value[0]) + value[1..];
             }
-            Slug = value.ToSlug(DateTime.Now.ToYymmddhhmmss());
+            Slug = value.ToSlug(DateTimeOffset.Now.ToYymmddhhmmss());
         }
     }
     public string Sku { get; set; } = string.Empty;

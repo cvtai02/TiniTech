@@ -20,17 +20,17 @@ namespace Identity.Infrastructure.Jwt
         public string GenerateAccessToken(User user, string refreshTokenId = "")
         {
             //TODO: get token lifetime base on user role from db
-            return GenerateToken(user, DateTime.UtcNow.AddHours(1), refreshTokenId ?? "");
+            return GenerateToken(user, DateTimeOffset.UtcNow.AddHours(1), refreshTokenId ?? "");
         }
 
         public string GenerateRefreshToken(User user)
         {
 
             //TODO: get token lifetime base on user role from db
-            return GenerateToken(user, DateTime.UtcNow.AddDays(7));
+            return GenerateToken(user, DateTimeOffset.UtcNow.AddDays(7));
         }
 
-        public string GenerateToken(User user, DateTime? expires = null, string refreshTokenId = "")
+        public string GenerateToken(User user, DateTimeOffset expires, string refreshTokenId = "")
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_options.Secret);
@@ -45,12 +45,12 @@ namespace Identity.Infrastructure.Jwt
                 new("refreshTokenId", refreshTokenId), // use for checking refresh token validation. just need to store invalid access token
             };
 
-
+            
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = expires,
+                Expires = expires.UtcDateTime,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _options.Issuer,
                 Audience = _options.Audience

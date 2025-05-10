@@ -9,10 +9,10 @@ using Rating.Infrastructure.Data;
 
 #nullable disable
 
-namespace Rating.Data.Migrations
+namespace Rating.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250506170549_v1")]
+    [Migration("20250509191050_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -32,9 +32,6 @@ namespace Rating.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double>("AverageRating")
-                        .HasColumnType("float");
 
                     b.Property<int>("FiveStar")
                         .HasColumnType("int");

@@ -116,6 +116,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
             }
         }
         // add new variants
+        var lowestPrice = decimal.MaxValue;
         foreach (var variant in request.New.Variants)
         {
             var existingVariant = product.Variants.FirstOrDefault(v => variant.IsSameId(v));
@@ -124,7 +125,7 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
                 existingVariant.Price = variant.Price;
                 existingVariant.Sku = variant.Sku;
                 existingVariant.IsDeleted = false;
-
+                lowestPrice = Math.Min(lowestPrice, variant.Price);
             }
             else
             {
@@ -140,11 +141,10 @@ public class UpdateProductInfoCommandHandler : IRequestHandler<UpdateProductInfo
                     Metric = new VariantMetric()
                 });
 
+                lowestPrice = Math.Min(lowestPrice, variant.Price);
+
             }
-            if (product.Metric.LowestPrice > variant.Price)
-            {
-                product.Metric.LowestPrice = variant.Price;
-            }
+            product.Metric.LowestPrice = lowestPrice;
         }
 
         await _context.SaveChangesAsync(cancellationToken);

@@ -8,6 +8,8 @@ export interface loginForm {
 export interface LoginResponse {
   isAuthenticated: boolean;
   accessTokenExpiresTime: Date | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   refreshTokenExpiresTime: Date | null;
   user: User | null;
 }

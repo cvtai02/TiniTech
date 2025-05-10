@@ -12,7 +12,7 @@ using Purchase.Infrastructure.Data;
 namespace Purchase.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250508191036_v1")]
+    [Migration("20250509192500_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -165,8 +165,6 @@ namespace Purchase.Infrastructure.Data.Migrations
 
                     b.HasIndex("OrderId")
                         .IsUnique();
-
-                    b.HasIndex("ShippingProviderId");
 
                     b.ToTable("Shippings");
                 });
@@ -334,12 +332,6 @@ namespace Purchase.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Purchase.Core.Entities.ShippingProvider", "ShippingProvider")
-                        .WithMany()
-                        .HasForeignKey("ShippingProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("SharedKernel.ValueObjects.Address", "From", b1 =>
                         {
                             b1.Property<int>("ShippingId")
@@ -426,8 +418,6 @@ namespace Purchase.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
-
-                    b.Navigation("ShippingProvider");
 
                     b.Navigation("To")
                         .IsRequired();

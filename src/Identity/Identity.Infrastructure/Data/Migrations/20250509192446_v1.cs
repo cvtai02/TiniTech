@@ -49,13 +49,13 @@ namespace Identity.Infrastructure.Data.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AccessTokenLifetime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    RefreshTokenLifetime = table.Column<TimeSpan>(type: "time", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Roles", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,6 +75,30 @@ namespace Identity.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClaimRole",
+                columns: table => new
+                {
+                    ClaimsId = table.Column<int>(type: "int", nullable: false),
+                    RolesName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClaimRole", x => new { x.ClaimsId, x.RolesName });
+                    table.ForeignKey(
+                        name: "FK_ClaimRole_Claims_ClaimsId",
+                        column: x => x.ClaimsId,
+                        principalTable: "Claims",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClaimRole_Roles_RolesName",
+                        column: x => x.RolesName,
+                        principalTable: "Roles",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -85,7 +109,9 @@ namespace Identity.Infrastructure.Data.Migrations
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Hash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Locked = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Locked = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoleName = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -94,30 +120,11 @@ namespace Identity.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClaimRole",
-                columns: table => new
-                {
-                    ClaimsId = table.Column<int>(type: "int", nullable: false),
-                    RolesId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClaimRole", x => new { x.ClaimsId, x.RolesId });
                     table.ForeignKey(
-                        name: "FK_ClaimRole_Claims_ClaimsId",
-                        column: x => x.ClaimsId,
-                        principalTable: "Claims",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClaimRole_Roles_RolesId",
-                        column: x => x.RolesId,
+                        name: "FK_Users_Roles_RoleName",
+                        column: x => x.RoleName,
                         principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Name");
                 });
 
             migrationBuilder.CreateTable(
@@ -144,34 +151,10 @@ namespace Identity.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "RoleUser",
-                columns: table => new
-                {
-                    RolesId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoleUser", x => new { x.RolesId, x.UsersId });
-                    table.ForeignKey(
-                        name: "FK_RoleUser_Roles_RolesId",
-                        column: x => x.RolesId,
-                        principalTable: "Roles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RoleUser_Users_UsersId",
-                        column: x => x.UsersId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
-                name: "IX_ClaimRole_RolesId",
+                name: "IX_ClaimRole_RolesName",
                 table: "ClaimRole",
-                column: "RolesId");
+                column: "RolesName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimUser_UsersId",
@@ -179,9 +162,9 @@ namespace Identity.Infrastructure.Data.Migrations
                 column: "UsersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoleUser_UsersId",
-                table: "RoleUser",
-                column: "UsersId");
+                name: "IX_Users_RoleName",
+                table: "Users",
+                column: "RoleName");
         }
 
         /// <inheritdoc />
@@ -197,19 +180,16 @@ namespace Identity.Infrastructure.Data.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "RoleUser");
-
-            migrationBuilder.DropTable(
                 name: "UserLogins");
 
             migrationBuilder.DropTable(
                 name: "Claims");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Roles");
         }
     }
 }

@@ -2,7 +2,7 @@
 
     <!-- Rating Summary Section -->
     <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">Customer Reviews</h2>
+        <h2 class="text-2xl font-bold mb-4">Đánh giá sản phẩm</h2>
         
         <div class="flex items-center mb-4">
             <div class="flex items-center">
@@ -22,7 +22,7 @@
                     }
                 }
                 <span class="text-xl font-bold ml-2">@Model.Summary.AverageRating.ToString("0.0")</span>
-                <span class="text-gray-500 ml-2">(@Model.Summary.TotalRating reviews)</span>
+                <span class="text-gray-500 ml-2">(@Model.Summary.TotalRating đánh giá)</span>
             </div>
         </div>
         
@@ -57,7 +57,7 @@
     <!-- Review List Section -->
 
     <div id="reviews-container" class="border-t border-gray-200 pt-6">
-        <h3 class="text-xl font-semibold mb-4">Customer Comments</h3>
+        <h3 class="text-xl font-semibold mb-4">Bình luận của khách hàng</h3>
         
         @if (Model.Ratings.Items.Any())
         {

@@ -51,9 +51,9 @@ public class AccountController : Controller
         return View();
     }
     [HttpPost("/api/account/register")]
-    public IActionResult PostRegister([FromBody]RegisterForm model)
+    public async Task<IActionResult> PostRegister([FromBody]RegisterForm model)
     {
-        var response = _authService.Register(model, default).Result;
+        var response = await _authService.Register(model, default);
         if (response == null)
         {
             return BadRequest(new Response

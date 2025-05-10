@@ -127,7 +127,9 @@ public static class ProductBriefDtoExtensions
             Rating = product.Metric.RatingAvg,
             RatingCount = product.Metric.RatingCount,
             Stock = product.Metric.Stock,
-            Sold = product.Metric.Sold
+            Sold = product.Metric.Sold,
+            Created = product.Created,
+            LastModified = product.LastModified
         };
     }
 }

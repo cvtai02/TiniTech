@@ -17,7 +17,7 @@ public class CheckUserProductPurchase : ICheckUserProductPurchase
         _dbContext = dbContext;
     }
 
-    public async Task<DateTime?> GetUserProductPurchaseDate(string userId, int productId)
+    public async Task<DateTimeOffset?> GetUserProductPurchaseDate(string userId, int productId)
     {
 
         var x = await _dbContext.Orders
@@ -27,6 +27,6 @@ public class CheckUserProductPurchase : ICheckUserProductPurchase
             .Select(o => o.Created)
             .FirstOrDefaultAsync();
 
-        return x != default ? x.DateTime : null;
+        return x != default ? x : null;
     }
 }

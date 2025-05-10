@@ -7,5 +7,5 @@ namespace Contracts.Purchase.Interfaces;
 
 public interface ICheckUserProductPurchase
 {
-    Task<DateTime?> GetUserProductPurchaseDate(string userId, int productId);
+    Task<DateTimeOffset?> GetUserProductPurchaseDate(string userId, int productId);
 }

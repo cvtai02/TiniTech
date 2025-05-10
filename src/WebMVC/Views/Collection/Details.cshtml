@@ -20,17 +20,17 @@
 
     var sortDictionary = new Dictionary<string, FrontStoreOrderEnum>
     {
-        { "Most Featured", FrontStoreOrderEnum.MostFeatured },
+        { "Nổi bật nhất", FrontStoreOrderEnum.MostFeatured },
         { "Best Selling",  FrontStoreOrderEnum.BestSelling },
-        { "Highest Rated",  FrontStoreOrderEnum.HighestRated },
-        { "Price: High to Low",  FrontStoreOrderEnum.PriceHighToLow },
-        { "Price: Low to High",  FrontStoreOrderEnum.PriceLowToHigh },
+        { "Đánh giá cao",  FrontStoreOrderEnum.HighestRated },
+        { "Giá: Cao tới thấp",  FrontStoreOrderEnum.PriceHighToLow },
+        { "Giá: Thấp tới Cao",  FrontStoreOrderEnum.PriceLowToHigh },
     };
 
     categories.Add(new CategoryDto
     {
         Slug = "whatever",
-        Name = "All Products",
+        Name = "Tất cả",
     });
 
     currentRootCategory?.Subcategories.Add(new CategoryDto
@@ -52,7 +52,7 @@
             <div class=" flex items-baseline gap-6 "> 
                 <nav class="filter-item relative ">
                     <div class="cursor-pointer font-medium inline-flex items-baseline text-2xl transition-colors">
-                        @(currentRootCategory != null ? currentRootCategory.Name : "All Products")
+                        @(currentRootCategory != null ? currentRootCategory.Name : "Tất cả danh mục")
                         <div class="ml-2 flex indicator w-4 h-4 rounded-full  bg-gradient-to-r from-teal-200 to-teal-500 p-1">
                             <div class="absolute w-2 h-2 rounded-full z-20 mx-auto my-auto bg-white">
                             </div>
@@ -132,7 +132,7 @@
                                    id="searchInput"
                                    value="@Model.QueryParameters.Search"
                                    class="block w-full ps-10" 
-                                   placeholder="Search Name, SKU, Slug." />
+                                   placeholder="Tìm theo tên, SKU, slug" />
                         </div>
                     </form>                
                 </div>

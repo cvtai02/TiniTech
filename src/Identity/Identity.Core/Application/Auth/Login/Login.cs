@@ -22,8 +22,6 @@ public class LoginQuery : LoginForm, IRequest<Result<LoginDto>>
 
 public class LoginDto : LoginResponse
 {
-    public string AccessToken { get; set; } = string.Empty;
-    public string RefreshToken { get; set; } = string.Empty;
 }
 
 public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<LoginDto>>
@@ -58,8 +56,8 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<LoginDto>>
         return new LoginDto
         {
             IsAuthenticated = true,
-            AccessTokenExpiresTime = DateTime.UtcNow.AddMinutes(60),
-            RefreshTokenExpiresTime = DateTime.UtcNow.AddDays(7),
+            AccessTokenExpiresTime = DateTimeOffset.UtcNow.AddMinutes(60),
+            RefreshTokenExpiresTime = DateTimeOffset.UtcNow.AddDays(7),
             RefreshToken = _tokenService.GenerateRefreshToken(user),
             //TODO: get refresh token id to pass to access token
             AccessToken = _tokenService.GenerateAccessToken(user),

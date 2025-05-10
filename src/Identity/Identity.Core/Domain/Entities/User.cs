@@ -9,7 +9,7 @@ public class User : BaseAuditableEntity
     public string Phone { get; set; } = String.Empty;
     public string ImageUrl { get; set; } = String.Empty;
     public string Hash { get; set; } = null!;
-    public DateTime? Locked { get; set; } = null;
+    public DateTimeOffset? Locked { get; set; } = null;
     public string Role { get; set; } = null!;
     public List<Claim> Claims { get; set; } = [];
     public bool IsActive => Locked == null;

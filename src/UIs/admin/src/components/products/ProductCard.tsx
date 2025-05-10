@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ProductBriefDto } from '../../types';
 import {
-  MdDelete,
-  MdEdit,
-  MdMoreVert,
   MdStar,
   MdStarOutline,
   MdLocalShipping,
   MdInventory,
 } from 'react-icons/md';
 import { formatUSD, formatVND } from '../../utils/formatCurrency';
-import { updateProductStatus } from '../../services/product';
-import { useMutation } from '@tanstack/react-query';
+import { formatDate } from '../../utils/formatDate';
 import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
@@ -19,39 +15,8 @@ interface ProductCardProps {
   onProductDeleted?: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onProductDeleted,
-}) => {
-  const [showOptions, setShowOptions] = useState(false);
-
-  const toggleOptions = () => {
-    setShowOptions(!showOptions);
-  };
-
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
-
-  const deleteMutation = useMutation({
-    mutationFn: () => updateProductStatus(product.id, 'Deleted'),
-    onSuccess: () => {
-      if (onProductDeleted) {
-        onProductDeleted();
-      }
-    },
-  });
-
-  const handleDelete = () => {
-    if (
-      window.confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?`)
-    ) {
-      deleteMutation.mutate();
-    }
-    setShowOptions(false);
-  };
-
-  const handleUpdate = () => {
-    setShowOptions(false);
-  };
 
   return (
     <div
@@ -84,18 +49,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="mt-2 flex gap-4 text-xs font-medium">
               <div className="flex items-center  rounded-md">
                 <MdLocalShipping className="mr-1" />
-                <span>Sold: {product.sold}</span>
+                <span>Đã bán: {product.sold}</span>
               </div>
               <div
                 className={`flex items-center rounded-md ${product.stock > 0 ? 'text-green-500' : 'text-red-500'}`}
               >
                 <MdInventory className="mr-1" />
-                <span>Stock: {product.stock}</span>
+                <span>Còn: {product.stock}</span>
+              </div>
+            </div>
+            <div className="mt-2 flex gap-4 text-xs font-medium">
+              <div className="flex items-center  rounded-md">
+                <span>Ngày tạo: {formatDate(product.created.toString())}</span>
+              </div>
+            </div>
+            <div className="mt-2 flex gap-4 text-xs font-medium">
+              <div className="flex items-center  rounded-md">
+                <span>
+                  Cập nhật: {formatDate(product.lastModified.toString())}
+                </span>
               </div>
             </div>
           </div>
           <p className="mt-2 text-primary flex justify-between items-center font-bold">
-            {formatUSD(product.price)}
+            {formatVND(product.price)}
           </p>
         </div>
       </div>

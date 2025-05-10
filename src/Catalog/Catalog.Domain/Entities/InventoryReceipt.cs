@@ -10,7 +10,7 @@ public class ImportReceipt : BaseAuditableEntity
     public string? Supplier { get; set; }
     public decimal TotalCost => Items.Sum(item => item.Quantity * item.UnitCost);
     public string? Note { get; set; } = null!;
-    public DateTime ReceiptDate { get; set; }
+    public DateTimeOffset ReceiptDate { get; set; }
     public List<ImportReceiptItem> Items { get; set; } = [];
 
 }

@@ -32,7 +32,7 @@ public class ProductController : ApiController
         var result = await Sender.Send(cmd);
 
         return result.Match(
-            r => CreatedAtAction(nameof(GetBySlug), new { slug = r }, new Response
+            r => CreatedAtAction(nameof(GetBySlug), new { slug = r }, new Response<string>
             {
                 Title = "Product Created",
                 Status = 200,
@@ -153,7 +153,7 @@ public class ProductController : ApiController
     [HttpGet("sku-search")]
     public async Task<IActionResult> SearchBySku([FromQuery] string q)
     {
-        var result = await Sender.Send(new GetListBySkuQuery() { Sku = q});
+        var result = await Sender.Send(new GetListBySkuQuery() { Sku = q });
 
         return result.Match(
             r => Ok(new Response

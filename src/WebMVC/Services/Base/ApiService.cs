@@ -40,15 +40,17 @@ public class ApiService
 
     public async Task<Response<TResponse>> PostDataAsync<TRequest, TResponse>(string endpoint, TRequest data, CancellationToken cancellationToken = default)
     {
-        //get cookies from the request and set them in the httpClient
-        var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
-        if (cookies != null)
+        //get access token from the httpContext cookies
+        var accessToken = _httpContextAccessor.HttpContext?.Request.Cookies["access_token"];
+        if (accessToken != null)
         {
-            foreach (var cookie in cookies)
-            {
-                _httpClient.DefaultRequestHeaders.Add("Cookie", $"{cookie.Key}={cookie.Value}");
-            }
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
+        else
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
+        }
+
         HttpResponseMessage response;
 
         try
@@ -63,7 +65,7 @@ public class ApiService
 
         var result = await ValidateResponseAsync<TResponse>(response);
 
-        //set cookies from the response to the httpClient
+        //set cookies from the auth response
         if (response.Headers.TryGetValues("Set-Cookie", out var rsCookies))
         {
             foreach (var rawCookie in rsCookies)
@@ -104,6 +106,14 @@ public class ApiService
     /// <exception cref="ApiError"></exception>
     private static async Task<Response<T>> ValidateResponseAsync<T>(HttpResponseMessage response)
     {
+
+        if (response == null)
+        {
+            throw new ApiReachFailedException("Internal Server Error");
+        }
+
+
+
         var jsonString = await response.Content.ReadAsStringAsync();
         Response<T>? responseDto;
         if (jsonString == null)
@@ -123,7 +133,36 @@ public class ApiService
         }
         catch
         {
-            Console.WriteLine("response body: " + jsonString);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                throw new ApiError(new Response()
+                {
+                    Status = (int)response.StatusCode,
+                    Title = "Unauthorized",
+                    Detail = "Unauthorized",
+                });
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                throw new ApiError(new Response()
+                {
+                    Status = (int)response.StatusCode,
+                    Title = "Forbidden",
+                    Detail = "Forbidden",
+                });
+            }
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new ApiError(new Response()
+                {
+                    Status = (int)response.StatusCode,
+                    Title = "Not Found",
+                    Detail = "Not Found",
+                });
+            }
+
             throw new DeserializeException("Failed to deserialize response body.", new Exception(jsonString));
         }
 
@@ -136,11 +175,21 @@ public class ApiService
         }
         else
         {
+            if (responseDto != null)
+            {
+                throw new ApiError(new Response()
+                {
+                    Status = (int)response.StatusCode,
+                    Title = responseDto.Title,
+                    Detail = responseDto.Detail,
+                });
+            }
+
             throw new ApiError(new Response()
             {
                 Status = (int)response.StatusCode,
-                Title = responseDto?.Title ?? "Unknown error",
-                Detail = responseDto?.Detail ?? "Unknown error",
+                Title = "Unknown error",
+                Detail = "Unknown error",
             });
         }
     }

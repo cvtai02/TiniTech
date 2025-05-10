@@ -13,6 +13,6 @@ public class UserRatingDto
     public string Avatar { get; set; } = string.Empty;
     public int Rating { get; set; } // Rating value (1-5)
     public string Comment { get; set; } = string.Empty;
-    public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset? CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 }

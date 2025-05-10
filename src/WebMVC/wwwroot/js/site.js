@@ -183,3 +183,9 @@ function toast(message) {
         }, 300);
     }, 3000);
 }
+
+function formatVND(value) {
+    if (!value && value !== 0) return "";
+    if (value === 0) return "0đ";
+    return Number(value).toLocaleString("vi-VN") + " ₫";
+}

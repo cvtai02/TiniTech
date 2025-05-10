@@ -20,7 +20,7 @@ const ProductPage: React.FC = () => {
   const [filters, setFilters] = useState<GetProductsQuery>(
     new GetProductsQuery({
       page: 1,
-      pageSize: 8,
+      pageSize: 10,
       orderBy: 'CreatedDate',
       orderDirection: 'Descending',
       status: ['Active'],

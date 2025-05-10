@@ -1,7 +1,6 @@
 import {
   ReactNode,
   createContext,
-  use,
   useContext,
   useEffect,
   useState,
@@ -80,6 +79,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Store auth data in localStorage
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('refreshToken', JSON.stringify(data.refreshToken));
+      localStorage.setItem('accessToken', JSON.stringify(data.accessToken));
       localStorage.setItem('exp', JSON.stringify(data.accessTokenExpiresTime));
 
       // You might want to store tokens here too
@@ -104,7 +105,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Clear stored auth data
       localStorage.removeItem('user');
       localStorage.removeItem('exp');
-
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
       // Reset relevant cache
       queryClient.clear();
     },

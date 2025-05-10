@@ -155,12 +155,6 @@ namespace Purchase.Infrastructure.Data.Migrations
                         principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Shippings_ShippingProviders_ShippingProviderId",
-                        column: x => x.ShippingProviderId,
-                        principalTable: "ShippingProviders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -202,11 +196,6 @@ namespace Purchase.Infrastructure.Data.Migrations
                 table: "Shippings",
                 column: "OrderId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Shippings_ShippingProviderId",
-                table: "Shippings",
-                column: "ShippingProviderId");
         }
 
         /// <inheritdoc />
@@ -219,6 +208,9 @@ namespace Purchase.Infrastructure.Data.Migrations
                 name: "OrderItems");
 
             migrationBuilder.DropTable(
+                name: "ShippingProviders");
+
+            migrationBuilder.DropTable(
                 name: "Shippings");
 
             migrationBuilder.DropTable(
@@ -229,9 +221,6 @@ namespace Purchase.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
-
-            migrationBuilder.DropTable(
-                name: "ShippingProviders");
         }
     }
 }
