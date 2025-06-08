@@ -10,7 +10,7 @@ export async function apiFetch(
     headers: {
       ...init?.headers,
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${JSON.parse(localStorage.getItem('accessToken') || '')}`,
+      Authorization: `Bearer ${JSON.parse(localStorage.getItem('accessToken') || '{}')}`,
     },
   };
 

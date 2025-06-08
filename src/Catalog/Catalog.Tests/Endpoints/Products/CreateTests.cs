@@ -1,9 +1,4 @@
 using Catalog.Application.Products.Commands.CreateProductCommand;
-using Catalog.Application.Products.Commands.UpdateProductInfo;
-using Catalog.Application.Products.Queries.GetBySku;
-using Catalog.Application.Products.Queries.GetDetailBySlug;
-using Catalog.Application.Products.Queries.GetProducts;
-using Catalog.Application.Products.Queries.GetRelated;
 using Catalog.EndPoints.Controllers;
 using FluentValidation.Results;
 using MediatR;
@@ -11,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SharedKernel.Exceptions;
-using SharedKernel.Models;
 using WebSharedModels.Dtos.Common;
-using Xunit;
 
 namespace Catalog.Tests.Controllers;
 
@@ -79,7 +72,6 @@ public class CreateProductEndpointTests
         var result = await _controller.Create(command);
 
         // Assert
-
         var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
         Assert.NotNull(badRequestResult.Value);
         Assert.Equal(400, ((ProblemDetails)badRequestResult.Value).Status);

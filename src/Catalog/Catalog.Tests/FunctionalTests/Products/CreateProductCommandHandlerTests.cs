@@ -213,6 +213,7 @@ public class CreateProductCommandHandlerTests : IClassFixture<TestFixture>
         // Assert
         Assert.True(result.IsSuccess);
 
+
         Assert.NotNull(createdProduct);
         Assert.Equal(command.Name, createdProduct.Name);
         Assert.Equal(command.Sku, createdProduct.Sku);

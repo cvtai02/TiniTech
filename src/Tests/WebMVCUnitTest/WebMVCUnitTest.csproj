@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebMVC\WebMVC.csproj" />
     <ProjectReference Include="..\..\WebMVC\WebMVC.csproj" />
   </ItemGroup>
 

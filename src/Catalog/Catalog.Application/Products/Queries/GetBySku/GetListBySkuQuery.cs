@@ -41,9 +41,6 @@ public class GetBySkuQueryHandler : IRequestHandler<GetListBySkuQuery, Result<Li
 
     public async Task<Result<List<SkuItem>>> Handle(GetListBySkuQuery request, CancellationToken cancellationToken)
     {
-
-
-
         var variants = await _context.Variants
             .Where(v => v.Sku.Contains(request.Sku) && v.IsDeleted == false)
             .Include(v => v.Product)

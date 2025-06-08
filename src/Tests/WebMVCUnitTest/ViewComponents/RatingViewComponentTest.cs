@@ -49,9 +49,12 @@ public class RatingViewComponentTest
         };
 
 
-        var ratings = new ProductRatingDto
+        var ratings = new ProductRatingDto()
         {
-            new() { Ratings =new PaginatedList<UserRatingDto>(userRatings, 2,3,2)},
+            Ratings = new PaginatedList<UserRatingDto>(userRatings, 2, 3, 2),
+
+            Summary = new RatingSummaryDto()
+
         };
         _ratingServiceMock.Setup(s => s.GetByProduct(query)).ReturnsAsync(ratings);
 
@@ -78,4 +81,5 @@ public class RatingViewComponentTest
         Assert.Equal("/Views/Shared/Components/Error/ErrorComponent.cshtml", viewResult.ViewName);
         Assert.NotNull(viewResult.ViewData.Model);
     }
+
 }

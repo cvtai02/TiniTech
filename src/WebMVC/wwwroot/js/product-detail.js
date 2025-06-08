@@ -682,7 +682,7 @@ function renderCustomerReviews(model) {
     // Start the container for the entire reviews section
     let html = `
       <div>
-        <h3 class="text-xl font-semibold mb-4">Customer Comments</h3>
+        <h3 class="text-xl font-semibold mb-4">Bình luận của khách hàng</h3>
     `;
 
     // Check if there are any ratings

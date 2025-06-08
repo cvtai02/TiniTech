@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using WebMVC.Services.Abstractions;
 using WebSharedModels.Dtos.Common;
 using WebSharedModels.Dtos.Identity;
@@ -51,7 +44,7 @@ public class AccountController : Controller
         return View();
     }
     [HttpPost("/api/account/register")]
-    public async Task<IActionResult> PostRegister([FromBody]RegisterForm model)
+    public async Task<IActionResult> PostRegister([FromBody] RegisterForm model)
     {
         var response = await _authService.Register(model, default);
         if (response == null)
